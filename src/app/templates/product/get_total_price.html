@@ -1,0 +1,9 @@
+<div class="d-flex justify-content-center">
+	<div class="input-group mb-2 w-50">
+        <div class="input-group-prepend">
+        	<div class="input-group-text">$</div>
+        </div>
+        <input type="text" class="price_input form-control" onfocusout="disableInput(this)" data-row="row-{{product.id}}" id="row-{{product.id}}-price" name="price" value="{{ price }}" disabled />
+    </div>
+	<button class="btn btn-link" type="button" onclick="editableInput(this)" data-code-id="#row-{{product.id}}-code"><i class="fa fa-edit text-primary"></i></button>
+</div>

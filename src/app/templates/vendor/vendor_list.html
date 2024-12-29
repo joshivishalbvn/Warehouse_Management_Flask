@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block title %} 
+Vendors
+{% endblock title %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="/static/plugins/sweetalert2/sweetalert2.all.min.js"></script>
+{% endblock css %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex flex-sm-row flex-column justify-content-between">
+            <div class="d-flex flex-sm-row">
+                <div class="col-6 d-flex justify-content-between">
+                    <h4 class="card-title d-flex" style="float: left; margin-right:10px;">Vendors</h4> 
+                </div>
+            </div>
+            <button onclick="$('#lg_sidebar_form').toggleClass('sidebar-open')" hx-swap="innerHTML" hx-target="#lg_sidebar_form"
+            hx-get="{{ url_for('vendor_bp.create_vendor') }}" class="btn btn-primary ml-sm-1">Add</button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table border-top-0  table-striped table-bordered text-nowrap border-bottom" id="vendor_table" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Sr No.</th>
+                        <th>Email</th>
+                        <th>Full Name</th>
+                        <th>Phone</th>
+                        <th>City</th>
+                        <th>Total Purchase Orders</th>
+                        <th>Total Quantity</th>
+                        <th>Profit($)</th>
+                        <th>Last Purchase Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+    
+
+{% block filters %}
+<div class="event">
+    <div class="row rounded py-2 mb-2 mx-n2">
+        
+            <div class="col-12 col-sm-12 col-lg-12">
+                <label for="users-list-company">Company</label>
+                <fieldset class="form-group">
+                    <select id="id_company" class="form-control">
+                        <option value="">All</option>
+                        {% for company in company_list %}
+                        <option value="{{company.id}}">{{company.name}}</option>
+                        {% endfor %}
+                    </select>
+                </fieldset>
+            </div>
+
+        <div class="col-12 col-sm-12 col-lg-12 d-flex align-items-center justify-content-between mt-2">
+            <button type="reset" class="btn btn-primary btn-block glow mb-0 vendor-list-clear">Clear</button>
+        </div>
+    </div>
+</div>
+{% endblock filters %}
+
+{% block large_form %}
+{% endblock large_form %}
+
+{% block script %}
+
+<script src="{{ url_for('static', filename='assets/js/htmx_1.9.4.min.js') }}"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+<script>
+	var element_table_id = '#vendor_table';
+</script>
+
+<script>
+	$(document).ready(function() {
+        var table = $(element_table_id).DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "{{ url_for('vendor_bp.vendor_data_table') }}",
+                "data": function (d) {
+                    d.company = $('#id_company').val();
+                }
+            },
+            "columns": [
+            { data: 'id', name: 'id' },
+            { data: 'email', name: 'email' },
+            { data: 'full_name', name: 'full_name' },
+            { data: 'phone', name: 'phone' },
+            { data: 'city', name: 'city' },
+            { data: 'purchase_order', name: 'purchase_order' },
+            { data: 'total_quantity', name: 'total_quantity' },
+            { data: 'profit', name: 'profit' },
+            { data: 'purchase_date', name: 'purchase_date' },
+            { data: 'actions', name: 'actions' },
+            ]
+        });
+
+        $('#id_company').on('change', function() {
+            table.ajax.reload(); 
+        });
+        
+        $(document).on('click', '.vendor-list-clear', function () {
+            $("#id_company").val(null).trigger('change');
+            $("#id_role").val(null).trigger('change');
+        })
+    });
+
+</script>
+
+<script>
+    document.body.addEventListener("vendorResponse", function(evt){
+		$(document).find("#lg_sidebar_form").removeClass('sidebar-open');
+		table.ajax.reload(null, false);
+		
+		$.toast({
+		  text: evt.detail.message,
+		  position: 'bottom-right',
+		  stack: false,
+		  icon: evt.detail.level,
+		});
+	});
+
+	$(document).on('click', '.update_vendor' , function (e) {
+        let url = $(this).data("url");
+
+        htmx.ajax('GET', url, {
+            target:'#lg_sidebar_form',
+            swap:'innerHTML',
+        }).then(() => {
+            $('#lg_sidebar_form').toggleClass('sidebar-open');
+        });
+    });
+
+    $(document).on('click', '.delete-btn', function (e) {
+        var url = $(this).attr("data-url"); 
+        var table = $('#vendor_table').DataTable()
+
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this item!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willDelete) => {
+            if (willDelete) {
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': $('meta[name="csrf-token"]').attr('content') 
+                    },
+                    success: function(response) {
+                        swal("Poof! Item has been deleted!", {
+                            icon: "success",
+                        }).then(() => {
+                            table.ajax.reload(); 
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        swal("Error", "An error occurred while deleting the item", "error");
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+{% endblock script %}

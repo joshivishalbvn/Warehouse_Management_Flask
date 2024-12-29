@@ -1,0 +1,275 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'cdns/jquery-ui.css' %}">
+<style>
+    #ui-datepicker-div{
+      z-index: 100000 !important;
+    }
+  </style>
+{% endblock css %}
+
+{% block content %}
+
+<div class="card match-height py-4">
+
+    <h4 class="card-title d-flex">
+        Job Work List <i class="fas fa-filter" onclick="filter_button()" style="display: block !important; cursor: pointer; margin-left: 10px;"></i>
+    </div>
+    <div class="card-body">
+        <div>
+            <h2 class="nav-tab-wrapper">
+                <span data-id="#tab-201" data-table="#pending_job_work_table" class="btn btn-outline-primary ml-sm-0 tab-2 nav-tab-active tab-job-work">Requested</span>
+                <span data-id="#tab-202" data-table="#approved_job_work_table" class="btn btn-outline-primary ml-sm-0 tab-2 nav-tab tab-job-work">Approved</span>
+                <span data-id="#tab-203" data-table="#packed_job_work_table" class="btn btn-outline-primary ml-sm-0 tab-2 nav-tab tab-job-work">Packed</span>
+            </h2>
+        </div>
+
+        <section id="tab-201" class="tab-content active">
+            <table class="table border-top-0 table-striped table-bordered border-bottom" style="width:100%" id="pending_job_work_table" >
+                <thead>
+                    <tr>
+                        <th>Sr. No.</th>
+                        <th>Date</th>
+                        <th>Order ID</th>
+                        <th>Product</th>
+                        <th>Type</th>
+                        <th>Job Description</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                </tbody>
+            </table>
+        </section>
+        <section id="tab-202" class="tab-content">
+            <table class="table border-top-0 table-striped table-bordered border-bottom" style="width:100%" id="approved_job_work_table" >
+                <thead>
+                    <tr>
+                        <th>Sr. No.</th>
+                        <th>Date</th>
+                        <th>Order ID</th>
+                        <th>Product</th>
+                        <th>Type</th>
+                        <th>Job Description</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                </tbody>
+            </table>
+        </section>
+        <section id="tab-203" class="tab-content">
+            <table class="table border-top-0 table-striped table-bordered border-bottom" style="width:100%" id="packed_job_work_table" >
+                <thead>
+                    <tr>
+                        <th>Sr. No.</th>
+                        <th>Date</th>
+                        <th>Order ID</th>
+                        <th>Product</th>
+                        <th>Type</th>
+                        <th>Job Description</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                </tbody>
+            </table>
+        </section>
+        
+    </div>
+</div>
+
+<div class="modal" id="JobworkHistoryModal">
+	<div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+		<div class="modal-content tx-size-sm">
+			<div class="modal-header">
+				<h4 class="modal-title">Job Work History</h4>
+				<button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
+			</div>
+			<div class="modal-body" id="jobwork_modal_body">
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock content %}
+
+{% block filters %}
+<div class="event">
+    <div class="row rounded py-2 mb-2 mx-n2">
+        <div class="col-12 col-sm-12 col-lg-12">
+            <label for="filter_customer">Date</label>
+            <input class="form-control" id="id_jobwork_date" type="text" name="daterange" autocomplete="off" />
+        </div>
+        <div class="col-12 col-sm-12 col-lg-12 d-flex align-items-center justify-content-between mt-2">
+            <button type="reset" class="btn btn-primary btn-block users-list-clear glow mb-0" id="clear_search_filter">Clear</button>
+        </div>
+    </div>
+</div> 
+{% endblock filters %}
+
+{% block script %}
+<script src="{%  static 'assets/js/sidebar_open.js' %}"></script>
+<script src="{% static 'assets/webapp/tabbing.js' %}"></script>
+<script src="{% static 'cdns/jquery-ui.js' %}"></script>
+<script src="{% static 'assets/js/htmx_1.9.4.min.js' %}"></script>
+
+<script>
+    $("#id_jobwork_date").datepicker({ dateFormat: 'yy-mm-dd' });
+</script>
+
+<script>
+    var to_center = "_all";
+    var scrollX = true;
+    var invisible_columns = [];
+    var order_false = [1,2,3,5,-1];
+    var url = '{% url "order:job_work_list_ajax" %}';
+    var role = false;
+    var filter_id = $("#id_jobwork_date");
+    var columns = [
+        { data: 'id', name: 'id' },
+        { data: 'created_at', name: 'created_at' },
+        { data: 'order', name: 'order' },
+        { data: 'product', name: 'product' },
+        { data: 'type', name: 'type' },
+        { data: 'job_description', name: 'job_description' },
+        { data: 'quantity', name: 'quantity' },
+        { data: 'status', name: 'status' },
+        { data: 'action', name: 'action' },
+    ]
+    function set_filters(status){
+        var data = {};
+        data["status"] = status;
+        data["date"]= $("#id_jobwork_date").val();
+        return data;
+    }
+
+    function initialize_datatable(){
+        $("#approved_job_work_table").DataTable({
+            scrollY: 700,
+            columns: columns,
+            columnDefs: [
+                {targets: to_center, className: "dt-center"},
+                {orderable: false, targets: order_false},
+                {targets: invisible_columns, visible: role },
+                {width: 290, targets: [3, 5]},
+            ],
+            ajax: {
+                url: url,
+                type: 'get',
+                data: set_filters("approved"),
+            },
+            processing: true,
+            serverSide: true,
+            order: [0 , "desc"],
+            language: {
+                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>',
+                "emptyTable": "No matching records found",
+            },
+            rowCallback: function(nRow, aData, iDisplayIndex) {
+                var oSettings = this.fnSettings();
+                $("td:first", nRow).html(oSettings._iDisplayStart + iDisplayIndex + 1);
+                return nRow;
+            },
+        });
+
+        $("#packed_job_work_table").DataTable({
+            scrollY: 700,
+            columns: columns,
+            columnDefs: [
+                {targets: to_center, className: "dt-center"},
+                {orderable: false, targets: order_false},
+                {targets: invisible_columns, visible: role },
+                {width: 290, targets: [3, 5]},
+            ],
+            ajax: {
+                url: url,
+                type: 'get',
+                data: set_filters("packed"),
+            },
+            processing: true,
+            serverSide: true,
+            order: [0 , "desc"],
+            language: {
+                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>',
+                "emptyTable": "No matching records found",
+            },
+            rowCallback: function(nRow, aData, iDisplayIndex) {
+                var oSettings = this.fnSettings();
+                $("td:first", nRow).html(oSettings._iDisplayStart + iDisplayIndex + 1);
+                return nRow;
+            },
+        });
+
+        $("#pending_job_work_table").DataTable({
+            scrollY: 700,
+            columns: columns,
+            columnDefs: [
+                {targets: to_center, className: "dt-center"},
+                {orderable: false, targets: order_false},
+                {targets: invisible_columns, visible: role },
+                {width: 290, targets: [3, 5]},
+            ],
+            ajax: {
+                url: url,
+                type: 'get',
+                data: set_filters("requested"),
+            },
+            processing: true,
+            serverSide: true,
+            order: [0 , "desc"],
+            language: {
+                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>',
+                "emptyTable": "No matching records found",
+            },
+            rowCallback: function(nRow, aData, iDisplayIndex) {
+                var oSettings = this.fnSettings();
+                $("td:first", nRow).html(oSettings._iDisplayStart + iDisplayIndex + 1);
+                return nRow;
+            },
+        });
+    }
+
+    $(document).ready(function () {
+        initialize_datatable();
+    });
+
+    $(document).ready(function(){
+        filter_id.on("change", function() {
+            $("#approved_job_work_table, #packed_job_work_table, #pending_job_work_table").DataTable().destroy();
+            initialize_datatable()
+        });
+        $(document).on('click', '#clear_search_filter', function () {
+            $("#id_jobwork_date").val(null).trigger('change');
+        });
+    })
+
+    $(document).on("click", ".tab-job-work", function () {
+        let table_id = $(this).data("table");
+
+        $(table_id).DataTable().ajax.reload(null, true);
+    });
+
+    $(document).on('click', '.jobwork_history' , function (e) {
+        let url = $(this).data("url");
+
+        htmx.ajax('GET', url, {
+            target:'#jobwork_modal_body',
+            swap:'innerHTML',
+        });
+    });
+</script>
+
+{% endblock script %}

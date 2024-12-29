@@ -1,0 +1,25 @@
+<div class="row my-1">
+    <div>
+        <b>Product : </b> {{ object.ordered_product.product.name }} ({{ object.ordered_product.product.code }})
+    </div>
+    
+    {% if object.created_by.role == object.created_by.CUSTOMER %}
+    <div class="col-md-6 mt-3">
+        <label>Requested Quantity :</label>
+        <input type="number" min="0" value="{{ object.quantity }}" class="form-control text-warning" disabled="true" />
+    </div>
+    {% endif %}
+    
+    <div class="col-md-6 mt-3">
+        <label>Approved Quantity :</label>
+        <input type="number" min="0" value="{{ object.total_approved_quantity }}" class="form-control text-primary" disabled="true" />
+    </div>
+
+    {% if not object.status == object.REQUESTED %}
+    <div class="col-md-6 mt-3">
+        <label>Total Packed Quantity :</label>
+        <input type="number" min="0" value="{{ object.get_total_packed_quantity }}" class="form-control text-success" disabled="true" />
+    </div>
+    {% endif %}
+    
+</div>

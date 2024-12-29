@@ -1,0 +1,105 @@
+    <style>
+        .ref-note-list {
+            border: 3px solid skyblue;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+    
+    
+        .float-end {
+            display: flex;
+            justify-content: flex-end;
+            width: 100%;
+        }
+    </style>
+
+    <div class="ref-note-list row" aria-expanded="true" aria-labelledby="">
+
+        <div class="row">
+            <div class="col-md-2 text-start">
+               <b>Template Id:</b> <br>
+               <b>Template Name:</b><br>
+               <b>Subject: </b><br>
+               <b>Recipient: </b><br>
+               <b>Company: </b><br>
+               <b>Delivery Method: </b><br>
+            </div>
+            <div class="col-md-7  text-start">
+                {{template_id|safe}}<br>       
+                {{name|safe}}<br>
+                {{subject|safe}}<br>
+                {{recipient|safe}}<br>
+                {{company|safe}}<br>
+                {{delivery_method|safe}}<br>
+            </div>
+            <div class="col-md-3 text-end">
+
+                <span><a href="{% url 'marketings:detail_marketing' pk=id %}" title="Details"><i class="fa fa-eye"></i></a></span>
+                <span><a href="{% url 'marketings:update_marketing' pk=id %}" title="Edit" class="text-primary"><i class="fa fa-edit"></i></a></span>
+                <span>
+                    <a href="#" title="Delete" class="text-primary marketing-delete-btn text-danger"
+                    data-id="{{ id }}" data-name="{{ name }}" data-url="{{ url }}">
+                    <i class="fa fa-trash"></i>
+                </a>
+                </span>
+            </div>
+        </div>
+    </div>
+
+ {% block script %}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+    
+    $(document).on('click', '.marketing-delete-btn', function (e) {
+        e.preventDefault(); 
+    
+        var id = $(this).data("id");
+        var name = $(this).data("name");
+        if (name == "None") {
+            name = "";
+        }
+    
+        Swal.fire({
+            title: 'Delete Confirmation',
+            text: `Are you sure you want to delete ${name}?`,
+            icon: 'question',
+            showCloseButton: true,
+            showCancelButton: true,
+            confirmButtonColor: "#7442DB",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Perform the delete action (ajax) here
+                $.ajax({
+                    type: "GET",
+                    url: '{% url "marketings:delete_marketing" %}',
+                    data: {
+                        "id": id
+                    },
+                    success: function (data) {
+                        $('#table').DataTable().ajax.reload(null, false);
+                        if (data["message"]) {
+                            $.toast({
+                                text: data.message,
+                                position: 'bottom-right',
+                                stack: false,
+                                icon: 'success',
+                            })
+                        }
+                    }
+                });
+            }
+        });
+    });
+    </script>
+
+    <script>
+       
+            $(document).on('click', '.marketing-delete-btn' , function (){
+                $(table_id).DataTable().destroy();
+                initailize_datatables()
+            })
+        </script>
+    {% endblock script %} 

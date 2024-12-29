@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load crispy_forms_tags %}
+<section id="horizontal-form-layout">
+
+    <div class="row match-height">
+        <form action="" method="post" class="order-form" enctype="multipart/form-data" id="order_form" novalidate>
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <b>SALES ORDER REQUEST</b>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-body table-responsive">
+                                <table id="request_order_table" class="display nowrap table-striped  table-bordered" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">SR NO.</th>
+                                            <th class="text-center">Order Date</th>
+                                            <th class="text-center">Created By</th>
+                                            <th class="text-center">Status</th>
+                                            <th class="text-center">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="text-center">
+                                            <td class="text-center p-2" >1</td>
+                                            <td class="text-center" >10 Jan 2023</td>
+                                            <td>Mack</td>
+                                            <td><span class="badge bg-primary" style="border-radius:5px; font-size: 15px;">Requested</span></td>
+                                            {% comment %} <td><input class="form-control" id="value_1" type="text" value="300" ></td> {% endcomment %}
+                                            <td><span>
+                                                <div class="row">
+                                                    <center>  
+                                                        <a href="{% url 'order:sales_order_request_detail' %}" title="Print" class="text-primary" id="print_order" style="cursor:pointer;"> <i class="fa fa-eye"></i></a> &nbsp
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="text-center">
+                                            <td class="text-center p-2" >2</td>
+                                            <td class="text-center" >10 Feb 2023</td>
+                                            <td>Mack</td>
+                                            <td><span class="badge bg-primary" style="border-radius:5px; font-size: 15px;">Requested</span></td>
+                                            <td><span>
+                                                <div class="row">
+                                                    <center>
+                                                        <a href="{% url 'order:sales_order_request_detail' %}" title="Detail"><i class="fa fa-eye font-medium-3 mr-2"></i></a>  &nbsp
+                                                    </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="text-center">
+                                            <td class="text-center p-2" >3</td>
+                                            <td class="text-center" >10 Sep 2023</td>
+                                            <td>Mack</td>
+                                            <td><span class="badge bg-primary" style="border-radius:5px; font-size: 15px;">Requested</span></td>
+                                            <td><span>
+                                                <div class="row">
+                                                    <center> 
+                                                        <a href="{% url 'order:sales_order_request_detail' %}" title="Detail"><i class="fa fa-eye font-medium-3 mr-2"></i></a>  &nbsp
+                                            </td>
+                                        </tr>
+                                        <tr class="text-center">
+                                            <td class="text-center p-2" >4</td>
+                                            <td class="text-center" >10 Dec 2023</td>
+                                            <td>Mack</td>
+                                            <td><span class="badge bg-primary" style="border-radius:5px; font-size: 15px;">Requested</span></td>
+                                            <td><span>
+                                                <div class="row">
+                                                    <center> 
+                                                        <a href="{% url 'order:sales_order_request_detail' %}" title="Detail"><i class="fa fa-eye font-medium-3 mr-2"></i></a>  &nbsp
+                                                    </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                          </div>
+                    </div>
+                </div>
+            </div>
+        
+    </div>
+</section>
+{% endblock %}
+
+{% block script %}
+
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap4.min.js"></script>
+
+<script src="https://cdn.datatables.net/datetime/1.5.1/js/dataTables.dateTime.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#request_order_table').DataTable( {
+            dom: 'Qlfrtip'
+        });
+    });
+</script>
+{% endblock script %}

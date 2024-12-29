@@ -1,0 +1,531 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<style>
+    .main-footer{
+        display:none;
+    }
+    
+    .detail_size{
+        padding: inherit;
+    }
+</style>
+{% endblock css %}
+
+{% block content %}
+<div class="row row-sm">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-body h-100">
+                <div class="row row-sm ">
+                    <div class="col-lg-4 col-md-12">
+                        <div class="row">
+                            <div class="col-lg-2">
+                                {% for image in product_images %}
+                                        <img class="products_images mt-2" id="photo_id_{{ forloop.counter }}" src="{% if image.image %} {{image.image.url}} {% endif %}"  alt="avatar" style="display: flex; border:1px; cursor:pointer; margin-bottom: 1px">
+                                {% endfor %}
+                            </div>
+                            <div class="col-lg-10 product_preview card" style="align-items:center;">
+                                <img src = "" id="displayed_image" height="394px" width="100%"> 
+                            </div>
+                        </div>
+                        
+                    </div>  
+                    <div class="col-xl-7 col-lg-12 col-md-12 mt-4 mt-xl-0">
+                        <div class="col-7">
+                            
+                            <div class="mg-xl-t-9-f">
+                                <label for="id_name" class=" "><b>Name:</b>
+                                    <span class=""><b>{{product.name}}</b></span>
+                                </label>
+                            </div>
+                            <div class="mg-xl-t-9-f">
+                                <label for="" class=" "><b>Code:</b>
+                                    <span class="">{{product.code}} </span>
+                               </label>
+                           </div>
+                            <div class="mg-xl-t-9-f">
+                               <label for="" class=" "><b>Stock:</b>
+                                   <span class="">{% if product.available_stock %}{{product.available_stock}}{% else %}750{% endif %}</span> 
+                               </label>
+                           </div>
+                        </div>
+                        <div class="d-flex detail_size">
+                            <label for="id_name" class=" "><b>Case Sizes (qty):</b></label>
+                            <span class="size d-flex title active" data-index="1"  data-bs-toggle="tooltip"><label class="rdiobox mb-0"><input  checked="" name="rdio" type="radio"> <span>80</span></label></span>
+                            <span class="size d-flex title" data-index="2"  data-bs-toggle="tooltip"><label class="rdiobox mb-0"><input name="rdio" type="radio"> <span>100</span></label></span>
+                            <span class="size d-flex title" data-index="3"  data-bs-toggle="tooltip"><label class="rdiobox mb-0"><input name="rdio" type="radio"> <span>120</span></label></span>
+                            <span class="size d-flex title" data-index="4"  data-bs-toggle="tooltip"><label class="rdiobox mb-0"><input name="rdio" type="radio"> <span>210</span></label></span>
+                            <span class="size d-flex title" data-index="5"  data-bs-toggle="tooltip"><label class="rdiobox mb-0"><input name="rdio" type="radio"> <span>250</span></label></span>
+                            <span class="size d-flex title" data-index="6"   data-bs-toggle="tooltip"><label class="rdiobox mb-0"><input name="rdio" type="radio"> <span>300</span></label></span>
+                        </div>
+                        <div class="">
+                           
+                            <div class="table-div" id="table-1">
+                                {% include "customer/80qty.html" %}
+                            </div>
+                            <div class="table-div hidden" id="table-2">
+                                {% include "customer/100qty.html" %}
+                            </div>
+                            <div class="table-div hidden" id="table-3">
+                                {% include "customer/120qty.html" %}
+                                </div>
+                            <div class="table-div hidden" id="table-4">
+                                {% include "customer/210qty.html" %}
+                            </div>
+                            <div class="table-div hidden" id="table-5">
+                                {% include "customer/250qty.html" %}
+                            </div>
+                            <div class="table-div hidden" id="table-6">
+                                {% include "customer/300qty.html" %}
+                            </div>
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /row -->
+
+
+<!-- row -->
+<div class="row row-sm">
+    <div class="col-md-12 col-xl-4 col-xs-12 col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="feature2">
+                    <i class="mdi mdi-airplane-takeoff bg-purple ht-50 wd-50 text-center brround text-white"></i>
+                </div>
+                <h5 class="mb-2 tx-16">Free Shipping</h5>
+                <span class="fs-14 text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua domenus orioneu.</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12 col-xl-4 col-xs-12 col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="feature2">
+                    <i class="mdi mdi-headset bg-pink  ht-50 wd-50 text-center brround text-white"></i>
+                </div>
+                <h5 class="mb-2 tx-16">Customer Support</h5>
+                <span class="fs-14 text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua domenus orioneu.</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12 col-xl-4 col-xs-12 col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="feature2">
+                    <i class="mdi mdi-refresh bg-teal ht-50 wd-50 text-center brround text-white"></i>
+                </div>
+                <div class="icon-return"></div>
+                <h5 class="mb-2  tx-16">30 days money back</h5>
+                <span class="fs-14 text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua domenus orioneu.</span>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- row closed -->
+
+{% endblock %}
+
+{% block filters %}
+<div class="event">
+    <div class="row rounded py-2 mb-2 mx-n2">
+
+        <div class="col-12 col-sm-12 col-lg-12">
+            <label for="id_company">Status</label>
+            <fieldset class="form-group">
+                <select id="id_status" class="select2-data-array form-control select2-list">
+                    <option value="">All</option>
+                    {% comment %} {% for obj in object_list|slice:":1" %}
+                    <option value="{{obj.STATUS_CHOICES.0.0}}">{{obj.STATUS_CHOICES.0.1|capfirst}}</option>
+                    <option value="{{obj.STATUS_CHOICES.1.0}}">{{obj.STATUS_CHOICES.1.1|capfirst}}</option>
+                    {% endfor %} {% endcomment %}
+                </select>
+            </fieldset>
+        </div>
+        {% if request.user.role == "Super Admin" %}
+        <div class="col-12 col-sm-12 col-lg-12">
+            <label for="id_company">Company</label>
+            <fieldset class="form-group">
+                <select id="id_company" class="select2-data-array form-control select2-list">
+                    <option value="">All</option>
+                    {% for company in company_list %}
+                    <option value="{{company.id}}">{{company.name|capfirst}}</option>
+                    {% endfor %}
+                </select>
+            </fieldset>
+        </div>
+        {% endif %}
+        <div class="col-12 col-sm-12 col-lg-12">
+        </div>
+        <div class="col-12 col-sm-12 col-lg-12 d-flex align-items-center justify-content-between mt-2">
+            <button type="reset" class="btn btn-primary btn-block glow mb-0 list-clear">Clear</button>
+        </div>
+    </div>
+</div>
+
+<div class="event">
+    
+    {% if request.user.is_superuser or requser.user.role == "Super Admin" %}
+    <div class="col-12 col-sm-12 col-lg-12">
+    <label for="filter_company">Company</label>
+    <fieldset class="form-group">
+        <select id="filter_company" class="select2-data-array form-control select2-list">
+        <option value="" disabled selected hidden>---Select---</option>
+        {% for company in companies %}
+            <option value="{{company.id}}">{{company.name|title}}</option>     
+        {% endfor %}     
+        </select>
+    </fieldset>
+    </div>
+    {% endif %}
+
+    <div class="row rounded py-2 mb-2 mx-n2">
+    <div class="col-12 col-sm-12 col-lg-12">
+        <label for="users-list-role">Product</label>
+        <fieldset class="form-group">
+        <select id="id_role" class="form-control">
+            <option value="" disabled selected hidden>---Select---</option>
+        </select>
+        </fieldset> 
+    </div>
+    <div class="col-12 col-sm-12 col-lg-12">
+    </div>
+    <div class="col-12 col-sm-12 col-lg-12 d-flex align-items-center justify-content-between mt-2">
+        <button type="reset" class="btn btn-primary btn-block users-list-clear glow mb-0" id="clear_search_filter">Clear</button>
+    </div>
+    </div>
+
+</div>
+{% endblock filters %}
+
+{% block script %}
+<script src="{%  static 'assets/js/sidebar_open.js' %}"></script>
+<script src="{% static 'assets/webapp/initailize_datatables.js' %}"></script>
+
+<script>
+    var role = true;
+    if ("{{request.user.role}}" == "Company Admin") {
+        role = false;
+    }
+    if ("{{request.user.role}}" == "Sales Representative") {
+        role = false;
+    };
+    var i = 1;
+    var table_id = '#responsive-datatable'
+    var filter_id = $("#id_company,#id_status")
+    var to_center = [0,1,2,3,5]
+    var invisible_columns = []
+    var order_false = [-1]
+    var url = '{% url "products:product_list_ajax" %}'
+    var columns = [
+        // data: json key from prepare_results, name: model field name
+        { data: 'id', name: 'id' },
+        { data: 'product_image', name: 'product_image' },
+        { data: 'name', name: 'name' },
+        { data: 'code', name: 'code' },
+        {% if request.user.role == "Customer" %}
+        { data: 'price', name: 'price' },
+        {% endif %}
+        {% if request.user.role != "Customer" %}
+        { data: 'status', name: 'status' },
+        {% endif %}
+        {% if request.user.is_superuser or requser.user.role == "Super Admin" %}
+        { data: 'company', name: 'company' },
+        {% endif %}
+        { data: 'actions', name: 'actions' },
+        {% if request.user.role == "Customer" %}
+        { data: 'quantity', name: 'quantity' },
+        { data: 'total_price', name: 'total_price' },
+        { data: 'add', name: 'add' }
+        {% endif %}
+    ]
+
+    function set_filters() {
+        var data = {}
+        data["company"] = $("#id_company").val();
+        data["status"] = $("#id_status").val();
+        return data
+    }
+
+    initailize_datatables()
+
+    $(document).on('click', '.list-clear' , function (){
+        $("#id_company").val(null).trigger('change');
+        $("#id_status").val(null).trigger('change');
+        $(table_id).DataTable().destroy();
+        initailize_datatables()
+    });
+</script>
+
+<script>
+	$(document).on('click', '.product-delete-btn' , function (e){
+	  var id = $(this).data("id")
+	  var name = $(this).data("title")
+	  if(name == "None"){
+		  name = ""
+	  }
+	  var url = $(this).data("url")
+	  var delete_ele = $(this)
+
+	  Swal.fire({
+		  html: `Are you sure you want to delete <b>${name}</b> ?`,
+		  icon: 'question',
+		  showCloseButton: true,
+		  showCancelButton: true,
+		  confirmButtonColor: "#7442DB",
+	  }).then((result) => {
+		  
+		  /* Read more about isConfirmed, isDenied below */
+		  if (result.isConfirmed) {
+			  $.ajax({
+				  type: "POST",
+				  url: url,
+				  data: {
+					  "id": id,
+					  "csrfmiddlewaretoken": '{{ csrf_token }}'
+				  },
+				  success: function (data) {
+					$(table_id).DataTable().ajax.reload(null, false);
+					if (data["message"]){
+					  $.toast({
+						  text: data.message,
+						  position: 'bottom-right',
+						  stack: false,
+						  icon: 'success',                    
+					  })
+				  }
+				}    
+			  });
+		  }
+	  })
+  })
+  </script>
+
+<!---order teb js -->
+<script>
+
+    $("#title1").click(function(){
+        $(this).addClass("active-div");
+        $(this).addClass("main-content-label2");
+        $(this).removeClass("main-content-label");
+        $(".form-1").removeClass("hidden");
+        $(".form-2").addClass("hidden");
+
+        $("#title2").removeClass("active-div");
+        $("#title2").removeClass("main-content-label2");
+        $("#title2").addClass("main-content-label");
+    })
+
+    $("#title2").click(function(){
+        var id = $("#user_id").val()
+        $(this).addClass("active-div");
+        $(this).addClass("main-content-label2");
+        $(this).removeClass("main-content-label");
+        $(".form-2").removeClass("hidden");
+        $(".form-1").addClass("hidden");
+
+        $("#title1").removeClass("active-div");
+        $("#title1").removeClass("main-content-label2");
+        $("#title1").addClass("main-content-label");
+    })
+
+    $('.title').hover(function() {
+        $(this).css('cursor','pointer');
+    });
+</script>
+
+<script>
+$( document ).ready(function() {
+    first_image = $("#photo_id_1").attr("src")
+    $('#displayed_image').attr("src",first_image);
+});
+
+$(document).on('click', '.products_images', function (e) {
+  $img = $(this).clone();
+    src = $(this).attr("src")
+  $('#displayed_image').attr("src","");
+  $('#displayed_image').attr("src",src);
+})
+</script>
+
+<script>
+  var role = true;
+  if ("{{request.user.role}}" == "company admin") {
+      role = false;
+  }
+  if ("{{request.user.role}}" == "sales representative") {
+      role = false;
+  };
+  var i = 1;
+  var url = '{% url "products:product_barcode_list" %}'
+  var table_id = '#table'
+  var to_center = [0,1,2,3]
+  var invisible_columns = []
+  var order_false = [-1]
+  var columns = [
+      // data: json key from prepare_results, name: model field name
+      { data: 'id', name: 'id' },
+      { data: 'number', name: 'number' },
+      { data: 'code', name: 'code' },
+      { data: 'action', name: 'action' },
+  ]
+
+  function set_filters() {
+      var data = {'id':"{{product.id}}"}
+      return data
+  }
+
+  initailize_datatables()
+
+</script>
+
+<script>
+  $(document).on('click', '.ajax-delete-btn', function (e) {
+    var id = $(this).data("id")
+    var name = $(this).data("title")
+    if (name == "None") {
+        name = ""
+    }
+    var url = $(this).data("url")
+    var delete_ele = $(this)
+
+    Swal.fire({
+        html: `Are you sure you want to delete <b>${name}</b> ?`,
+        icon: 'question',
+        showCloseButton: true,
+        showCancelButton: true,
+        confirmButtonColor: "#7442DB",
+    }).then((result) => {
+
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    "id": id,
+                    "csrfmiddlewaretoken": '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    $('#table').DataTable().ajax.reload(null, false);
+                    if (data["message"]) {
+                        $.toast({
+                            text: data.message,
+                            position: 'bottom-right',
+                            stack: false,
+                            icon: 'success',
+                        })
+                    }
+                }
+            });
+        }
+    })
+  })
+</script>
+<!-- -----------------End Of Delete Barcode Js------------------------- -->
+
+<!-- -----------------Print Barcode Js------------------------- -->
+<script>
+  function ImageToPrint(source)
+    {
+        
+        return "<html><head><scri"+"pt>function step1(){\n" +
+                "setTimeout('step2()', 10);}\n" +
+                "function step2(){window.print();window.close()}\n" +
+                "</scri" + "pt></head><body onload='step1()'>\n" +
+                "<img src='/media/" + source + "' /></body></html>";
+    }
+    
+  $(document).on('click', '.ajax-image-btn', function (e) {
+    
+    var source = $(this).data("image")
+   
+        var Pagelink = "about:blank";
+        var pwa = window.open(Pagelink, "_new");
+        
+        pwa.document.open();
+        pwa.document.write(ImageToPrint(source));
+        pwa.document.close();
+    
+  })
+</script>
+<!-- -----------------End Of Print Barcode Js------------------------- -->
+
+<script>
+	document.body.addEventListener('htmx:beforeSwap', function(evt) {
+	  if(evt.detail.xhr.status === 200){
+		  if(evt.detail.requestConfig.verb != 'get')
+		  {
+			  evt.detail.shouldSwap = false;
+			  window.location.reload();
+			  
+		  }
+	  }
+  });
+</script>
+
+<script>
+    function removeAllTab(){
+        $(".title").removeClass("active");
+    }
+
+    function hideAllTable(){
+        $(".table-div").addClass("hidden");
+    }
+
+    $(".title").click(function(){
+        let id = $(this).data("index");
+        
+        removeAllTab();
+        hideAllTable();
+        
+        $(this).addClass("active");
+        $("#table-"+id).removeClass("hidden");
+    })
+
+    $('.title').hover(function() {
+        $(this).css('cursor','pointer');
+    });
+
+</script>
+
+<script>
+    $("#80-table").DataTable({
+        "columnDefs": [
+        {"className": "dt-center", "targets": "_all"}
+      ],
+    });
+    $("#100-table").DataTable({
+        "columnDefs": [
+        {"className": "dt-center", "targets": "_all"}
+      ],
+    });
+    $("#120-table").DataTable({
+        "columnDefs": [
+        {"className": "dt-center", "targets": "_all"}
+      ],
+    });
+    $("#210-table").DataTable({
+        "columnDefs": [
+        {"className": "dt-center", "targets": "_all"}
+      ],
+    });
+    $("#250-table").DataTable({
+        "columnDefs": [
+        {"className": "dt-center", "targets": "_all"}
+      ],
+    });
+    $("#300-table").DataTable({
+        "columnDefs": [
+        {"className": "dt-center", "targets": "_all"}
+      ],
+    });
+
+</script>
+{% endblock script %}

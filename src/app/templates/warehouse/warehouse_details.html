@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{warehouse.name}}'s Details
+{% endblock title %}
+
+{% block css %}
+<style>
+#zone-table td, #zone-table th{
+    text-align: center;
+}
+</style>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="/static/plugins/sweetalert2/sweetalert2.all.min.js"></script>
+{% endblock css %}
+
+{% block content %}
+
+<div class="col-lg-12">
+
+    <div class="card">
+        <span title="Update" data-url="{{ url_for('wh_bp.update_warehouse', id=warehouse.id) }}"
+            class="update_this_warehouse open_sidebar d-flex justify-content-end"
+            style="margin-right: 1%; margin-top: 1%; color:var(--primary-bg-color); cursor: pointer; position:">
+            <i class="fa fa-edit"></i>
+        </span>
+        <div class="card-header">
+            <div class="mx-4 mb-4">
+                <div class="row">
+                    <div class="col-sm-6 col-lg-6 col-6">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="row">
+                                    <strong> Name : </strong>
+                                </div>
+                                <div class="row">
+                                    <strong> Company : </strong>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="row">
+                                    {{warehouse.name}}
+                                </div>
+                                <div class="row">
+                                    {{warehouse.company}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="row"><strong>Status : </strong></div>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="row">
+                                    <span
+                                        style="color: {% if warehouse.status == 'Active' %} green; {% else %} red; {% endif %}">{{warehouse.status}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="row">
+                                    <strong>Address : </strong>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="row">
+                                    {{warehouse.address_line_1}}, {% if warehouse.address_line_2
+                                    %}{{warehouse.address_line_2}}, {% endif %} {{warehouse.city}}, {{warehouse.state}},
+                                    {{warehouse.country}}, {{warehouse.zip_code}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-6 col-6">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="row">
+                                    <strong>Zones : </strong>
+                                </div>
+                                <div class="row">
+                                    <strong>Products : </strong>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <div>
+                                    <b style="margin-left: -12px; color:green"> Active - {{active_zones}}</b> |
+                                    <b style="color:red;">Inactive - {{inactive_zones}}</b>
+                                </div>
+                                <div class="row"> {{warehouse.product_count}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body" style="padding: 0 !important">
+
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex flex-sm-row flex-column justify-content-between">
+                <h4 class="card-title">ZONES</h4>
+                <button type="button" hx-get="{{ url_for('zone_bp.create_zone') }}" hx-target="#sidebar_form"
+                    hx-swap="innerHTML" onclick="$('#sidebar_form').toggleClass('sidebar-open')"
+                    class="btn btn-primary">Add</button>
+            </div>
+            <input type="number" hidden value="{{warehouse.id}}" id="id_warehouse_2">
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table border-top-0 table-bordered text-nowrap border-bottom" id="zone-table"
+                    style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Sr No.</th>
+                            <th>Name</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Products</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button onclick="javascript:history.go(-1);" class="btn btn-dark">
+                <span class="bi bi-arrow-return-left"></span> Back
+            </button>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block form %}
+<div class="addcompany  addcompany-animate">
+</div>
+<div class="addwarehouse  addwarehouse-animate">
+</div>
+{% endblock form %}
+
+{% block script %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="{{ url_for('static', filename='assets/js/htmx_1.9.4.min.js') }}"></script>
+<script>
+    var element_table_id = undefined;
+    var csrf = "{{ csrf_token }}";
+    var warehouse_id = "{{warehouse.id|safe}}";
+    var zone_list_url = "{{ url_for('zone_bp.zone_data_table') }}"
+</script>
+<script>
+    $(document).ready(function () {
+        var table = $('#zone-table').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": zone_list_url,
+                "data": function (d) {
+                    d.company = $('#id_company').val();
+                    d.warehouse = warehouse_id;
+                }
+            },
+            "columns": [
+                { data: 'id', name: 'id' },
+                { data: 'name', name: 'name' },
+                { data: 'status', name: 'status' },
+                { data: 'products', name: 'products' },
+                { data: 'actions', name: 'actions' },
+            ]
+        });
+
+        $('#id_company').on('change', function () {
+            table.ajax.reload();
+        });
+
+        $(document).on('click', '.list-clear', function () {
+            $("#id_company").val(null).trigger('change');
+        })
+
+        $(document).on('click', '.zone_update', function (e) {
+            url = $(this).data("url")
+            htmx.ajax('GET', url, {
+                target: '#sidebar_form', swap: 'innerHTML',
+            }).then(() => {
+                $('#sidebar_form').toggleClass('sidebar-open')
+            });
+        });
+
+        $(document).on('click', '.update_this_warehouse', function (e) {
+            url = $(this).data("url")
+            htmx.ajax('GET', url, {
+                target: '#sidebar_form', swap: 'innerHTML',
+            }).then(() => {
+                $('#sidebar_form').toggleClass('sidebar-open')
+            });
+        });
+
+        $(document).on('click', '.add_zone', function (e) {
+            url = $(this).data("url")
+            htmx.ajax('GET', url, {
+                target: '#sidebar_form', swap: 'innerHTML',
+            }).then(() => {
+                $('#sidebar_form').toggleClass('sidebar-open')
+                $("#id_warehouse").val(warehouse_id)
+            });
+        })
+
+        $(document).on('click', '.delete-btn', function (e) {
+            var url = $(this).attr("data-url");
+            swal({
+                title: "Are you sure?",
+                text: "Once deleted, you will not be able to recover this zone!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            url: url,
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function (response) {
+                                swal("Poof! Zone has been deleted!", {
+                                    icon: "success",
+                                }).then(() => {
+                                    table.ajax.reload();
+                                });
+                            },
+                            error: function (xhr, status, error) {
+                                swal("Error", "An error occurred while deleting the item", "error");
+                            }
+                        });
+                    }
+                });
+        });
+
+    });
+
+</script>
+
+{% endblock script %}

@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %} Vendor Payment {% endblock title %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-12 col-xl-12 col-xs-12 col-sm-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="mg-b-5">
+          <h4 class="card-title">Vendor Payment</h4>
+        </div>
+        <div> 
+          <form action="" method="post" enctype="multipart/form-data" id="stock-create-form" novalidate class="mt-4">
+            {% csrf_token %}
+            <div class="row">
+              {% if user.role == "super admin" %}
+                <div class="col-md-2 col-12">
+                  <div class="form-group row select2-list">
+                    <div class="col-md-12">
+                      {{form.company|as_crispy_field}}
+                    </div>
+                  </div>
+                </div>
+              {% else %}
+                <input type="hidden" id="id_company" name="company" value="{{user.get_company_id}}" class="select2-list">
+              {% endif %} 
+
+              <div class="col-md-6 col-12">
+                <div id="div_id_barcode" class="form-group select2-list">
+                  <div class="row">
+                    <div class="col-md-2">
+                      <label for="id_barcode" class="requiredField">
+                        Company<span class="asteriskField">*</span>
+                      </label>
+                    </div>
+                    <div class="col-md-9">
+                      <div>
+                        <select name="product" onchange="loadquantity()" class="select form-control select2-list" required id="id_product">
+                          <option value="" disabled selected hidden>----Select----</option>
+                          <option value="1">Hair oil</option>
+                          <option value="2">Baby Shampoo</option>
+                          <option value="3">Deodorant</option>
+                          <!-- {% for product in products %} -->
+                          <!-- <option value="{{product.id}}">{{product.name}}</option> -->
+                          <!-- {% endfor %} -->
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6 col-12">
+                <div id="div_id_product_code" class="form-group select2-list">
+                  <div class="row">
+                    <div class="col-md-2">
+                      <label for="id_product_code" class="requiredField">
+                        Vendor<span class="asteriskField">*</span>
+                      </label>
+                    </div>
+                    <div class="col-md-9">
+                      <div>
+                        <select name="product" onchange="loadquantity()" class="select form-control select2-list" required id="id_product">
+                          <option value="" disabled selected hidden>----Select----</option>
+                          <option value="1">Hair oil</option>
+                          <option value="2">Baby Shampoo</option>
+                          <option value="3">Deodorant</option>
+                          <!-- {% for product in products %} -->
+                          <!-- <option value="{{product.id}}">{{product.name}}</option> -->
+                          <!-- {% endfor %} -->
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 col-12">
+                <div class="form-group row">
+                  <div class="col-md-12">
+                    <div id="div_id_zone" class="form-group">
+                      <div class="row">
+                        <div class="col-md-2">
+                          <label for="id_zone" class="requiredField select2-list">
+                            Payment Mode<span class="asteriskField">*</span>
+                          </label>
+                        </div>
+                        <div class="col-md-9">
+                          <div>
+                            <select name="zone" nchange="loadAvailableStock()" class="select form-control" required id="id_zone">
+                              <option value="" disabled selected hidden>----Select----</option>
+                              <option value="a-101">A-101</option>
+                              <option value="a-58">A-58</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6 col-12">
+                <div class="form-group row">
+                  <div class="col-md-12">
+                    <div id="div_id_warehouse" class="form-group">
+                      <div class="row">
+                        <div class="col-md-2">
+                          <label for="id_warehouse" class="requiredField select2-list">
+                            Payment Date<span class="asteriskField">*</span>
+                          </label>
+                        </div>
+                        <div class="col-md-9">
+                          <div>
+                            <input type="date" class="form-control">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 col-12">
+                <div class="form-group row">
+                  <div class="col-md-12">
+                    <div id="div_id_zone" class="form-group">
+                      <div class="row">
+                        <div class="col-md-2">
+                          <label for="id_zone" class="requiredField select2-list">
+                            Payment Amount<span class="asteriskField">*</span>
+                          </label>
+                        </div>
+                        <div class="col-md-9">
+                          <div>
+                            <input type="text" class="form-control">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6 col-12">
+                <div id="div_id_product" class="form-group select2-list">
+                  <div class="row">
+                    <div class="col-md-2">
+                      <label for="id_product" class="requiredField">
+                        Reference Number<span class="asteriskField">*</span>
+                      </label>
+                    </div>
+                    <div class="col-md-9">
+                      <div>
+                        <input type="text" class="form-control">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 col-12">
+                <div id="div_id_product" class="form-group select2-list">
+                  <div class="row">
+                    <div class="col-md-2">
+                      <label for "id_product" class="requiredField">
+                        Due Amount<span class="asteriskField">*</span>
+                      </label>
+                    </div>
+                    <div class="col-md-9">
+                      <div>
+                        <input type="text" class="form-control">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6 col-12">
+                <div id="div_id_product" class="form-group select2-list">
+                  <div class="row">
+                    <div class="col-md-2">
+                      <label for="id_product" class="requiredField">
+                        Remarks<span class="asteriskField">*</span>
+                      </label>
+                    </div>
+                    <div class="col-md-9">
+                      <div>
+                        <input type="text" class="form-control">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row" id="product_case_form">
+            </div>
+
+            <div class="row">
+              <div class="col-lg-6">
+                <!-- Add product case button -->
+              </div>
+              <div class="col-lg-6 text-end">
+                <div class="row">
+                  <div class="col-md-3 col-12">
+                  </div>
+                  <div class="col-md-3 col-12" id="id_available_stock">
+                  </div>
+                  <div class="col-md-6 col-12">
+                    <button type="button" class="btn btn-primary mr-2" id="create-stock">
+                      <i class="ft-check-square mr-1"></i>Save
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="form_cancel">
+                      <i class="ft-x mr-1"></i>Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Include other templates if needed -->
+{% include "vendor/payment_history.html" %}
+{% endblock %}
+
+
+<!-- stock filters -->
+
+{% block filters %}
+        <div class="event">
+          
+          {% if request.user.is_superuser or requser.user.role == "Super Admin" %}
+          <div class="col-12 col-sm-12 col-lg-12">
+            <label for="filter_company">Sales Report</label>
+            <fieldset class="form-group">
+              <select id="filter_company" class="select2-data-array form-control select2-list">
+                <option value="" disabled selected hidden>---Select---</option>
+                {% for company in companies %}
+                  <option value="{{company.id}}">{{company.name|title}}</option>     
+                {% endfor %}     
+              </select>
+            </fieldset>
+          </div>
+          {% endif %}
+
+          <div class="row rounded py-2 mb-2 mx-n2">
+            <div class="col-12 col-sm-12 col-lg-12">
+              {% comment %} <label for="users-list-role">Product</label>
+              <fieldset class="form-group">
+                <select id="id_role" class="form-control">
+                  <option value="" disabled selected hidden>---Select---</option>
+                </select>
+              </fieldset> {% endcomment %}
+            </div>
+            <div class="col-12 col-sm-12 col-lg-12">
+                <label for="filter_company">From Date</label>
+                <fieldset class="form-group">
+                    <input type="date" class="form-control">
+                </fieldset>
+            </div>
+            <div class="col-12 col-sm-12 col-lg-12">
+                <label for="filter_company">To Date</label>
+                <fieldset class="form-group">
+                    <input type="date" class="form-control">
+                </fieldset>
+            </div>
+            <div class="col-12 col-sm-12 col-lg-12 d-flex align-items-center justify-content-between mt-2">
+              <button type="button" class="btn btn-primary btn-block users-list-clear glow mb-0" id="">Search</button>
+            </div>
+
+            <div class="col-12 col-sm-12 col-lg-12 d-flex align-items-center justify-content-between mt-2">
+              <button type="reset" class="btn btn-primary btn-block users-list-clear glow mb-0" id="clear_search_filter">Clear</button>
+            </div>
+          </div>
+
+        </div>
+{% endblock filters %}
+
+
+{% block script %}
+
+
+<script src="https://cdn.datatables.net/datetime/1.5.1/js/dataTables.dateTime.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#vendor_payment_list_table').DataTable( {
+            dom: 'Qlfrtip'
+        });
+    });
+  </script>
+{% endblock %}

@@ -1,0 +1,54 @@
+<div>
+    {% for form in inlines.products %}
+        {{ form.management_form }}
+        
+        <table class="hidden">
+            <tbody class="extra-fields-wrap">
+                <tr id="row-{{ loopindex }}">
+                    <td class="hidden product-id">0</td>
+                    <td class="hidden">
+                        <!-- Render hidden field directly -->
+                        <input type="hidden" name="{{ form.product_id.name }}" id="{{ form.product_id.id }}" value="{{ form.product_id.data }}">
+                    </td>
+                    <td>
+                        <span id="row-{{ loopindex }}-product_name"></span> 
+                        ( <a id="row-{{ loopindex }}-product_code" href="" title=""></a> )
+                    </td>
+                    {% if "/create/" in request.path or "/update/" in request.path %}
+                    {% else %}
+                    <td>
+                        {{ form.batch_number() }}
+                    </td>
+                    {% endif %}
+                    <td>
+                        {{ form.per_piece_price() }}
+                    </td>
+                    <td>
+                        <div class="d-flex justify-content-end">
+                            <select name="{{ form.case_size_id.name }}" id="{{ form.case_size_id.id }}" style="width: 200px;" data-row="row-{{ loopindex }}" data-type="select">
+                                {% for choice in form.case_size_id.choices %}
+                                    <option value="{{ choice[0] }}" {% if choice[0] == form.case_size_id.data %}selected{% endif %}>{{ choice[1] }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="button" class="btn btn-link text-dark add-case" data-row="row-{{ loopindex }}" data-bs-target="#ProductCaseForm" data-bs-toggle="modal"><i class="fa fa-plus"></i></button>
+                        </div>
+                    </td>
+                    <td>
+                        <input type="text" name="{{ form.case_quantity.name }}" id="{{ form.case_quantity.id }}" value="{{ form.case_quantity.data }}" data-row="row-{{ loopindex }}">
+                    </td>
+                    <td>
+                        <input type="text" name="{{ form.total_pieces.name }}" id="{{ form.total_pieces.id }}" value="{{ form.total_pieces.data }}" disabled="disabled">
+                    </td>
+                    <td>
+                        <input type="text" name="{{ form.amount.name }}" id="{{ form.amount.id }}" value="{{ form.amount.data }}" disabled="disabled">
+                    </td>
+                    <td>
+                        <!-- Manually handle deletion field -->
+                        <input type="hidden" name="{{ form.DELETE.name }}" id="{{ form.DELETE.id }}" value="{{ form.DELETE.data }}">
+                        <button type="button" class="btn btn-link fa fa-trash button-delete text-danger" data-row="#row-{{ loopindex }}"></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    {% endfor %}
+</div>

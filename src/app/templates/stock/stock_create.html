@@ -1,0 +1,120 @@
+
+<div class="row my-3">
+  <div class="col-sm-5">
+    <div class="row">
+      <div class="col-md-4">
+        <label for="id_company_list">Select Company<span class="asteriskField">*</span> : </label>
+      </div>
+      <div class="col-md-8">
+        <select class="form-control select2" name="company_list" id="id_company_list">
+          <option value="" selected>---------</option>
+          {% for company in company_list %}
+          <option value="{{ company.id }}">{{ company.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-7">
+    <div class="row">
+      <div class="col-md-3">
+        <label for="id_product_list">Select Product<span class="asteriskField">*</span> : </label>
+      </div>
+      <div class="col-md-6">
+        <select name="product_list" class="select2" id="id_product_list"></select>
+      </div>
+      <div class="col-md-2">
+        <button type="button" 
+              hx-get="{{ url_for('stock_bp.create_stock') }}" 
+              hx-target="#sidebar_form" 
+              hx-swap="innerHTML" 
+              onclick="stock_add()"
+              class="btn btn-primary"
+              id="add_stock_button">
+          Add Stock
+      </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% include "stock/stock_list.html" %}
+
+{% block script %}
+<script src="{{ url_for('static', filename='assets/js/htmx_1.9.4.min.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0/js/select2.min.js"></script>
+<script>
+
+  $(document).ready(function() {
+    $("#id_company_list").select2({
+      placeholder: "Search by company name",
+      allowClear: true,    
+      tags: true,          
+    });
+
+    $("#id_product_list").select2({
+      placeholder: "Search by product code, name, and barcode",
+      allowClear: true,    
+      tags: true,          
+    });
+      var get_products_url = "{{ url_for('product_bp.get_products_ajax') }}";
+      $(document).on('change', '#id_company_list', function(e) {
+        var companyId = $(this).val();
+        $.ajax({
+          url: get_products_url, 
+          type: 'GET',
+          data: {
+              company_id: companyId 
+          },
+          success: function(response) {
+                console.log(response); 
+                
+                var selectProductDropdown = $('#id_product_list'); 
+                selectProductDropdown.empty();
+                
+                if (response.products && Array.isArray(response.products)) {
+                    response.products.forEach(product => {
+                        var newOption = $('<option></option>').val(product.id).text(product.text);
+                        selectProductDropdown.append(newOption);
+                    });
+                } else {
+                    console.error('Invalid response format:', response);
+                }
+            },
+          error: function(xhr, status, error) {
+              console.error('AJAX request failed:', status, error);
+          }
+      });
+      });
+  });
+
+  function stock_add(){
+    let id = $("#id_product_list").val();
+    if(id){
+      $('#sidebar_form').toggleClass('sidebar-open');
+    }
+    else{
+      $.toast({
+        text: "Select the product to add stock !!!",
+        position: 'bottom-right',
+        stack: false,
+        icon: 'warning',
+      });
+    }
+  }
+</script>
+<script>
+  function updateHtmxAttributes() {
+      var productId = $("#id_product_list").val();
+      var companyId = $("#id_company_list").val();
+      var button = document.getElementById('add_stock_button');
+      button.setAttribute('hx-vals', JSON.stringify({
+          product_id: productId,
+          company_id: companyId
+      }));
+  }
+  document.getElementById('add_stock_button').addEventListener('click', updateHtmxAttributes);
+</script>
+
+{% endblock script %}

@@ -1,0 +1,51 @@
+{% load static %}
+<div class="dropdown">
+<select name="cases" aria-haspopup="true" class="form-control" id="case-{{order.id}}" data-cart-id={{order.id}} onchange="adjustTotal({{order.id}})" style="width:230px">
+    <option value="{{selected_case_size.id}}">{{ selected_case_size.quantity }} Qty, {{ selected_case_size.weight }} Weight , {{ selected_case_size.cubic_meter_volume }} CMV</option>
+    
+    <div class="dropdown-menu tx-13">
+    {% for case in product_cases%}
+    <option  class="dropdown-item" value="{{case.id}}">{{ case.quantity }} Qty, {{ case.weight }} Weight , {{ case.cubic_meter_volume }} CMV</option>
+    
+    {%  endfor %}
+</div>
+</select>
+</div>
+
+
+
+{% block script %}
+<script src="{%  static 'assets/plugins/jquery/jquery.min.js' %}"></script>
+
+<script>
+
+        function adjustTotal (rowId) {
+            var case_size_id = $('#case-'+rowId).val()
+			var value = $("#qty-"+rowId).val();
+			var cart_id = rowId
+			$.ajax({
+                url: '{% url "products:updated_cart_product" %}',
+                type: "get",
+                dataType: "json",
+                data: {
+                    'case_size_id': case_size_id,
+                    'cart_id': cart_id,
+					"quantity":value,
+                    
+                },
+                success: function (data) {
+                    $("#id_total_amount").val(data.grand_total)
+                    $("#selected-final-price-"+rowId).text(data.product_total)
+                    $("#row-cartoon-price-"+rowId).text(data.cartoon_price)
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    console.log(thrownError);
+                }
+            });
+        }
+
+</script>
+
+
+
+{% endblock script %}

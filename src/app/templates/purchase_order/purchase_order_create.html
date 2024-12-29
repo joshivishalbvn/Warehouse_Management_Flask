@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section id="horizontal-form-layout">
+    <div class="row match-height main-form">
+        <form method="post" onsubmit="return manageInlineForm()" enctype="multipart/form-data" novalidate>
+            {{ form.hidden_tag() }}
+
+            <!-- Form for purchase order details -->
+            <div class="row">
+                <div class="col-md-12 col-xl-12 col-xs-12 col-sm-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="main-content-label mg-b-5 my-2">
+                                <b class="card-title">Purchase</b>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="">{{ form.company_id.label }}{% if form.company_id.flags.required %}<span class="asteriskField">*</span> {% endif %}</label>
+                                    {{ form.company_id(class="form-control", onchange="loadProducts(); loadVendors()") }}
+                                    {% for error in form.company_id.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="col-md-4 col-12">
+                                    <label for="">{{ form.vendor_id.label }}{% if form.vendor_id.flags.required %}<span class="asteriskField">*</span> {% endif %}</label>
+                                    {{ form.vendor_id(class="form-control") }}
+                                    {% for error in form.vendor_id.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="col-md-4 col-12">
+                                    <label for="id_item_name">Add Product<span class="asteriskField">*</span></label>
+                                    <select id="id_item_name" name="product" placeholder="select item"></select>
+                                </div>
+                            </div>
+
+                            <div class="text-end mt-2">
+                                <button type="button" class="btn btn-primary" id="submit_product">Add</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table for displaying added products -->
+            <div class="row added_product_list">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <b>Products</b>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-body table-responsive">
+                                <table id="purchase_order_table" class="table text-center m-0 w-100">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">Product</th>
+                                            <th class="text-center">Price Per Piece (₹)</th>
+                                            <th class="text-center">Case Size</th>
+                                            <th class="text-center">Number of Cases</th>
+                                            <th class="text-center">Total Pieces</th>
+                                            <th class="text-center">Item Total (₹)</th>
+                                            <th class="text-center" style="width:90px">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="product_rows">
+                                        <!-- Existing rows will be inserted here -->
+                                        {% for field in form.products %}
+                                        <tr>
+                                            <td>
+                                                {{ field.product_id(class="form-control") }}
+                                                {% for error in field.product_id.errors %}
+                                                <span class="text-danger">{{ error }}</span>
+                                                {% endfor %}
+                                            </td>
+                                            <td>
+                                                {{ field.per_piece_price(class="form-control") }}
+                                                {% for error in field.per_piece_price.errors %}
+                                                <span class="text-danger">{{ error }}</span>
+                                                {% endfor %}
+                                            </td>
+                                            <td>
+                                                {{ field.case_size_id(class="form-control") }}
+                                                {% for error in field.case_size_id.errors %}
+                                                <span class="text-danger">{{ error }}</span>
+                                                {% endfor %}
+                                            </td>
+                                            <td>
+                                                {{ field.case_quantity(class="form-control") }}
+                                                {% for error in field.case_quantity.errors %}
+                                                <span class="text-danger">{{ error }}</span>
+                                                {% endfor %}
+                                            </td>
+                                            <td>
+                                                {{ field.total_pieces(class="form-control") }}
+                                                {% for error in field.total_pieces.errors %}
+                                                <span class="text-danger">{{ error }}</span>
+                                                {% endfor %}
+                                            </td>
+                                            <td>
+                                                {{ field.item_total(class="form-control") }}
+                                                {% for error in field.item_total.errors %}
+                                                <span class="text-danger">{{ error }}</span>
+                                                {% endfor %}
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-danger btn-sm" onclick="removeProductRow(this)">Remove</button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="5">
+                                                <div class="text-end mt-2">
+                                                    <b>Total Amount (₹): </b>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {{ form.total_price(class="form-control", disabled=True) }}
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Invoice and remarks fields -->
+            <div class="row">
+                <div class="col-md-12 col-xl-12 col-xs-12 col-sm-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6">
+                                    <label for="{{ form.invoice.id }}">
+                                        {{ form.invoice.label }}{% if form.invoice.flags.required %}<span class="asteriskField">*</span> {% endif %}
+                                    </label>
+                                    {{ form.invoice(class="form-control") }}
+                                    {% for error in form.invoice.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    {% endfor %}
+                                    <div class="row gallery mt-2"></div>
+                                </div>
+                                <div class="col-6">
+                                    <label for="{{ form.remarks.id }}">
+                                        {{ form.remarks.label }}{% if form.remarks.flags.required %}<span class="asteriskField">*</span> {% endif %}
+                                    </label>
+                                    {{ form.remarks(class="form-control", rows=3) }}
+                                    {% for error in form.remarks.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-end mb-5">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a href="{{ url_for('po_bp.create_purchase_order') }}"><button type="button" class="btn btn-secondary">Cancel</button></a>
+            </div>
+        </form>
+    </div>
+</section>
+
+<script id="product-row-template" type="text/template">
+    <tr>
+        <td>
+            <select name="purchase_order_products[{index}][product_id]" class="form-control product_list_drop_down">
+                <!-- Options will be inserted here dynamically -->
+            </select>
+        </td>
+        <td><input type="text" name="purchase_order_products[{index}][per_piece_price]" class="form-control" /></td>
+        <td>
+            <select name="purchase_order_products[{index}][case_size_id]" class="form-control">
+                <!-- Options for case sizes will be inserted here dynamically -->
+            </select>
+        </td>
+        <td><input type="text" name="purchase_order_products[{index}][case_quantity]" class="form-control" /></td>
+        <td><input type="text" name="purchase_order_products[{index}][total_pieces]" class="form-control" /></td>
+        <td><input type="text" name="purchase_order_products[{index}][item_total]" class="form-control" /></td>
+        <td>
+            <button type="button" class="btn btn-danger btn-sm" onclick="removeProductRow(this)">Remove</button>
+        </td>
+    </tr>
+</script>
+
+{% endblock content %}
+
+{% block script %}
+<script src="{{ url_for('static', filename='assets/js/manage_images.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/product/product_dropdown.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/purchase_order/calculate_order_amount.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/purchase_order/update_order_manage_inline.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/purchase_order/create_product_case.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/js/toast.js') }}"></script>
+<script>
+    var product_detail_url = "{{ url_for('product_bp.get_product_details_ajax') }}"
+    var productDetailUrl = "{{ url_for('product_bp.product_details', id=0) }}";
+    var productIndex = 0;
+
+    $(document).ready(function() {
+        $("#company_id").select2({
+            placeholder: "Select Company",
+            allowClear: true,
+        });
+        $("#id_item_name").select2({
+            placeholder: "Select Product",
+            allowClear: true,
+        });
+        $("#vendor_id").select2({
+            placeholder: "Select Vendor",
+            allowClear: true,
+        });
+    });
+
+    function manageInlineForm(){
+        let rows = $(`#purchase_order_table tbody`).children("tr");
+        if (rows.length == 0) {
+            $.toast({
+                text: 'Add at least one product in order !!!',
+                position: 'bottom-right',
+                stack: false,
+                icon: 'error',
+            });
+            return false;
+        }
+
+        $(".extra-fields-wrap").empty();
+        $('.form-control').prop("disabled", false);
+        return true;
+    }
+
+    function removeProductRow(button) {
+        $(button).closest('tr').remove();
+        updateTotalAmount();
+    }
+
+    function updateTotalAmount() {
+        // Implement your logic to update the total amount here.
+    }
+
+    function loadProducts(){
+        var company_id = $('#company_id').val();
+    
+        $.ajax({
+            type: "GET",
+            url: "{{ url_for('product_bp.get_products_ajax') }}",
+            data: {
+                "company_id": company_id,
+            },
+            success: function (response) {
+                console.log(response);
+
+                var selectProductDropdown = $('#id_item_name');
+                selectProductDropdown.empty();
+
+                if (response.products && Array.isArray(response.products)) {
+                    response.products.forEach(product => {
+                        var newOption = $('<option></option>').val(product.id).text(product.text);
+                        selectProductDropdown.append(newOption);
+                    });
+                } else {
+                    console.error('Invalid response format:', response);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('AJAX request failed:', status, error);
+            }
+        });
+    }
+
+    function loadVendors(){
+        var company_id = $('#company_id').val();
+    
+        $.ajax({
+            type: "GET",
+            url: "{{ url_for('vendor_bp.get_vendor_ajax') }}",
+            data: {
+                "company_id": company_id,
+            },
+            success: function (response) {
+                console.log(response);
+
+                var selectVendorDropdown = $('#vendor_id');
+                selectVendorDropdown.empty();
+
+                if (response.vendors && Array.isArray(response.vendors)) {
+                    response.vendors.forEach(vendor => {
+                        var newOption = $('<option></option>').val(vendor.id).text(vendor.text);
+                        selectVendorDropdown.append(newOption);
+                    });
+                } else {
+                    console.error('Invalid response format:', response);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('AJAX request failed:', status, error);
+            }
+        });
+    }
+</script>
+
+{% endblock %}

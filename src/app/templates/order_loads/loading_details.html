@@ -1,0 +1,620 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags static %}
+
+{% block css %}
+<link href="{%  static 'assets/plugins/bootstrap/css/modal.css' %}" rel="stylesheet" id="style" />
+{% endblock css %}
+
+{% block content %}
+
+<div class="card match-height">
+    {% if not request.user.role == request.user.CUSTOMER %}
+    <div class="card-header d-flex justify-content-between ">
+        <div class="mt-3">
+            
+        </div>
+        <div class="text-end">
+            {% if load_obj.status == load_obj.COMPLETED or load_obj.ON_WATER %}
+                {% if tracking %}
+                    <a href="{{tracking}}" class="btn btn-primary ml-sm-1 text-ri mt-3">Track</a>
+                {% endif %}
+            {% endif %}
+
+            <a href="{% url 'order_loads:invoice_download' load_obj.id %}" class="btn btn-primary ml-sm-1 text-ri mt-3">Download Invoice</a>
+        </div>
+        
+    </div>
+    {% endif %}
+    
+    <div class="card-body">
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header text-center"><b><h5>{{load_obj.loading_id}} ({{load_obj.status|capfirst}})</h5></b></div>
+                    <div class="col-12 card-body">
+
+                        {% if not request.user.role == request.user.CUSTOMER %}
+                            <div class="row">
+
+                                
+                                <div class="col-md-4">
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label" for="horizontal-form-2">Loading Date :</label>
+                                        <div class="col-md-9">
+                                        <input type="text" class="form-control square" id="horizontal-form-2" name="last-name" data-available-credit="{{available_credits}}" value="{{ load_obj.created_at.date }}" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                
+                                
+                                <div class="col-md-4">
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label" for="horizontal-form-2">Customer :</label>
+                                        <div class="col-md-9">
+                                        <input type="text" class="form-control square" id="horizontal-form-2" name="last-name" data-available-credit="{{available_credits}}" value="{{load_obj.customer.user.first_name|capfirst}} {{load_obj.customer.user.last_name|capfirst}}" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {% if request.user.is_superuser or requser.user.role == "Super Admin" %}
+                                <div class="col-md-4">
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label" for="horizontal-form-2">Company :</label>
+                                        <div class="col-md-9">
+                                        <input type="text" class="form-control square" id="horizontal-form-2" name="last-name" data-available-credit="{{available_credits}}" value="{{load_obj.company.name}}" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+
+                            </div>
+
+                        {% else %}
+
+                        <div class="row">
+                            
+                            <div class="col-md-4">
+                                <div class="form-group row">
+                                    <label class="col-md-3 col-form-label" for="horizontal-form-2">Loading Date :</label>
+                                    <div class="col-md-9">
+                                    <input type="text" class="form-control square" id="horizontal-form-2" name="last-name" data-available-credit="{{available_credits}}" value="{{ load_obj.created_at.date }}" disabled>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        {% endif %}
+                        
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if show_shipment %}
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header text-center"><b><h5>Shipment Details</h5></b></div>
+                    <div class="col-12 card-body">
+                        <div class="row">
+
+                            <div class="col-md-4">
+                                <div class="form-group row">
+                                    <label class="col-md-3 col-form-label" for="horizontal-form-2">Container :</label>
+                                    <div class="col-md-9">
+                                    <input type="text" class="form-control square" id="horizontal-form-2" name="last-name" data-available-credit="{{available_credits}}" value="{{ shipment_obj.container_number }}" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="form-group row">
+                                    <label class="col-md-3 col-form-label" for="horizontal-form-2">Invoice Number :</label>
+                                    <div class="col-md-9">
+                                    <input type="text" class="form-control square" id="horizontal-form-2" name="last-name" data-available-credit="{{available_credits}}" value="{{ shipment_obj.invoice_number }}" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="form-group row">
+                                    <label class="col-md-3 col-form-label" for="horizontal-form-2">Invoice Date :</label>
+                                    <div class="col-md-9">
+                                    <input type="text" class="form-control square" id="horizontal-form-2" name="last-name" data-available-credit="{{available_credits}}" value="{{ shipment_obj.invoice_date }}" disabled>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-md-4">
+                                <div class="form-group row">
+                                    <label class="col-md-3 col-form-label" for="horizontal-form-2">Bill Number :</label>
+                                    <div class="col-md-9">
+                                    <input type="text" class="form-control square" id="horizontal-form-2" name="last-name" data-available-credit="{{available_credits}}" value="{{ shipment_obj.bill_number }}" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="form-group row">
+                                    <label class="col-md-3 col-form-label" for="horizontal-form-2">Bill Date :</label>
+                                    <div class="col-md-9">
+                                    <input type="text" class="form-control square" id="horizontal-form-2" name="last-name" data-available-credit="{{available_credits}}" value="{{ shipment_obj.bill_date }}" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="form-group row">
+                                    <label class="col-md-3 col-form-label" for="horizontal-form-2">Drawback Value:</label>
+                                    <div class="col-md-9">
+                                    <input type="text" class="form-control square" id="horizontal-form-2" name="last-name" data-available-credit="{{available_credits}}" value="{{ shipment_obj.dbk }}" disabled>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-md-4">
+                                <div class="form-group row">
+                                    <label class="col-md-3 col-form-label" for="horizontal-form-2">RODTEP Value :</label>
+                                    <div class="col-md-9">
+                                    <input type="text" class="form-control square" id="horizontal-form-2" name="last-name" data-available-credit="{{available_credits}}" value="{{ shipment_obj.rodtep }}" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="form-group row">
+                                    <label class="col-md-3 col-form-label" for="horizontal-form-2">Bill of leading :</label>
+                                    <div class="col-md-9">
+                                    <input type="text" class="form-control square" id="horizontal-form-2" name="last-name" data-available-credit="{{available_credits}}" value="{{ shipment_obj.bol }}" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="form-group row">
+                                    <label class="col-md-3 col-form-label" for="horizontal-form-2">ETA:</label>
+                                    <div class="col-md-9">
+                                    <input type="text" class="form-control square" id="horizontal-form-2" name="last-name" data-available-credit="{{available_credits}}" value="{{ shipment_obj.eta }}" disabled>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div id="loading_items">
+            
+            <table class="table table-striped table-bordered file-export" style="width: 100%;"id="loading_order_products_table">
+            <thead>
+                <tr>
+                    <th >Sr No.</th>
+                    <th >Product Name</th>
+                    <th >Quantity</th>
+                    <th style="width: 18%;">Case Pack</th>
+                    <th >Unit Price ($)</th>
+                    <th >Item Total ($)</th>
+                    <th >Discount (%)</th>
+                    <th >Net Price ($) {{is_quotation}}</th>
+                </tr>
+            </thead>
+                <tbody>
+                
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row row-sm price_detail_div">
+                <div class="col-lg-12">
+                    {% if not request.user.role == request.user.CUSTOMER %}
+                        <div class="card">
+                            <div class="card-header text-center"><b><h5>Pricing Details</h5></b></div>
+                            <div class="row card-body">
+                                <div class="col-md-12 row">
+                                    <div class="col-md-4 form-group d-flex">
+                                        <label class="mt-2">Item Total :</label>
+                                        <div class="col-6">
+                                        <input class="form-control" min=0 type="number" id="loading_item_total" name="loading_item_total" value="{{load_obj.total_amount }}" disabled>
+                                        </div>
+                                    </div>
+                                
+                                    
+                                    {% if load_obj.status == "completed" %}
+                                    <div class="col-md-4 form-group d-flex">
+                                        <label class="mt-2">Shipping Charges :</label>
+                                        <div class="col-6">
+                                        <input class="form-control" min=0 type="number" onchange="AdjustLoadingOrder({{load_obj.id}})" id="loading-shipping-charges-{{load_obj.id}}" name="loading-shipping_charge" value="{{ load_obj.shipping_charge }}">
+                                        </div>
+                                    </div>
+                                        
+                                    <div class="col-md-4 form-group d-flex">
+                                        <label class="mt-2">Packing Charges :</label>
+                                        <div class="col-6">
+                                        <input class="form-control" min=0 type="number" onchange="AdjustLoadingOrder({{load_obj.id}})" id="loading-packing-charges-{{load_obj.id}}" name="loading-packing_charge" value="{{ load_obj.packing_charge }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12 row mt-2">
+                                        
+                                    <div class="col-md-4 form-group d-flex">
+                                    <label class="mt-2">Discount (%) :</label>
+                                    <div class="col-6">
+                                        <input class="form-control" min=0 type="number" onchange="AdjustLoadingOrder({{load_obj.id}})" id="loading-discount-{{load_obj.id}}" name="over-all-discount" value="{{ load_obj.discount }}">
+                                    </div>
+                                    </div>
+
+                                    {% else %}
+
+                                    <div class="col-md-4 form-group d-flex">
+                                        <label class="mt-2">Shipping Charges :</label>
+                                        <div class="col-6">
+                                        <input class="form-control" min=0 type="number"   value="{{load_obj.shipping_charge }}" disabled>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4 form-group d-flex">
+                                        <label class="mt-2">Packing Charges :</label>
+                                        <div class="col-6">
+                                        <input class="form-control" min=0 type="number"   value="{{load_obj.packing_charge }}" disabled>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4 form-group d-flex">
+                                        <label class="mt-2">Discount (%) :</label>
+                                        <div class="col-6">
+                                        <input class="form-control" min=0 type="number"  value="{{load_obj.discount }}" disabled>
+                                        </div>
+                                    </div>
+
+                                    {% endif %}
+                                        
+
+                                
+
+                                    <div class="col-md-4 form-group d-flex">
+                                        <label class="mt-2">Grand Total :</label>
+                                        <div class="col-6">
+                                        <input class="form-control" min=0 type="number" id="loading_grand_total" name="loading_grand_total" value="{{load_obj.get_final_order_total }}" disabled>
+                                        </div>
+                                    </div>
+
+                                
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="card">
+                            <div class="card-header text-center"><b><h5>Pricing Details</h5></b></div>
+                            <div class="row card-body">
+                                <div class="col-md-12 row">
+                                    <div class="col-md-4 form-group d-flex">
+                                        <label class="mt-2">Item Total :</label>
+                                        <div class="col-6">
+                                        <input class="form-control" min=0 type="number" id="loading_item_total" name="loading_item_total" value="{{load_obj.total_amount }}" disabled>
+                                        </div>
+                                    </div>
+                                
+
+                                    <div class="col-md-4 form-group d-flex">
+                                        <label class="mt-2">Shipping Charges :</label>
+                                        <div class="col-6">
+                                        <input class="form-control" min=0 type="number"   value="{{load_obj.shipping_charge }}" disabled>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4 form-group d-flex">
+                                        <label class="mt-2">Packing Charges :</label>
+                                        <div class="col-6">
+                                        <input class="form-control" min=0 type="number"   value="{{load_obj.packing_charge }}" disabled>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4 form-group d-flex">
+                                        <label class="mt-2">Discount (%) :</label>
+                                        <div class="col-6">
+                                        <input class="form-control" min=0 type="number"  value="{{load_obj.discount }}" disabled>
+                                        </div>
+                                    </div>
+
+                                        
+
+                                    <div class="col-md-4 form-group d-flex">
+                                        <label class="mt-2">Grand Total :</label>
+                                        <div class="col-6">
+                                        <input class="form-control" min=0 type="number" id="loading_grand_total" name="loading_grand_total" value="{{load_obj.get_final_order_total }}" disabled>
+                                        </div>
+                                    </div>
+
+                                
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    </div>
+                {% if not request.user.role == request.user.CUSTOMER %}
+                    {% if load_obj.status == "completed" %}
+                    <div class="text-end p-2">
+
+                        {% if load_obj.status != load_obj.ON_WATER %}
+                        <button type="button" class="btn btn-primary btn-rounded" onclick="AddToShipiing({{load_obj.id}})">Add To On Water</button>
+                        {% endif %}
+
+                        {% if can_add_shipment %}
+                        <button type="button" data-bs-target="#shippingModal" data-bs-toggle="modal" hx-get="{% url 'order_loads:shipping_create' %}" hx-target="#shipping_form" hx-vars="{'load_order_id': '{{ load_obj.loading_id }}' }" class="btn btn-primary btn-rounded">Add Shipping Details</button>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    {% if load_obj.status == load_obj.ON_WATER %}
+                    <div class="text-end p-2">
+                        {% if can_add_shipment %}
+                        <button type="button" data-bs-target="#shippingModal" data-bs-toggle="modal" hx-get="{% url 'order_loads:shipping_create' %}" hx-target="#shipping_form" hx-vars="{'load_order_id': '{{ load_obj.loading_id }}' }" class="btn btn-primary btn-rounded">Add Shipping Details</button>
+                        {% endif %}
+                        <button type="button" class="btn btn-primary btn-rounded" onclick="AddToDispatch({{load_obj.id}})">Dispatch</button>
+                    </div>
+                    {% endif %}
+                    {% if load_obj.status == load_obj.DISPATCH %}
+                    <div class="text-end p-2">
+                        <button type="button" class="btn btn-primary btn-rounded" onclick="DeliverLoading({{load_obj.id}})">Deliver</button>
+                    </div>
+                    {% endif %}
+                {% endif %}
+                
+        </div>
+</div>
+</div>
+
+<div class="modal" id="shippingModal">
+    <div class="modal-lg modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content tx-size-sm">
+            <div class="modal-header">
+                <h5>Add Shipment</h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
+            </div>    
+            <div class="modal-body pd-x-20">
+                {% include 'order_loads/shipping_create.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="trackingModal">
+    <div class="modal-lg modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content tx-size-sm">
+            <div class="modal-header">
+                <h5>Add Tracking</h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
+            </div>    
+            <div class="modal-body pd-x-20">
+                {% include 'order_loads/tracking_create.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="creditModal">
+    <div class="modal-lg modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content tx-size-sm">
+            <div class="modal-header">
+                <h5>Use Credits</h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
+            </div>    
+            <div class="modal-body pd-x-20">
+                {% include 'customer/use_credits.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+    
+
+{% block script %}
+<script src="{% static 'assets/js/htmx_1.9.4.min.js' %}"></script>
+<script src="{% static 'assets/webapp/initailize_datatables.js' %}"></script>
+<script>
+    var role = true;
+    if ("{{request.user.role}}" == "company admin") {
+        role = false;
+    }
+    if ("{{request.user.role}}" == "sales representative") {
+        role = false;
+    };
+    var i = 1;
+    var table_id = '#loading_order_products_table'
+    var filter_id = $("");
+    var to_center = "_all"
+    var invisible_columns = []
+    var order_false = [-1]
+    var url = '{% url "order_loads:loading_products_list_ajax" %}';
+
+    var columns = [
+        { data: 'id', name: 'id' },
+		{ data: 'product', name: 'product' },
+		{ data: 'quantity', name: 'quantity' },
+		{ data: 'case_pack', name: 'case_pack' },
+        { data: 'unit_price', name: 'unit_price' },
+        { data: 'item_total', name: 'item_total' },
+        { data: 'discount', name: 'discount' },
+        { data: 'net_price', name: 'net_price' },
+    ]
+
+    function set_filters() {
+        var data = {}
+        data["loading_order_id"] = "{{ load_obj.id|safe }}";
+        return data;
+    }
+
+    initailize_datatables();
+</script>
+<script>
+
+function ajax_call_setup() {
+    csrf_token = $("input[name=csrfmiddlewaretoken]").val();
+    $.ajaxSetup({
+        headers: { "X-CSRFToken": csrf_token }
+    });
+}
+
+
+function AddToDispatch(loading_order_id){
+    var url = '{% url "order_loads:update_loading_to_dispatch_ajax" %}';
+
+    Swal.fire({
+        html: `Are you sure you want to dispatch this order ?`,
+        icon: 'question',
+        showCloseButton: true,
+        showCancelButton: true,
+        confirmButtonColor: "#7442DB",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    'id': loading_order_id,
+                    "csrfmiddlewaretoken": '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data["message"]) {
+                        $.toast({
+                            text: data.message,
+                            position: 'bottom-right',
+                            stack: false,
+                            icon: 'success',
+                        })
+                        if(data.level == "success"){
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 3000);
+                        }
+                    }
+                }
+            });
+        }
+    })
+}
+
+function DeliverLoading(loading_order_id){
+    
+    var url = '{% url "order_loads:update_loading_to_deliver_ajax" %}'
+
+    Swal.fire({
+        html: `Are you sure you want to deliver this order ?`,
+        icon: 'question',
+        showCloseButton: true,
+        showCancelButton: true,
+        confirmButtonColor: "#7442DB",
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    'id': loading_order_id,
+                    "csrfmiddlewaretoken": '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data["message"]) {
+                        $.toast({
+                            text: data.message,
+                            position: 'bottom-right',
+                            stack: false,
+                            icon: 'success',
+                        })
+                        if(data.level == "success"){
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 3000);
+                        }
+                    }
+                }
+            });
+        }
+    })
+}
+
+function AdjustLoadingOrder(loading_order_id){
+    var shipping_charges = $("#loading-shipping-charges-"+loading_order_id).val()
+    var packing_charges = $("#loading-packing-charges-"+loading_order_id).val()
+    var discount = $("#loading-discount-"+loading_order_id).val()
+    ajax_call_setup()
+    $.ajax({
+        url: '{% url "order_loads:update_load_order_ajax" %}',
+        type: "POST",
+        dataType: "json",
+        data: {
+            'id': loading_order_id,
+            'shipping_charges': shipping_charges,
+            'packing_charges': packing_charges,
+            'discount': discount,
+        },
+        success: function (data) {
+            $("#loading_grand_total").val(data.grand_total)
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+        }
+    });
+}
+
+function AddToShipiing(loading_id){
+    var url = '{% url "order_loads:add_to_shippimg" %}';
+
+    Swal.fire({
+        html: `Are you sure you want to ship this order ?`,
+        icon: 'question',
+        showCloseButton: true,
+        showCancelButton: true,
+        confirmButtonColor: "#7442DB",
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    'load_order_id': loading_id,
+                    "csrfmiddlewaretoken": '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data["message"]) {
+                        $.toast({
+                            text: data.message,
+                            position: 'bottom-right',
+                            stack: false,
+                            icon: 'success',
+                        })
+                        if(data.level == "success"){
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 3000);
+                        }
+                    }
+                }
+            });
+        }
+    })
+}
+
+</script>
+
+{% endblock script %}

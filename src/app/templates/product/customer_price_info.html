@@ -1,0 +1,14 @@
+<div class="total_price">
+    <div>
+
+        <span onfocusout="disableInput(this)" data-row="row-{{cart.id}}"
+            id="row-{{cart.id}}-price" name="price" value="{{ price }}"><text><b>Rate Per Piece $ </b></text>{{price}}</span>
+        </div>
+         <text><b>Rate Per Cartoon $</b></text> <span data-row="row-{{cart.id}}"
+            id="row-cartoon-price-{{cart.id}}" name="price">{{rate_per_cartton}}</span>
+    </br>
+    <text><b>Total Price$</b></text> <span data-row="row-{{cart.id}}"
+            id="selected-final-price-{{cart.id}}" name="price">{{total}}</span>
+
+    </div>
+</div>

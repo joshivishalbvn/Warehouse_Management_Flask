@@ -1,0 +1,682 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% block css %}
+<style>
+#product_table td, #product_table th,#employe_list td, #employe_list th #zone_list td, #zone_list th ,#wareshouseslist td, #wareshouseslist th{
+    text-align: center;
+}
+</style>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="/static/plugins/sweetalert2/sweetalert2.all.min.js"></script>
+{% endblock css %}
+
+<style>
+    .info-item {
+        margin-bottom: 20px;
+    }
+    .profile-picture-circle {
+        border-radius: 10%;
+        overflow: hidden;
+        width: 100px;
+        height: 100px;
+    }
+    .table-bordered {
+        width: 100% !important;
+    } 
+
+</style>
+<style>
+
+    table#priceLevel {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    table#priceLevel, table#priceLevel th, table#priceLevel td {
+        border: 1px solid black;
+    }
+
+    table#priceLevel th, table#priceLevel td {
+        padding: 8px;
+    }
+
+    table#priceLevel th {
+        background-color: #f2f2f2;
+    }
+
+    .form-3 {
+        width: 100%;
+        margin: 0 auto;
+    }
+</style>
+
+<style>
+    .main-footer{
+        display:none;
+    }
+
+    .blink {
+        animation: blinker 1.5s linear infinite;
+        color: red;
+        font-family: sans-serif;
+    }
+    @keyframes blinker {
+        50% {
+            opacity: 80%;
+        }
+    }
+
+    .copy_done{
+     color: white !important;
+     background-color: black;
+     border-radius: 5px;
+     padding-left:2px;
+     padding-right:2px;
+    }
+
+
+
+
+
+    .hover-image {
+	visibility: hidden;
+}
+
+.hover-title:hover {
+	.hover-image {
+		visibility: visible;
+		pointer-events: none;
+	}
+}
+
+.hover-image {
+	display: flex;
+	position: fixed;
+	top: 41%;
+	left: 26%;
+	transform: translate(-35%, -30%);
+	z-index: 10;
+	pointer-events: none;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+
+	/* Change width and height to scale images */
+	width: 90vw;
+	height: 90vh;
+}
+
+.hover-image img {
+	max-width: 50% !important;
+	max-height: 50% !important;
+	width: auto !important;
+	height: auto !important;
+	margin-bottom: 0;
+	padding: 1rem;
+	background-color: #F0EEFF !important;
+	border-radius: 1rem;
+	border: solid 1px #d8dcdf;
+	border-color: #d8dcdf;
+    box-shadow: 3px 28px 23px -28px #796eb1;
+}
+</style>
+
+
+<div class="col-lg-12">
+    <div class="card">
+    <span title="Update" data-url="{{ url_for('company_bp.update_company', id=company.id) }}" 
+			class="update_this_company open_sidebar d-flex justify-content-end" style="margin-right: 1%; margin-top: 1%; color:var(--primary-bg-color); cursor: pointer; position:">
+				<i class="fa fa-edit"></i>
+				</span>
+        <div class="card-body">
+            <div class="">
+                <div id="user_details" class="tabcontent">
+                    <div class="row">
+                        <div class="card">
+                            <div class="row mt-2">
+                                <div class="col-lg-12 d-flex mt-3">
+                                    <div class="col-4 d-flex">
+                                        <div class="profile-picture profile-picture-circle">
+                                            
+                                            <img src="{% if company.logo %} {{company.logo.url}}{% else %}{{ url_for('static', filename='assets/img/default user.png') }}{% endif %}" alt="user-img" class="rounded-circle mCS_img_loaded h-50 w-50"> 
+                                        </div>
+                                
+                                        <div class="info-item mt-4">
+                                            <b>Company Name:</b>
+                                            <span>{{ company.name | title }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="info-item mt-4">
+                                            <b>Email:</b>
+                                            <span>{{ company.email }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="info-item mt-4">
+                                            <b>Mobile No</b>
+                                            <span>{{ company.phone }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-1">
+                    <div class="mt-3">
+                        <span data-id="tab-1" class="btn btn-outline-primary order_tab  ml-sm-0 htmx-trigger-btn mt-3  list_button nav-tab-active " id="id_warehouses" >Warehouses</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span data-id="tab-2" class="btn btn-outline-primary order_tab ml-sm-0 htmx-trigger-btn mt-3 nav-tab list_button" id="id_zone"  >Zones</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span data-id="tab-3" class="btn btn-outline-primary order_tab ml-sm-0 htmx-trigger-btn mt-3 nav-tab list_button" id="id_employee"  >Employee</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span data-id="tab-4" class="btn btn-outline-primary order_tab ml-sm-0 htmx-trigger-btn mt-3 nav-tab list_button" id="id_products"  >Products</span>&nbsp;&nbsp;&nbsp;&nbsp;<br><br>
+                    </div>
+
+                    <section id="tab-1" class="tab-content active">
+                        <table border="1" class="table border-top-0 table-striped  table-bordered text-nowrap border-bottom" id="wareshouseslist">
+                            <thead>
+                                <tr class="w-100">
+                                    <th>Sr no.</th>
+                                    <th>Warehouse Name</th>
+                                    <th>Address</th>
+                                    <th>Zones</th>
+                                    <th>Products</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </section>
+                    
+                    
+                    <section id="tab-2" class="tab-content active">
+                        <table border="1" cellspacing="50" class="w-100 h-20 table border-top-0 table-striped  table-bordered text-nowrap border-bottom" id="zone_list">
+                            <thead>
+                                <tr class="w-100">
+                                    <th>Sr No.</th>
+                                    <th>Zone Name</th>
+                                    <th>Warehouse Name</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section id="tab-3" class="tab-content active">
+                        <div class="row">
+                            <div class="col-12 ">
+                                <table border="1" cellspacing="50" class="w-100 h-20 table border-top-0 table-striped  table-bordered text-nowrap border-bottom" id="employe_list">
+                                    <thead>
+                                        <tr class="w-100">
+                                            <th class="text-center">SR No</th>
+                                            <th class="text-center">Name</th>
+                                            <th class="text-center">Email</th>
+                                            <th class="text-center">Mobile</th>
+                                            <th class="text-center">Role</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="tab-4" class="tab-content active">
+                        <div class="row">
+                            <div class="col-12 ">
+
+                                <table border='1' cellspacing=50 class="w-100 h-20 table border-top-0 table-striped  table-bordered text-nowrap border-bottom" id="product_table">
+                                    <thead>
+                                        <tr class="w-100">
+                                            <th>SR No</th>
+                                            <th>Product Image</th>
+                                            <th>Product Name</th>
+                                            <th>Product code</th>
+                                            <th>Total Quantity</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="tab-5" class="tab-content active">
+                        <div class="row">
+                            <div class="col-6 addressinfo table">
+                                <div style="display:flex; flex-direction: row-reverse;">
+                                    <a class="btn btn-primary text-right" href="#">Add</a>
+                                </div>
+                                <table border=1 cellspacing=50 class="w-100 h-20 table border-top-0 table-striped  table-bordered text-nowrap border-bottom" id="address1"  style="border-top: 0px !important">
+                                    <thead>
+                                        <tr class="w-100">
+                                            <th>SR No</th>
+                                            <th>Billing Address</th>
+                                            <th>Default</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>110 N Carpenter St, United States</td>
+                                            <td>Yes</td>
+                                            <td>
+                                                <a href="" title="Detail">
+                                                    <i class="fa fa-eye font-medium-3 mr-3"></i>
+                                                </a>
+                                                <a href="" title="Delete">
+                                                    <i class="text-danger fa fa-trash font-medium-3 "></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td>632 N Main St, United States</td>
+                                            <td>No</td>
+                                            <td>
+                                                <a href="" title="Detail">
+                                                    <i class="fa fa-eye font-medium-3 mr-3"></i>
+                                                </a>
+                                                <a href="" title="Delete">
+                                                    <i class="text-danger fa fa-trash font-medium-3 "></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>3</td>
+                                            <td>330 Focus St, United States</td>
+                                            <td>No</td>
+                                            <td>
+                                                <a href="" title="Detail">
+                                                    <i class="fa fa-eye font-medium-3 mr-3"></i>
+                                                </a>
+                                                <a href="" title="Delete">
+                                                    <i class="text-danger fa fa-trash font-medium-3 "></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="col-6 addressinfo table">
+                                <div style="display:flex; flex-direction: row-reverse;">
+                                    <a class="btn btn-primary text-right" href="#">Add</a>
+                                </div>
+                                    
+                                <table border=1 cellspacing=50 class="w-100 h-20 table border-top-0 table-striped  table-bordered text-nowrap border-bottom" id="address2" style="border-top: 0px !important">
+                                    <thead>
+                                        <tr class="w-100">
+                                            <th>SR No</th>
+                                            <th>Shipping Address</th>
+                                            <th>Default</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>110 N Suncity St, United States</td>
+                                            <td>Yes</td>
+                                            <td>
+                                                <a href="" title="Detail">
+                                                    <i class="fa fa-eye font-medium-3 mr-3"></i>
+                                                </a>
+                                                <a href="" title="Delete">
+                                                    <i class="text-danger fa fa-trash font-medium-3 "></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td>320 N Hayat St, United States</td>
+                                            <td>No</td>
+                                            <td>
+                                                <a href="" title="Detail">
+                                                    <i class="fa fa-eye font-medium-3 mr-3"></i>
+                                                </a>
+                                                <a href="" title="Delete">
+                                                    <i class="text-danger fa fa-trash font-medium-3 "></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>3</td>
+                                            <td>960 N ITC St, United States</td>
+                                            <td>No</td>
+                                            <td>
+                                                <a href="" title="Detail">
+                                                    <i class="fa fa-eye font-medium-3 mr-3"></i>
+                                                </a>
+                                                <a href="" title="Delete">
+                                                    <i class="text-danger fa fa-trash font-medium-3 "></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                
+                <div class="form-3">
+                    <div class="card">
+                        <div class="card-body">
+                    
+                            <div class="mx-4 mb-4">
+                                <table class="table border-top-0 table-striped table-bordered text-nowrap border-bottom w-100" id="product-datatable">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center" >SR No.</th>
+                                            <th class="text-center">CODE</th>
+                                            <th class="text-center">IMAGE</th>
+                                            <th class="text-center">NAME</th>
+                                            <th class="text-center">COMPANY</th>
+                                            <th class="text-center">PRICE</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                    </tbody>
+                                
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <a href="javascript:history.go(-1);" class="btn btn-dark">
+                <span class="bi bi-arrow-return-left"></span> Back
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block form %}
+<div class="addcompany  addcompany-animate">
+</div>
+{% endblock form %}
+
+
+
+
+{% block script %}
+<script src="{{ url_for('static', filename='assets/js/sidebar_open.js') }}"></script>
+
+<script src="{{ url_for('static', filename='assets/webapp/companylist.js') }}"></script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="{{ url_for('static', filename='assets/js/htmx_1.9.4.min.js') }}"></script>
+
+<script>
+
+    $( document ).ready(function() {
+        $(".form-3").addClass("hidden");
+        window.onload=function(){
+            document.getElementById("id_warehouses").click();
+          };
+    });
+    $("#title1").click(function(){
+        $(this).addClass("active-div");
+        $(this).addClass("main-content-label2");
+        $(this).removeClass("main-content-label");
+        $(".form-1").removeClass("hidden");
+        $(".form-3").addClass("hidden");
+
+
+        $("#title3").removeClass("active-div");
+        $("#title3").removeClass("main-content-label2");
+        $("#title3").addClass("main-content-label");
+    })
+    $("#title3").click(function(){
+        $(this).addClass("active-div");
+        $(this).addClass("main-content-label2");
+        $(this).removeClass("main-content-label");
+        $(".form-3").removeClass("hidden");
+        $(".form-1").addClass("hidden");
+
+        $("#title1").removeClass("active-div");
+        $("#title1").removeClass("main-content-label2");
+        $("#title1").addClass("main-content-label");       
+    })
+
+    $('.title').hover(function() {
+        $(this).css('cursor','pointer');
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        var company_id = "{{company.id|safe}}";
+        var warehouse_list_url = "{{ url_for('wh_bp.warehouse_data_table') }}"
+        var zone_list_url = "{{ url_for('zone_bp.zone_data_table') }}"
+        var product_list_url = "{{ url_for('product_bp.product_data_table') }}"
+        var employee_list_url = "{{ url_for('user_bp.employee_data_table') }}"
+
+        var warehouse_table = $('#wareshouseslist').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": warehouse_list_url,
+                "data": function (d) {
+                    d.company = company_id;
+                }
+            },
+            "columns": [
+                { data: 'id', name: 'id' },
+                { data: 'name', name: 'name' },
+                { data: 'address', name: 'address' },
+                { data: 'zones', name: 'zones' },
+                { data: 'products', name: 'products' },
+                { data: 'status', name: 'status' },
+                { data: 'actions', name: 'actions' },
+            ]
+        });
+        
+        var employee_table = $('#employe_list').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": employee_list_url,
+                "data": function (d) {
+                    d.company = company_id;
+                }
+            },
+            "columns": [
+                { data: 'id', name: 'id' },
+                { data: 'name', name: 'name' },
+                { data: 'email', name: 'email' },
+                { data: 'mobile', name: 'mobile' },
+                { data: 'role', name: 'role' },
+            ]
+        });
+        
+        var product_table = $('#product_table').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": product_list_url,
+                "data": function (d) {
+                    d.company = company_id;
+                }
+            },
+            "columns": [
+                { data: 'id', name: 'id' },
+                { data: 'image', name: 'image' },
+                { data: 'name', name: 'name' },
+                { data: 'code', name: 'code' },
+                { data: 'quantity', name: 'quantity' },
+                { data: 'details_action', name: 'details_action' },
+            ]
+        });
+        
+        var zone_table = $('#zone_list').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": zone_list_url,
+                "data": function (d) {
+                    d.company = company_id;
+                }
+            },
+            "columns": [
+                { data: 'id', name: 'id' },
+                { data: 'name', name: 'name' },
+                { data: 'warehouse_name', name: 'warehouse_name' },
+                { data: 'status', name: 'status' },
+                { data: 'actions', name: 'actions' },
+            ]
+        });
+
+        $(document).on('click', '.zone_update', function (e) {
+            url = $(this).data("url")
+            htmx.ajax('GET', url, {
+                target: '#sidebar_form', swap: 'innerHTML',
+            }).then(() => {
+                $('#sidebar_form').toggleClass('sidebar-open')
+            });
+        });
+
+        $(document).on('click', '.update_this_warehouse' , function (e) {
+            url = $(this).data("url")
+            htmx.ajax('GET', url, {
+                target:'#sidebar_form', swap:'innerHTML',
+            }).then(() => {
+                $('#sidebar_form').toggleClass('sidebar-open')
+            });
+        });
+
+        $(document).on('click', '.delete-btn', function (e) {
+            var url = $(this).attr("data-url");
+            swal({
+                title: "Are you sure?",
+                text: "Once deleted, you will not be able to recover this zone!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function (response) {
+                            swal("Poof! Zone has been deleted!", {
+                                icon: "success",
+                            }).then(() => {
+                                zone_table.ajax.reload();
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            swal("Error", "An error occurred while deleting the item", "error");
+                        }
+                    });
+                }
+            });
+        });
+
+
+    });
+
+</script>
+
+
+<!---order teb js -->
+<script>
+    $('.order_tab').click(function(e) {
+  //Toggle tab link
+  $(this).addClass('nav-tab-active ').siblings().removeClass('nav-tab-active ');
+    $(this).removeClass('nav-tab').siblings().addClass('nav-tab');
+  //Toggle target tab
+    table_id = $(this).data('id')
+    $(`#${table_id}`).addClass('active').siblings().removeClass('active');
+
+    });
+</script>
+
+
+
+
+
+<script>
+	document.body.addEventListener('htmx:beforeSwap', function(evt) {
+	  if(evt.detail.xhr.status === 200){
+		  if(evt.detail.requestConfig.verb != 'get')
+		  {
+			  evt.detail.shouldSwap = false;
+			  window.location.reload();
+			  
+		  }
+	  }
+  });
+</script>
+
+<script>
+    function loadSalesRep() {
+        company_id = $("#id_company").val();
+        $.ajax({
+            type: "GET",
+            url: "#",
+            data: {
+                    "id": company_id,
+                },
+            dataType: 'json',
+            success: function (data) {
+                let html_data = '';
+                data.representatives.forEach(function (data) {
+                    html_data += `<option value="${data.id}">${data.representative_name}</option>`
+                });
+                $("#id_sales_representatives").html(html_data); 
+            }    
+        });
+
+    }
+</script>
+<script>
+    $('.product_tab').on('click', function (){
+        document.querySelectorAll('.checks').forEach(function(button,index) {
+            if (index==0||index==1||index==2){
+                button.setAttribute("checked","");
+            }
+        });
+        document.querySelectorAll('.price_input').forEach(function(button,index) {
+            if (index==0||index==1||index==2){
+                button.setAttribute("value","1000");
+            }
+            else{
+                button.setAttribute("value","00")
+            }
+        });
+    });
+
+    $(document).on('click', '.product_tab' , function (){
+});
+
+$(document).this.field('.fa-image').addClass('.remove-active')    
+</script>
+
+{% endblock script %}

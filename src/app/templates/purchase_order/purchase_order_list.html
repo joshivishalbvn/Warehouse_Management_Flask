@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Purchase Orders
+{% endblock title %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="/static/plugins/sweetalert2/sweetalert2.all.min.js"></script>
+{% endblock css %}
+
+{% block content %}
+<div class="row row-sm">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex flex-sm-row flex-column justify-content-between">
+                    <h4 class="card-title d-flex">Purchase Orders<i class="fas fa-filter" onclick="filter_button()"
+                            style="display: block !important; cursor: pointer;margin-left: 10px;"></i></h4>
+                    <div>
+                        <a href="{{ url_for('po_bp.create_purchase_order') }}" class="btn btn-primary ml-sm-1">Add</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="">
+                    <h2 class="nav-tab-wrapper">
+                        <span data-id="#tab-11"
+                            class="btn btn-outline-primary ml-sm-0 tab-2 nav-tab-active ">Created</span>
+                        <span data-id="#tab-22" class="btn btn-outline-primary ml-sm-0 tab-2 nav-tab">Unloading</span>
+                        <span data-id="#tab-33" class="btn btn-outline-primary ml-sm-0 tab-2 nav-tab">Completed</span>
+                    </h2>
+                </div>
+                <section id="tab-11" class="tab-content active">
+                    <table class="table border-top-0 table-striped table-bordered text-nowrap border-bottom"
+                        id="created_order_table" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Sr. No.</th>
+                                <th>Order ID</th>
+                                <th>Order Date</th>
+                                <th>Vendor</th>
+                                <th>No. of Products</th>
+                                <th>Total Quantity</th>
+                                <th>Total Amount (₹)</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </section>
+                <section id="tab-22" class="tab-content">
+                    <table class="table border-top-0 table-striped table-bordered text-nowrap border-bottom"
+                        id="unloading_order_table" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Sr. No.</th>
+                                <th>Order ID</th>
+                                <th>Order Date</th>
+                                <th>Vendor</th>
+                                <th>No. of Products</th>
+                                <th>Total Quantity</th>
+                                <th>Total Amount (₹)</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </section>
+                <section id="tab-33" class="tab-content">
+                    <table class="table border-top-0 table-striped table-bordered text-nowrap border-bottom"
+                        id="completed_order_table" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Sr. No.</th>
+                                <th>Order ID</th>
+                                <th>Order Date</th>
+                                <th>Vendor</th>
+                                <th>No. of Products</th>
+                                <th>Total Quantity</th>
+                                <th>Total Amount (₹)</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block filters %}
+<div class="event">
+
+    <div class="row rounded py-2 mb-2 mx-n2">
+
+        <div class="col-12 col-sm-12 col-lg-12">
+            <label for="id_company">Company</label>
+            <fieldset class="form-group">
+                <select id="id_order_company" onchange="LoadVendor()"
+                    class="select2-data-array form-control select2-list">
+                    <option value="">All</option>
+                    {% for company in company_list %}
+                    <option value="{{company.id}}">{{company.name}}</option>
+                    {% endfor %}
+                </select>
+            </fieldset>
+        </div>
+
+        <div class="col-12 col-sm-12 col-lg-12">
+            <label for="users-list-role">Vendor</label>
+            <fieldset class="form-group">
+                <select id="id_order_vendor" class="form-control">
+                    <option value="">All</option>
+                    {% for vendor in vendor_list %}
+                    <option value="{{vendor.id}}">{{vendor.full_name}}</option>
+                    {% endfor %}
+                </select>
+            </fieldset>
+        </div>
+        <div class="col-12 col-sm-12 col-lg-12">
+        </div>
+        <div class="col-12 col-sm-12 col-lg-12 d-flex align-items-center justify-content-between mt-2">
+            <button type="reset" class="btn btn-primary btn-block glow mb-0 order-list-clear">Clear</button>
+        </div>
+    </div>
+
+</div>
+{% endblock filters %}
+
+{% block script %}
+<script src="{{ url_for('static', filename='assets/webapp/tabbing.js') }}"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="{{ url_for('static', filename='assets/js/sidebar_open.js') }}"></script>
+<script>
+    $(document).ready(function () {
+        const tableConfigs = [
+            { id: 'created_order_table', status: 'created' },
+            { id: 'unloading_order_table', status: 'unloading' },
+            { id: 'completed_order_table', status: 'completed' }
+        ];
+
+        const tables = {};
+
+        tableConfigs.forEach(config => {
+            tables[config.id] = $(`#${config.id}`).DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ url_for('po_bp.purchase_order_data_table') }}",
+                    data: function (d) {
+                        d.vendor_id = $('#id_order_vendor').val();
+                        d.company_id = $('#id_order_company').val();
+                        d.status = config.status;
+                    }
+                },
+                columns: [
+                    { data: 'id', name: 'id' },
+                    { data: 'purchase_id', name: 'purchase_id' },
+                    { data: 'created_at', name: 'created_at' },
+                    { data: 'vendor', name: 'vendor' },
+                    { data: 'total_products', name: 'total_products' },
+                    { data: 'total_quantity', name: 'total_quantity' },
+                    { data: 'total_price', name: 'total_price' },
+                    { data: 'actions', name: 'actions' }
+                ]
+            });
+        });
+
+        $('#id_order_vendor, #id_order_company').on('change', function () {
+            Object.values(tables).forEach(table => table.ajax.reload());
+        });
+
+        $(document).on('click', '.order-list-clear', function () {
+            $("#id_order_vendor").val(null).trigger('change');
+            $("#id_order_company").val(null).trigger('change');
+        })
+
+
+    });
+
+    function LoadVendor() {
+        var selected_company_id = $("#id_order_company").val()
+        $.ajax({
+            type: "GET",
+            url: "{{ url_for('vendor_bp.get_vendor_ajax') }}",
+            data: {
+                "company_id": selected_company_id,
+            },
+            success: function (response) {
+                console.log(response);
+
+                var selectVendorDropdown = $('#id_order_vendor');
+                selectVendorDropdown.empty();
+
+                if (response.vendors && Array.isArray(response.vendors)) {
+                    response.vendors.forEach(vendors => {
+                        var newOption = $('<option></option>').val(vendors.id).text(vendors.text);
+                        selectVendorDropdown.append(newOption);
+                    });
+                } else {
+                    console.error('Invalid response format:', response);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('AJAX request failed:', status, error);
+            }
+        });
+    }
+</script>
+{% endblock script %}

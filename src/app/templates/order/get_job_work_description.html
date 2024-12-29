@@ -1,0 +1,31 @@
+{% load static %}
+
+<table class="d-flex justify-content-center" style="min-width:100%">
+    {% if job_work.voice_note %}
+    <tr class="text-nowrap">
+        <th style="width:100px">Voice note :</th>
+        <td>
+            <audio controls style="height:30px; width:260px">
+                <source src="{{ job_work.voice_note.url }}" type="audio/ogg">
+                Your browser does not support the audio element.
+            </audio>
+        </td>
+    </tr>
+    {% endif %}
+    {% if job_work.file %}
+    <tr class="text-nowrap">
+        <th>File / Photo :</th>
+        <td style="width:250px">
+            <a target="_blank" href="{{ job_work.file.url }}">
+                <img src="{% static 'photos/jobwork/pdf.png' %}" style="height:50px;width:auto">
+            </a>
+        </td>
+    </tr>
+    {% endif %}
+    {% if job_work.comment %}
+    <tr class="text-nowrap">
+        <th>Comment : </th>
+        <td class="text-start">{{job_work.comment|safe}}</td>
+    </tr>
+    {% endif %}
+</table>

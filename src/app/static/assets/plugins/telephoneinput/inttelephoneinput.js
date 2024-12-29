@@ -1,0 +1,4 @@
+$(function() {
+    $(".regionalphonenumberwidget").intlTelInput();
+});
+

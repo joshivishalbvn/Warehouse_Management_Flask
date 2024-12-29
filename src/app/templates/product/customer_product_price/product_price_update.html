@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Customer Product Price
+{% endblock title %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12 col-xl-12 col-xs-12 col-sm-12">
+        <div class="card border shadow">
+            <div class="card-body">
+
+                <div class="card-header">
+
+                    <h4 class="card-title">Update Customer Product Price</h4>
+
+                </div>
+                <form method="post" class="row g-3 p-3 " enctype="multipart/form-data" novalidate>
+
+                    {% csrf_token %}
+
+                    {{ form.non_field_errors }}
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <div class="col-md-12">
+                                {{ form.product | as_crispy_field}}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="col-md-12">
+                                {{ form.customer | as_crispy_field}}
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-6">
+                            <div class="col-md-12">
+                                {{ form.price| as_crispy_field }}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-danger">Submit</button>
+                            <button type="reset" class="btn btn-secondary">Reset</button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+
+{% block script %} 
+
+{% endblock script %}

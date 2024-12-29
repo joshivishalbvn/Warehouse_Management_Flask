@@ -1,0 +1,138 @@
+{% load widget_tweaks static sekizai_tags %}
+
+{% addtoblock "css" %}
+<link rel="stylesheet" href="{% static 'cdns/jquery-ui.css' %}">
+<style>
+  #ui-datepicker-div{
+    z-index: 100000 !important;
+  }
+</style>
+{% endaddtoblock %}
+
+<form id="shipping_form" hx-target="#shipping_form" hx-post="{% url 'order_loads:shipping_create' %}"
+    novalidate onsubmit="ManageShippingForm()">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-3 mt-3">
+            <label for="">Loading ID</label>
+            <input type="text" name="load_order" maxlength="10" class="form-control" value="{{ load_order_id }}" disabled="true" id="id_load_order" />
+        </div>
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.invoice_number.label }}{% if form.invoice_number.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.invoice_number %}
+            {% if form.invoice_number.errors %}
+                {% for error in form.invoice_number.errors %}
+                <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.invoice_date.label }}{% if form.invoice_date.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.invoice_date|attr:"autocomplete:off" %}
+            {% for error in form.invoice_date.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.bill_number.label }}{% if form.bill_number.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.bill_number %}
+            {% if form.bill_number.errors %}
+                {% for error in form.bill_number.errors %}
+                <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.bill_date.label }}{% if form.bill_date.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.bill_date|attr:"autocomplete:off" %}
+            {% for error in form.bill_date.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.dbk.label }}{% if form.dbk.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.dbk %}
+            {% for error in form.dbk.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.rodtep.label }}{% if form.rodtep.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.rodtep %}
+            {% for error in form.rodtep.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.bol.label }}{% if form.bol.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.bol %}
+            {% for error in form.bol.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.eta.label }}{% if form.eta.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.eta|attr:"autocomplete:off" %}
+            {% for error in form.eta.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.container_number.label }}{% if form.container_number.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.container_number %}
+            {% for error in form.container_number.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.tacking_url.label }}{% if form.tacking_url.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.tacking_url %}
+            {% for error in form.tacking_url.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        
+    </div>
+    <div class="text-end mt-5">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" onclick="$('#shippingModal').modal('hide');">Cancel</button>
+    </div>
+</form>
+
+{% addtoblock "script" %}
+<script src="{% static 'cdns/jquery-ui.js' %}"></script>
+
+<script>
+
+    document.addEventListener('htmx:afterRequest', function(evt) {
+        $("#id_bill_date, #id_invoice_date, #id_eta").datepicker();
+    })
+
+    document.body.addEventListener('htmx:responseError', function (evt) {
+        $.toast({
+            text: "Load order not found !!!",
+            position: 'bottom-right',
+            stack: false,
+            icon: "error",
+        });
+    });
+
+    document.body.addEventListener("ShipmentResponse", function(evt){
+        $.toast({
+            text: evt.detail.message,
+            position: 'bottom-right',
+            stack: false,
+            icon: evt.detail.level,
+        });
+
+        if(evt.detail.level == "success"){
+            window.location.reload();
+        }
+    });
+
+    function ManageShippingForm(){
+        $("#shipping_form").find(".form-control").prop("disabled", false);
+    }
+</script>
+
+{% endaddtoblock %}

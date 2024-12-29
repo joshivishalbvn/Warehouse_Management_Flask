@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}    
+{% block content %}
+<div class="card match-height py-4">  
+    <div id="tab-1-content-1" class="tab-1-content">
+        <div class="card-header">
+            <div class="d-flex flex-sm-row flex-column justify-content-between">
+                <h4 class="card-title">Products</h4>
+                
+                <div>
+                    {% csrf_token %}
+                    
+                    {% if total_products > 0 %}
+                    <a href="{% url 'customers:export_product_excel' %}" class="btn btn-primary ml-sm-1">Export Excel File</a>
+                    {% endif %}
+                    <a href="{% url 'order:order_create_from_excel' %}" class="btn btn-primary ml-sm-1">Import Excel File</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table border-top-0 mb-5 table-striped table-bordered text-nowrap border-bottom w-100"
+                    id="product-datatable">
+                    <thead>
+                        <tr>
+                            <th>Sr No.</th> 
+                            <th>Product Image</th>
+                            <th>Product Name</th>
+                            <th>Price</th>
+                            <th style="max-width: 10%;">Select Quantity</th>
+                            <th>Case Size</th>
+                            <th>Add</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-center">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block filters %}
+<div class="event">
+    
+       <div class="row rounded py-2 mb-2 mx-n2">
+        <div class="col-12 col-sm-12 col-lg-12">
+            <label for="users-list-role">Product</label>
+            <fieldset class="form-group">
+            <select id="id_role" class="form-control">
+                <option value=""selected>All</option>
+            </select>
+            </fieldset> 
+        </div>
+        <div class="col-12 col-sm-12 col-lg-12 d-flex align-items-center justify-content-between mt-2">
+            <button type="reset" class="btn btn-primary btn-block users-list-clear glow mb-0" id="clear_search_filter">Clear</button>
+        </div>
+    </div>
+
+</div> 
+
+{% endblock filters %}
+
+{% block script %}
+
+<script src="{% static 'assets/webapp/tabbing.js' %}"></script>
+<script>
+    var add_order_url  = "{% url 'products:add_order_ajax' %}";
+</script>
+<script src="{% static 'assets/js/order.js' %}"></script>
+
+<!-- -----------------Data Table Js------------------------- -->
+<script>
+    var role = true;
+    if ("{{request.user.role}}" == "Company Admin") {
+        role = false;
+    }
+    if ("{{request.user.role}}" == "Sales Representative") {
+        role = false;
+    };
+    var i = 1;
+    var table_id = '#product-datatable'
+    var filter_id = $("#id_warehouse, #id_zone, #id_vendor")
+    var to_center = [0, 1, 2, 3, 4, 5]
+    var invisible_columns = []
+    var order_false = [1, -1, -2, -3, -4]
+    var url = '{% url "products:customer_product_list_ajax" %}'
+    var columns = [
+        {data: 'id',name: 'id'},
+        {data: 'product_image',name: 'product_image'},
+        {data: 'product__name',name: 'product__name'},
+        {data: 'price', name: 'price'},
+        {data: 'case_size',name: 'case_size'},
+        {data: 'select_quantity', name: 'select_quantity'},
+        {data: 'add', name: 'id'},
+    ]
+
+    function set_filters() {
+        var data = {}
+        data["warehouse"] = $("#id_warehouse").val();
+        data["zone"] = $("#id_zone").val();
+        data["vendor"] = $("#id_vendor").val();
+        data["product"] = $("#id_product").val();
+        return data
+    }
+</script>
+<!-- -----------------End Of Data Table Js------------------------- -->
+
+<script>
+    function initailize_datatables() {
+        $(table_id).DataTable({
+            scrollX:true,
+            scrollY: '500px',
+            columnDefs: [
+                {targets: to_center, className: "text-center"},
+                {orderable: false, targets: order_false},
+                {targets: invisible_columns, visible: role},
+            ],
+            language: {
+                "emptyTable": "No matching records found",
+            },
+            order: [],
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: url,
+                type: 'get',
+                data: set_filters(),
+            },
+            columns: columns,
+            rowCallback: function (nRow, aData, iDisplayIndex) {
+                var oSettings = this.fnSettings();
+                $("td:first", nRow).html(oSettings._iDisplayStart + iDisplayIndex + 1);
+                return nRow;
+            },
+        });
+    };
+    initailize_datatables();
+
+    filter_id.on("change", function () {
+        $(table_id).DataTable().destroy();
+        initailize_datatables();
+    });
+</script>
+
+{% endblock script %}

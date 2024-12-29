@@ -1,0 +1,74 @@
+{% if formset %}
+    {% for product_form in formset.products %}
+        <tr id="row-{{ loop.index0 }}">
+            <td class="hidden">{{ product_form.id }}</td>
+            <td class="hidden">
+                {{ product_form.product_id(class="hidden") }}
+            </td>
+            <td>
+                {{ product_form.product_id.label }}
+                <a id="row-{{ loop.index0 }}-product_name_display" href="#" title="Product code">
+                    {{ product_form.product_id.data }}
+                </a>
+            </td>
+            {% if "/create/" in request.path or "/update/" in request.path %}
+                <!-- Conditional content for create/update paths -->
+            {% else %}
+                <td>
+                    {{ product_form.batch_number(class="form-control") }}
+                    {% for error in product_form.batch_number.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                    {% endfor %}
+                </td>
+            {% endif %}
+            <td>
+                {{ product_form.per_piece_price(class="form-control price_changed") }}
+                {% for error in product_form.per_piece_price.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            </td>
+            <td>
+                <div class="d-flex justify-content-end">
+                    <select name="purchase_order_products-{{ loop.index0 }}-case_size" class="form-control case_changed"
+                            id="id_purchase_order_products-{{ loop.index0 }}-case_size" data-row="{{ loop.index0 }}" style="width:200px">
+                        {% for case in product_form.case_size_id.choices %}
+                            <option
+                                value="{{ case[0] }}" {% if case[0] == product_form.case_size_id.data %} selected {% endif %}
+                                data-qty="{{ case[1] }}">
+                                {{ case[1] }} Qty
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" class="btn btn-link text-dark add-case" data-row="{{ loop.index0 }}" data-bs-target="#ProductCaseForm" data-bs-toggle="modal"><i class="fa fa-plus"></i></button>
+                </div>
+                {% for error in product_form.case_size_id.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            </td>
+            <td>
+                {{ product_form.case_quantity(class="form-control case_qty_changed") }}
+                {% for error in product_form.case_quantity.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            </td>
+            <td>
+                {{ product_form.total_pieces(class="form-control", disabled=True) }}
+            </td>
+            <td>
+                {{ product_form.amount(class="form-control", disabled=True) }}
+            </td>
+            <td>
+                {{ product_form.DELETE(class="hidden") }}
+                <button type="button" class="btn btn-link fa fa-trash button-delete text-danger" value="#{{ product_form.DELETE.id }}" data-row="#row-{{ loop.index0 }}"></button>
+            </td>
+        </tr>
+    {% else %}
+        <tr class="no-product">
+            <td colspan="10">No product found</td>
+        </tr>
+    {% endfor %}
+{% else %}
+    <tr class="no-product">
+        <td colspan="10">No product found</td>
+    </tr>
+{% endif %}

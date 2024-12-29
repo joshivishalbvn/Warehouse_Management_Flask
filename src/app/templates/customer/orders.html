@@ -1,0 +1,398 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="row row-sm">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="mt-3 mx-3">
+                    <span class="btn btn-outline-primary ml-sm-0 htmx-trigger-btn list_button mx-1 title active" data-index="1">Order Request</span>
+                    <span class="btn btn-outline-primary ml-sm-0 htmx-trigger-btn list_button mx-1 title" data-index="2">Accepted</span>
+                    <span class="btn btn-outline-primary ml-sm-0 htmx-trigger-btn list_button mx-1 title" data-index="3">Loading</span>
+                    <span class="btn btn-outline-primary ml-sm-0 htmx-trigger-btn list_button mx-1 title" data-index="7">On Water</span>
+                    <span class="btn btn-outline-primary ml-sm-0 htmx-trigger-btn list_button mx-1 title" data-index="6">Dispatched</span>
+                    <span class="btn btn-outline-primary ml-sm-0 htmx-trigger-btn list_button mx-1 title" data-index="4">Delivered</span>
+                    <span class="btn btn-outline-primary ml-sm-0 htmx-trigger-btn list_button mx-1 title" data-index="8">Cancelled</span>
+                    <span class="btn btn-outline-primary ml-sm-0 htmx-trigger-btn list_button mx-1 title" data-index="5">Payment</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="table-div" id="table-1">
+                        {% include "customer/order_request.html" %}
+                    </div>
+                    <div class="table-div hidden" id="table-2">
+                        {% include "customer/order_list.html" %}
+                    </div>
+                    <div class="table-div hidden" id="table-3">
+                        {% include "customer/packed_orders.html" %}
+                    </div>
+                    <div class="table-div hidden" id="table-4">
+                        {% include "customer/delivered_orders.html" %}
+                    </div>
+                    <div class="table-div hidden" id="table-5">
+                        {% include "customer/payments.html" %}
+                    </div>
+					<div class="table-div hidden" id="table-6">
+                        {% include "customer/dispatched_orders.html" %}
+                    </div>
+					<div class="table-div hidden" id="table-7">
+                        {% include "customer/on_water_orders.html" %}
+                    </div>
+					<div class="table-div hidden" id="table-8">
+                        {% include "customer/cancelled_orders.html" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="orderHistoryModal">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content tx-size-sm">
+            <div class="modal-header">
+                <h4 class="modal-title">Order History</h4>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body pd-x-20" id="order_history_list">
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    function removeAllTab(){
+        $(".title").removeClass("active");
+    }
+
+    function hideAllTable(){
+        $(".table-div").addClass("hidden");
+    }
+
+    $(".title").click(function(){
+        let id = $(this).data("index");
+        
+        removeAllTab();
+        hideAllTable();
+        
+        $(this).addClass("active");
+        $("#table-"+id).removeClass("hidden");
+    })
+
+    $('.title').hover(function() {
+        $(this).css('cursor','pointer');
+    });
+
+</script>
+
+<script src="{% static 'assets/webapp/initailize_datatables.js' %}"></script>
+<script src="{% static 'assets/js/htmx_1.9.4.min.js' %}"></script>
+<script>
+	var role = true;
+	if ("{{request.user.role}}" == "Company Admin") {
+		role = false;
+	}
+	if ("{{request.user.role}}" == "Sales Representative") {
+		role = false;
+	};
+	var i = 1;
+    var scrollX = false;
+	var table_id = '#request_order_table'
+	var filter_id = $("")
+	var to_center = "_all"
+	var invisible_columns = []
+	var order_false = [-1]
+	var url = '{% url "customers:customer_order_list" %}'
+
+	var columns = [
+        { data: 'id', name: 'id' },
+		{ data: 'order_id', name: 'order_id' },
+		{ data: 'created_at', name: 'created_at' },
+		{ data: 'grand_total', name: 'grand_total' },
+		{ data: 'actions', name: 'actions' },
+	]
+
+	function set_filters() {
+		var data = {}
+		data["company"] = $("#id_company").val();
+		data["role"] = $("#id_role").val();
+        data["status"] = "Submitted";
+		return data
+	}
+
+	initailize_datatables();
+
+</script>
+
+<script>
+	var role = true;
+	if ("{{request.user.role}}" == "Company Admin") {
+		role = false;
+	}
+	if ("{{request.user.role}}" == "Sales Representative") {
+		role = false;
+	};
+	var i = 1;
+    var scrollX = false;
+	var table_id = '#cancelled-order-table'
+	var filter_id = $("")
+	var to_center = "_all"
+	var invisible_columns = []
+	var order_false = [-1]
+	var url = '{% url "customers:customer_order_list" %}'
+
+	var columns = [
+        { data: 'id', name: 'id' },
+		{ data: 'order_id', name: 'order_id' },
+		{ data: 'created_at', name: 'created_at' },
+		{ data: 'grand_total', name: 'grand_total' },
+		{ data: 'actions', name: 'actions' },
+	]
+
+	function set_filters() {
+		var data = {}
+		data["company"] = $("#id_company").val();
+		data["role"] = $("#id_role").val();
+        data["status"] = "Cancelled";
+		return data
+	}
+
+	initailize_datatables();
+
+</script>
+<script>
+	var role = true;
+	if ("{{request.user.role}}" == "Company Admin") {
+		role = false;
+	}
+	if ("{{request.user.role}}" == "Sales Representative") {
+		role = false;
+	};
+	var i = 1;
+    var scrollX = false;
+	var table_id = '#on-water-order-table'
+	var filter_id = $("")
+	var to_center = "_all"
+	var invisible_columns = []
+	var order_false = [-1]
+	var url = '{% url "customers:customer_on_water_order_list" %}'
+
+	var columns = [
+        { data: 'id', name: 'id' },
+		{ data: 'order_id', name: 'order_id' },
+		{ data: 'created_at', name: 'created_at' },
+		{ data: 'grand_total', name: 'grand_total' },
+		{ data: 'actions', name: 'actions' },
+	]
+
+	function set_filters() {
+		var data = {}
+		data["company"] = $("#id_company").val();
+		data["role"] = $("#id_role").val();
+        data["status"] = "Submitted";
+		return data
+	}
+
+	initailize_datatables();
+
+</script>
+
+<script>
+	var role = true;
+	if ("{{request.user.role}}" == "Company Admin") {
+		role = false;
+	}
+	if ("{{request.user.role}}" == "Sales Representative") {
+		role = false;
+	};
+	var i = 1;
+    var scrollX = false;
+	var table_id = '#dispatched-order-table'
+	var filter_id = $("")
+	var to_center = "_all"
+	var invisible_columns = []
+	var order_false = [-1]
+	var url = '{% url "customers:customer_dispatched_order_list" %}'
+
+	var columns = [
+        { data: 'id', name: 'id' },
+		{ data: 'order_id', name: 'order_id' },
+		{ data: 'created_at', name: 'created_at' },
+		{ data: 'grand_total', name: 'grand_total' },
+		{ data: 'actions', name: 'actions' },
+	]
+
+	function set_filters() {
+		var data = {}
+		data["company"] = $("#id_company").val();
+		data["role"] = $("#id_role").val();
+        data["status"] = "Submitted";
+		return data
+	}
+
+	initailize_datatables();
+
+</script>
+
+<script>
+	var role = true;
+	if ("{{request.user.role}}" == "Company Admin") {
+		role = false;
+	}
+	if ("{{request.user.role}}" == "Sales Representative") {
+		role = false;
+	};
+	var i = 1;
+    var scrollX = false;
+	var table_id = '#payment-table'
+	var filter_id = $("")
+	var to_center = "_all"
+	var invisible_columns = []
+	var order_false = [-1]
+	var url = '{% url "customers:customer_payment_history_ajax" %}'
+
+	var columns = [
+		{ data: 'id', name: 'id' },
+        { data: 'receive_date', name: 'receive_date' },
+		{ data: 'amount', name: 'amount' },
+		{ data: 'payment_mode', name: 'payment_mode' },
+		{ data: 'reference_id', name: 'reference_id' },
+	]
+
+	function set_filters() {
+		var data = {}
+		data["customer_id"] = "{{ customer.id|safe }}";
+		return data
+	}
+
+	initailize_datatables();
+
+</script>
+
+<script>
+	var role = true;
+	if ("{{request.user.role}}" == "Company Admin") {
+		role = false;
+	}
+	if ("{{request.user.role}}" == "Sales Representative") {
+		role = false;
+	};
+	var i = 1;
+    var scrollX = false;
+	var table_id = '#accepted-order-table'
+	var filter_id = $("")
+	var to_center = "_all"
+	var invisible_columns = []
+	var order_false = [-1]
+	var url = '{% url "customers:customer_order_list" %}'
+
+	var columns = [
+        { data: 'id', name: 'id' },
+		{ data: 'order_id', name: 'order_id' },
+		{ data: 'created_at', name: 'created_at' },
+		{ data: 'grand_total', name: 'grand_total' },
+		{ data: 'actions', name: 'actions' },
+	]
+
+	function set_filters() {
+		var data = {}
+		data["company"] = $("#id_company").val();
+		data["role"] = $("#id_role").val();
+        data["status"] = "Accepted";
+		return data
+	}
+
+	initailize_datatables();
+
+</script>
+
+<script>
+	var role = true;
+	if ("{{request.user.role}}" == "Company Admin") {
+		role = false;
+	}
+	if ("{{request.user.role}}" == "Sales Representative") {
+		role = false;
+	};
+	var i = 1;
+    var scrollX = false;
+	var table_id = '#packed-order-table'
+	var filter_id = $("")
+	var to_center = "_all"
+	var invisible_columns = []
+	var order_false = [-1]
+	var url = '{% url "customers:customer_loading_order_list" %}'
+
+	var columns = [
+        { data: 'id', name: 'id' },
+		{ data: 'order_id', name: 'order_id' },
+		{ data: 'created_at', name: 'created_at' },
+		{ data: 'grand_total', name: 'grand_total' },
+		{ data: 'actions', name: 'actions' },
+	]
+
+	function set_filters() {
+		var data = {}
+		data["company"] = $("#id_company").val();
+		data["role"] = $("#id_role").val();
+		return data
+	}
+
+	initailize_datatables();
+</script>
+
+<script>
+	var role = true;
+	if ("{{request.user.role}}" == "Company Admin") {
+		role = false;
+	}
+	if ("{{request.user.role}}" == "Sales Representative") {
+		role = false;
+	};
+	var i = 1;
+    var scrollX = false;
+	var table_id = '#delivered-order-table'
+	var filter_id = $("")
+	var to_center = "_all"
+	var invisible_columns = []
+	var order_false = [-1]
+	var url = '{% url "customers:customer_delivered_order_list" %}'
+
+	var columns = [
+        { data: 'id', name: 'id' },
+		{ data: 'order_id', name: 'order_id' },
+		{ data: 'created_at', name: 'created_at' },
+		{ data: 'grand_total', name: 'grand_total' },
+		{ data: 'actions', name: 'actions' },
+	]
+
+	function set_filters() {
+		var data = {}
+		data["company"] = $("#id_company").val();
+		data["role"] = $("#id_role").val();
+		return data
+	}
+
+	initailize_datatables();
+
+</script>
+
+<script>
+    $(document).on('click', '.order_history' , function (e) {
+        let url = $(this).data("url");
+
+        htmx.ajax('GET', url, {
+            target:'#order_history_list',
+            swap:'innerHTML',
+        });
+    });
+</script>
+
+{% endblock script%}

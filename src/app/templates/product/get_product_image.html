@@ -1,0 +1,15 @@
+<div class="row">
+    <div class="col-md-12">
+        <img src="{% if img_url %} {{ url_for('static', filename=img_url) }} {% else %} {{ url_for('static', filename='images/product-image.png') }} {% endif %}"  alt="avatar" height="{{height}}" class="border-rounded">
+        
+    </div>
+</div>
+    
+{% if obj.get_preview_url %}
+<a class="info p-0 ml-1" href="{{obj.get_preview_url}}">
+</a>
+{% else %}
+<a class="info p-0" href="{{obj.get_update_url}}">
+</a>
+{% endif %}
+    

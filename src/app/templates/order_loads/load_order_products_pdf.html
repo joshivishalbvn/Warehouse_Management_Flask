@@ -1,0 +1,26 @@
+{% load static %}
+<head>
+    <link href="{%  static 'assets/css/style.css' %}" rel="stylesheet">
+    <link href="{%  static 'assets/plugins/bootstrap/css/bootstrap.css' %}" rel="stylesheet" id="style" />
+</head>
+<table class="table table-striped table-bordered file-export w-100 " >
+    <thead>
+        <tr>
+            <th class="text-center" ><b>Sr No</b>.</th>
+            <th class="text-center" ><b>Product Name</b></th>
+            <th class="text-center" ><b>Quantity</b></th>
+            <th class="text-center" ><b>Case Pack</b></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in product_list %}
+        <tr>
+            <td class="text-center" >{{ forloop.counter}}</td>
+            <td class="text-center p-2" >{{product.order_product.product.name}} ({{product.order_product.product.code}})</td>
+            <td class="text-center p-2" >Qty {{product.order_product.case_pack.quantity}}, Weight {{product.order_product.case_pack.weight}}(Oz) CMV {{product.order_product.case_pack.cubic_meter_volume}}</td>
+            <td class="text-center p-2" >{{product.quantity}}</td>
+        </tr>    
+    {% endfor %}  
+    </tbody>
+
+</table>

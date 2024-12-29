@@ -1,0 +1,8 @@
+{% if job_work.voice_note %}
+<audio controls style="height:30px; width:260px">
+    <source src="{{ job_work.voice_note.url }}" type="audio/ogg">
+    Your browser does not support the audio element.
+</audio>
+{% else %}
+-
+{% endif %}

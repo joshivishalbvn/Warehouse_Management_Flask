@@ -1,0 +1,10 @@
+<span class="span-secondary hover-title mr-sm" title="{{product.name}}">
+    <button class="btn btn-secondary">
+        <i class="fas fa-image"></i>
+    </button>
+    <a target="_blank" href="{{ url_for('static', filename=img_url) }}">
+        <div class="hover-image">
+            <img src="{{ url_for('static', filename=img_url) }}" alt="Item Image" style="max-height: 11rem; max-width: 11rem; " class="img-fluid" />
+        </div>
+    </a>
+</span>

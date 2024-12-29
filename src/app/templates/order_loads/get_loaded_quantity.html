@@ -1,0 +1,35 @@
+
+{% if  loaded %}
+<div class="text-center">
+
+	<div class="col-12">
+		<input class="product_quantity form-control" id="id_qty_{{obj.id}}"  min="0" type="number" value="{{obj.quantity}}" max="{{obj.quantity}}"  oninput="AdjustLoadedQuantity({{obj.id}})">
+	</div>  
+	
+	<div class="col-12 mt-2">
+		<button  type="button" class="btn btn-danger  btn-rounded loading-delete-btn"  data-url="{{delete_url}}" title="Delete" data-title="{{obj.order_product.product.name}}"  data-id="{{obj.id}}">Remove</button>
+	</div>
+
+</div>
+	
+{% else %}
+	
+<div class="text-center">
+	{% comment %} {% if obj.is_job_work_approved %} {% endcomment %}
+	<div class="col-12">
+		<input class="product_quantity form-control" id="qty_{{obj.id}}" min="0" type="number" value="{{ready_for_load}}" max="{{ready_for_load}}"  oninput="AdjustQuantity({{obj.id}})">
+	</div>  
+	
+	<div class="col-12 mt-2">
+		<button  type="button" class="btn btn-primary  btn-rounded " onclick="AddLoadItems({{obj.id}})">Add</button>
+	</div>
+		
+	{% comment %} {% else %}
+	<div class="col-12 mt-2">
+		<span class="btn btn-warning  btn-rounded">Pending</span>
+	</div>
+	{% endif %} {% endcomment %}
+</div>
+{% endif %}
+		
+

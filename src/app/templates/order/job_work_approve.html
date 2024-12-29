@@ -1,0 +1,58 @@
+{% load widget_tweaks static sekizai_tags %}
+
+<form id="job_work_form" hx-target="#job_work_form" hx-post="{% if form %} {% url 'order:approve_job_work_ajax' form.instance.id %} {% endif %}"
+    novalidate>
+    {% csrf_token %}
+    <input type="hidden" id="id_remaining_qty" name="remaining_qty" value="{{ remaining_qty }}" />
+    <div class="row my-2">
+        <div>
+            <b>Product : </b> {{ form.instance.ordered_product.product.name }}
+        </div>
+
+        <div class="col-md-6 mt-3">
+            <label>{{ form.requested_quantity.label }}{% if form.requested_quantity.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            <input type="number" name="requested_quantity" min="0" value="{{ total_quantity }}" class="form-control" disabled="true" id="id_requested_quantity">
+        </div>
+        
+        <div class="col-md-6 mt-3">
+            <label>Select Quantity{% if form.quantity.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.select_quantity|attr:"value:0" %}
+            {% for error in form.select_quantity.errors %}Total Pending Quantity
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        
+    </div>
+    <div class="text-end mt-5">
+        <button type="submit" class="btn btn-primary">Approve</button>
+        <button type="button" class="btn btn-secondary" onclick="$('#JobWorkApproveModal').modal('hide');">Cancel</button>
+    </div>
+</form>
+
+{% addtoblock "script" %}
+
+<script>
+
+    document.addEventListener('htmx:afterRequest', function(evt) {
+        $(document).on("input", "#id_select_quantity", function(){
+            let quantity = parseInt($(this).val());
+            let total_jobwork_qty = parseInt($("#id_requested_quantity").val());
+            let pending_quantity = 0;
+
+            if(total_jobwork_qty>0){
+                pending_quantity = parseInt($("#id_requested_quantity").val());
+            }else{
+                pending_quantity = parseInt($("#id_remaining_qty").val());
+            }
+            if( quantity > pending_quantity){
+                $(this).val(pending_quantity);
+            }
+            if( quantity < 0 ){
+                $(this).val(0);
+            }
+        });
+    })
+
+</script>
+
+{% endaddtoblock %}

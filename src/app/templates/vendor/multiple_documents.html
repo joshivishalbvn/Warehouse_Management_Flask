@@ -1,0 +1,101 @@
+{% load static sekizai_tags %}
+
+{% addtoblock "css" %}
+<style>
+input[type=checkbox] {
+    display: none;
+  }
+</style>
+{% endaddtoblock %}
+
+  <div class="col-md-2">
+    <label class="label-control mt-2 font-weight-bold" for="id_additional_charges">Documents:</label>
+  </div>
+  <div class="col-md-12">
+
+    {% for extra_fields in inlines %}
+        {{extra_fields.management_form}}
+        {% for form in extra_fields %}
+            {{form.id}}
+            <div class="extra-fields-wrap">
+                <div class="row extra-fields extra-fields-main">
+
+                  <div class="hidden">
+                    {{ form.vendor }}
+                  </div>
+
+                  <div class="col-md-6">
+                    <label for="{{ form.weight.auto_id }}">{{ form.name.label }}{% if form.name.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                        {% for error in form.name.errors %}
+                        <span class="error text-danger">{{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
+                  </div>
+                  
+                  <div class="col-md-5">
+                    <label for="{{ form.documents.auto_id }}">{{ form.documents.label }}{% if form.documents.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+                    {{ form.documents }}
+                    {% if form.documents.errors %}
+                        {% for error in form.documents.errors %}
+                        <span class="error text-danger">{{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
+                  </div>
+    
+                  <div class="col-md-1 d-flex align-items-center justify-content-center pt-4 mt-2">
+                    <label for="{{form.DELETE.auto_id}}" class="label-delete-group text-danger mb-4">{{form.DELETE}}<a class="fa fa-trash delete_form_button" value="{{form.DELETE.auto_id}}"></a></label>
+                    {% comment %} <label for="{{form.DELETE.auto_id}}" class="label-delete-group">{{form.DELETE}} {{form.DELETE.field.label}}</label> {% endcomment %}
+                  </div>
+                </div>
+            </div>
+        {% endfor %}
+        <div class="extra-fields-added">
+        </div>
+    {% endfor %}
+
+<div class="row text-end">
+    <div class="col-md-12">
+      <button class="btn btn-default pull-right" type="button" id="add-case-inline" onclick="AddForm()"><i class="fa fa-plus"
+      id=""></i> Add more</button>
+  </div>
+</div>
+
+{% addtoblock "script" %}
+<script>
+  function AddForm() {
+    var total_forms = parseInt($("#id_vendor_details-TOTAL_FORMS").val());
+    clone_group = $(".extra-fields-wrap").first().clone(true);
+    html_text = clone_group.html()
+    _html_text = html_text.replaceAll("-0-", "-" + total_forms + "-");
+    final_template = $.parseHTML(_html_text);
+    $(".extra-fields-added").append(final_template)
+    $(".extra-fields-added").find(".extra-fields-main").removeClass("extra-fields-main").addClass("extra-fields-main-" + total_forms);
+    $(".extra-fields-main-" + total_forms).find(".form-control").val("");
+    $(".extra-fields-main-" + total_forms).find(".delete-button-wrap").show();
+    $("#div_id_vendor_details-"+ total_forms +"-documents").children('div').empty()
+    html_content = `<input type="file" name="vendor_details-${total_forms}-documents" class="form-control clearablefileinput form-control-file" id="id_vendor_details-${total_forms}-documents">`
+    $("#div_id_vendor_details-"+ total_forms +"-documents").children('div').html(html_content)
+    
+    total_forms++;
+    $("#id_vendor_details-TOTAL_FORMS").val(total_forms);
+  };
+
+  $(document).on("click", ".radio_set_as_primary", function (e) {
+    event.preventDefault();
+    $(".radio_set_as_primary input").prop("checked", false);
+    $(".delete-button-wrap").show()
+    $(this).find("input").prop("checked", true);
+    $(this).siblings(".delete-button-wrap").find("input").prop("checked", false);
+    $(this).siblings(".delete-button-wrap").hide();
+  })
+
+  $(document).on("click", ".delete_form_button", function() {
+    var id = $(this).attr("value")
+    $(id).prop('checked',true);
+    var parent_div = $(this).parent().parent().parent()
+    parent_div.hide();
+  });
+</script>
+{% endaddtoblock %}

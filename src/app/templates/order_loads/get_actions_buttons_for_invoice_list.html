@@ -1,0 +1,9 @@
+<div class="text-center">
+    <a href="{{ invoice_url }}" class="mx-1" title="Invoice"><i class="fa fa-print text-info"></i></a>
+    <a href="{{detail_url}}" class="order-details-btn mx-1" data-id="{{obj.id}}" title="Detail"><i class="fa fa-eye font-medium-3"></i></a>
+    
+    {% if is_due %}
+        <a class="text-right add_payment" data-url="{{add_payment_url}}" data-id='{{obj.id}}'><i class="fa fa-plus font-medium-3" title="Add Payment"></i></a>
+    {% endif %}
+        
+</div>

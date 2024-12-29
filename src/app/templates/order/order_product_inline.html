@@ -1,0 +1,43 @@
+{% load widget_tweaks %}
+
+<div>
+    {% for formset in inlines %}
+        {{ formset.management_form }}
+        <table class="hidden">
+            <tbody class="extra-fields-wrap">
+                <tr id="row-__prefix__">
+                    <td class="hidden product-id">0</td>
+                    <td class="hidden">
+                        {% render_field formset.empty_form.product|add_class:"hidden" %}
+                    </td>
+                    <td>
+                        <span id="row-__prefix__-product_name"></span>
+                        ( <a id="row-__prefix__-product_code" href="" title=""></a> )
+                    </td>
+                    <td>
+                        {% render_field formset.empty_form.customer_price|attr:"disabled:disabled" %}
+                    </td>
+                    <td>
+                        <div class="d-flex justify-content-end">
+                            {% render_field formset.empty_form.case_pack|add_class:"case_changed"|attr:"style:width:200px"|attr:"data-row:__prefix__" %}
+                            <button type="button" class="btn btn-link text-dark add-case" data-row="__prefix__" data-bs-target="#ProductCaseForm" data-bs-toggle="modal"><i class="fa fa-plus"></i></button>
+                        </div>
+                    </td>
+                    <td>
+                        {% render_field formset.empty_form.quantity|add_class:"case_qty_changed"|attr:"data-row:__prefix__"|attr:"min:0" %}
+                    </td>
+                    <td>
+                        {% render_field formset.empty_form.total_pieces|attr:"disabled:disabled" %}
+                    </td>
+                    <td>{% render_field formset.empty_form.item_total|attr:"disabled:disabled" %}</td>
+                    <td class="hidden">{% render_field formset.empty_form.discount|add_class:"change_discount"|attr:"min:0" %}</td>
+                    <td>{% render_field formset.empty_form.net_price|attr:"disabled:disabled" %}</td>
+                    <td>
+                        {% render_field formset.empty_form.DELETE|add_class:"hidden" %}
+                        <button type="button" class="btn btn-link fa fa-trash button-delete text-danger" value="#{{formset.empty_form.DELETE.auto_id}}" data-row="#row-__prefix__"></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    {% endfor %}
+</div>

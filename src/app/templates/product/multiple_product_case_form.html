@@ -1,0 +1,119 @@
+{% block css %}
+<style>
+input[type=checkbox] {
+    display: none;
+}
+.delete_button {
+    cursor: pointer;
+}
+</style>
+{% endblock css %}
+
+<div class="col-md-12 mt-3">
+  <label class="font-weight-bold">Product Cases:</label>
+</div>
+
+<div class="col-md-12"></div>
+
+<form method="POST" enctype="multipart/form-data">
+  {{ form.hidden_tag() }}
+  
+  <!-- Management Form for formset -->
+  {{ form.product_cases.management_form }}
+
+  <div class="extra-fields-container">
+    {% for form in form.product_cases %}
+    <div class="extra-fields-wrap">
+      <div class="row extra-fields extra-fields-main mt-3">
+        <div class="col-md-4">
+          {{ form.weight.label(class="form-control-label") }}
+          {{ form.weight(class="form-control", placeholder="Enter weight") }}
+          {% if form.weight.errors %}
+          <ul class="errors">
+            {% for error in form.weight.errors %}
+            <small class="form-text text-danger">{{ error }}</small>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+
+        <div class="col-md-4">
+          {{ form.cubic_meter_volume.label(class="form-control-label") }}
+          {{ form.cubic_meter_volume(class="form-control", placeholder="Enter volume") }}
+          {% if form.cubic_meter_volume.errors %}
+          <ul class="errors">
+            {% for error in form.cubic_meter_volume.errors %}
+            <small class="form-text text-danger">{{ error }}</small>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+
+        <div class="col-md-3">
+          {{ form.quantity.label(class="form-control-label") }}
+          {{ form.quantity(class="form-control", placeholder="Enter quantity") }}
+          {% if form.quantity.errors %}
+          <ul class="errors">
+            {% for error in form.quantity.errors %}
+            <small class="form-text text-danger">{{ error }}</small>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+
+        <!-- Include delete button -->
+        <div class="col-md-1 d-flex align-items-center pt-4 mt-2">
+          <input type="hidden" name="{{ form.prefix }}-DELETE" id="{{ form.prefix }}-DELETE" class="delete-checkbox">
+          <button type="button" class="btn btn-link fa fa-trash delete_button text-danger" data-id="{{ form.prefix }}-DELETE"></button>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="extra-fields-added"></div>
+
+  <div class="row mt-3">
+    <div class="col-md-12 text-end">
+      <button class="btn btn-default" type="button" id="add-case-inline"><i class="fa fa-plus"></i> Add more</button>
+    </div>
+  </div>
+  
+
+</form>
+
+{% block script %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  function AddForm() {
+    var total_forms = parseInt($("#id_product_cases-TOTAL_FORMS").val(), 10);
+    
+    var clone_group = $(".extra-fields-wrap").first().clone(true); 
+    var html_text = clone_group.html();
+
+    if (html_text) {
+      var new_html_text = html_text.replace(/-0-/g, "-" + total_forms + "-");
+      $(".extra-fields-added").append('<div class="extra-fields-wrap">' + new_html_text + '</div>');
+      $(".extra-fields-added").find(".extra-fields-main").removeClass("extra-fields-main").addClass("extra-fields-main-" + total_forms);
+      $(".extra-fields-main-" + total_forms).find(".form-control").val('');
+      $(".extra-fields-main-" + total_forms).find(".errors").html('');
+      total_forms += 1;
+      $("#id_product_cases-TOTAL_FORMS").val(total_forms);
+    } else {
+      console.error('HTML text for cloning is undefined.');
+    }
+  }
+
+  $(document).ready(function() {
+    $("#add-case-inline").on("click", function() {
+      AddForm();
+    });
+
+    $(document).on("click", ".delete_button", function() {
+      var delete_checkbox_id = $(this).data("id");
+      $("#" + delete_checkbox_id).prop('checked', true).change(); 
+      $(this).closest(".extra-fields-wrap").hide(); 
+    });
+  });
+</script>
+{% endblock script %}

@@ -1,0 +1,175 @@
+
+<div class="panel panel-primary card mb-0">
+    <div class="panel-body tabs-menu-body p-0 border-0">
+      <ul class="Date-time" style="padding:2px;">
+        <div class="d-flex justify-content-between justify-content-center mt-3">
+          <div class="col-6 main-content-label mg-b-5 text-white mt-2">
+            Update Product
+          </div>
+          <button class="btn btn-primary  main-content-label mg-b-5 mb-3"
+            onclick="$('#lg_sidebar_form').toggleClass('sidebar-open')">
+            <i class="fe fe-x" data-bs-toggle="tooltip" title="" data-bs-original-title="fe fe-x" aria-label="fe fe-x"></i>
+          </button>
+        </div>
+    </div>
+  </div>
+  
+  <div class="row">
+      <div class="col-md-12 col-xl-12 col-xs-12 col-sm-12">
+          <div class="card">
+            <div class="card-body">
+                <form id="product-update-form" class="row g-3 p-3" enctype="multipart/form-data" novalidate>
+                  {{ form.hidden_tag() }}
+  
+                    <div class="row">
+  
+                      <div class="col-md-12 col-12">
+                        {{ form.name.label(class="form-control-label") }}
+                        {{ form.name(class="form-control", placeholder="Enter Name") }}
+                        {% if form.name.errors %}
+                        <ul class="errors">
+                          {% for error in form.name.errors %}
+                          <small class="form-text text-danger">{{ error }}</small>
+                          {% endfor %}
+                        </ul>
+                        {% endif %}
+                      </div>
+                      
+                      <div class="col-md-12 col-12">
+                        {{ form.code.label(class="form-control-label") }}
+                        {{ form.code(class="form-control", placeholder="Enter Code") }}
+                        {% if form.code.errors %}
+                        <ul class="errors">
+                          {% for error in form.code.errors %}
+                          <small class="form-text text-danger">{{ error }}</small>
+                          {% endfor %}
+                        </ul>
+                        {% endif %}
+                      </div>
+                      
+                      <div class="col-md-12 col-12">
+                        {{ form.status.label(class="form-control-label") }}
+                        {{ form.status(class="form-control", placeholder="Select Status") }}
+                        {% if form.status.errors %}
+                        <ul class="errors">
+                          {% for error in form.status.errors %}
+                          <small class="form-text text-danger">{{ error }}</small>
+                          {% endfor %}
+                        </ul>
+                        {% endif %}
+                      </div>
+  
+                      <div class="col-md-12 col-12">
+                        {{ form.product_image.label(class="form-control-label") }}
+                        {{ form.product_image(class="form-control", placeholder="Enter Code") }}
+                        {% if form.product_image.errors %}
+                        <ul class="errors">
+                          {% for error in form.product_image.errors %}
+                          <small class="form-text text-danger">{{ error }}</small>
+                          {% endfor %}
+                        </ul>
+                        {% endif %}
+                      </div>
+  
+                      <div class="col-md-12 col-12">
+                        {{ form.company_id.label(class="form-control-label") }}
+                        {{ form.company_id(class="form-control select2", placeholder="Enter Code") }}
+                        {% if form.company_id.errors %}
+                        <ul class="errors">
+                          {% for error in form.company_id.errors %}
+                          <small class="form-text text-danger">{{ error }}</small>
+                          {% endfor %}
+                        </ul>
+                        {% endif %}
+                      </div>
+  
+                    <div class="row">
+                        <div class="col-md-12">
+                          
+
+                          <button id="update_product" data-url="{{ url_for('product_bp.update_product' ,id=product.id) }}" class="btn btn-primary mr-2 update_product" hx-encoding="multipart/form-data">Save</button>
+
+                            <button type="button" onclick="$('#lg_sidebar_form').toggleClass('sidebar-open')" class="btn btn-secondary">Cancel</button>
+                        </div>
+                    </div>
+  
+                </form>
+            </div>
+          </div>
+      </div>
+  </div>
+  
+{% block script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0/js/select2.min.js"></script>
+<script src="{{ url_for('static', filename='assets/js/toast.js') }}"></script>
+
+<script>
+  $(document).ready(function() {
+      $('.select2').select2({
+          width: '100%' // Adjust width as needed
+      });
+  });
+</script>
+<script>
+
+    $(document).ready(function() {
+      $('#update_product').on('click', function(e) {
+          e.preventDefault(); 
+          var $btn = $(this);
+          var form = $('#product-update-form')[0];
+          var formData = new FormData(form);
+          var url = $btn.attr('data-url')
+          if ($('#product-datatable').length) {
+              var table = $('#product-datatable').DataTable();
+          }
+          $btn.prop('disabled', true);
+          $.ajax({
+              url: url,
+              type: 'POST',
+              data: formData,
+              processData: false,
+              contentType: false,
+              success: function(response) {
+                  console.log('Form submitted successfully:', response);
+                  $('#lg_sidebar_form').removeClass('sidebar-open');
+                  console.log("table",table)
+                  if (table) {
+                      table.ajax.reload();
+                      $.toast({
+                      text: "Product Updated Sucessfully !!!",
+                      position: 'bottom-right',
+                      stack: false,
+                      icon: 'success',
+                    });
+                  } else {
+                    $.toast({
+                        text: "Product Updated Sucessfully !!!",
+                        position: 'bottom-right',
+                        stack: false,
+                        icon: 'success',
+                    });
+                    setTimeout(function() {
+                        location.reload();
+                    }, 3000);
+                  }
+              },
+              error: function(xhr) {
+                  console.error('Form submission failed:', xhr.status, xhr.statusText);
+                  var response = xhr.responseJSON;
+                  if (response && response.errors) {
+                      $('#product-update-form .form-text.text-danger').remove();
+                      for (var field in response.errors) {
+                          var errors = response.errors[field];
+                          if (errors.length > 0) {
+                              var $field = $('#product-update-form [name="' + field + '"]');
+                              $field.after('<small class="form-text text-danger">' + errors.join('<br>') + '</small>');
+                          }
+                      }
+                  }
+                  $btn.prop('disabled', false);
+              }
+          });
+      });
+    });
+    </script>
+  {% endblock script %}

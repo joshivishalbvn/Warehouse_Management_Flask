@@ -1,0 +1,420 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	<meta charset="UTF-8">
+	<meta name="csrf-token" content="{{ csrf_token() }}">
+	<meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=0'>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="Description" content="Bootstrap Responsive Admin Web Dashboard HTML5 Template">
+	<meta name="Author" content="Spruko Technologies Private Limited">
+	<meta name="Keywords"
+		content="admin,admin dashboard,admin dashboard template,admin panel template,admin template,admin theme,bootstrap 4 admin template,bootstrap 4 dashboard,bootstrap admin,bootstrap admin dashboard,bootstrap admin panel,bootstrap admin template,bootstrap admin theme,bootstrap dashboard,bootstrap form template,bootstrap panel,bootstrap ui kit,dashboard bootstrap 4,dashboard design,dashboard html,dashboard template,dashboard ui kit,envato templates,flat ui,html,html and css templates,html dashboard template,html5,jquery html,premium,premium quality,sidebar bootstrap 4,template admin bootstrap 4" />
+
+	<!-- Title -->
+	<title>
+		{% block title %} 
+		
+		{% endblock title %}
+	</title>
+
+	<!--- Favicon --->
+	<link rel="icon" href="{{ url_for('static', filename='assets/img/brand/favicon.png') }}" type="image/x-icon" />
+	
+
+
+		<!--- Style css -->
+		
+		<link href="{{ url_for('static', filename='assets/css/style.css') }}" rel="stylesheet">
+		
+		<link href="{{ url_for('static', filename='assets/css/plugins.css') }}" rel="stylesheet">
+		
+		<!--- Icons css -->
+		
+		<link href="{{ url_for('static', filename='assets/css/icons.css') }}" rel="stylesheet">
+
+		<!--- Animations css -->
+		
+		<link href="{{ url_for('static', filename='assets/css/animate.css') }}" rel="stylesheet">
+	<!-- Bootstrap css -->
+	
+	<link href="{{ url_for('static', filename='assets/plugins/bootstrap/css/bootstrap.css') }}" rel="stylesheet" id="style" />
+
+    <!-- Select2 CSS -->
+	
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/select2.min.css') }}">
+
+	<style>
+		.select2-container.select2-container--default.select2-container--open{
+			z-index: 15000;
+		}
+	</style>
+
+	<!-- select2 class override -->
+	<style>
+		.select2-container{
+			width: 100% !important;
+		}
+		.select2-container--default .select2-selection--single {
+			height: 35px !important;
+			padding: 10px 16px;
+			line-height: 1.3;
+			border-radius: 6px;
+		}
+
+		.select2-container--default .select2-selection--single .select2-selection__clear {
+			height: 0px !important;
+		}
+		
+		.select2-container--default .select2-selection--single .select2-selection__rendered {
+			line-height: 12px !important;
+		}
+		.select2-container--default .select2-selection--single {
+			border: 1px solid #dedcfb !important;
+			box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset;
+			transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+		}
+		.select2-container--default .select2-search--dropdown .select2-search__field{
+			border: 1px solid black !important;
+		}
+
+		div:where(.swal2-icon)  {
+			border-color: #fff !important;
+		  }
+		.nav-tab-active {
+			color: white !important;
+			background-color: var(--primary-bg-color) !important;
+		}
+		.nav-tab {
+			background-color: white !important;
+		}
+
+		.tab-content {
+			display: none ;
+		}
+
+		.tab-content.active {
+			display: block;
+		}
+		.job_work_title{
+			margin-top: auto;
+			margin-left: 22px;
+			font-size:17px;
+		}
+		.invoice-title h2, .invoice-title h3 {
+			display: inline-block;
+		}
+
+		.table > tbody > tr > .no-line {
+			border-top: none;
+		}
+
+		.table > thead > tr > .no-line {
+			border-bottom: none;
+		}
+
+		.table > tbody > tr > .thick-line {
+			border-top: 2px solid !important; 
+		}
+		.panel-default {
+			border: 1px solid #ddd;
+		}
+		.panel-title {
+			margin-top: 0;
+			margin-bottom: 0;
+			font-size: 16px;
+			color: inherit;
+		}
+		.checkboxwidth{
+			width:10px;
+		}
+		.panel-heading {
+			padding: 10px 15px !important;
+			border-bottom: 1px solid #ddd !important;
+			background: #fff;
+			background-color: #f5f5f5 !important;
+			border-color: #ddd;
+			color: #333;
+		}
+
+	</style>
+	
+	<style>
+		.asteriskField{
+			color: red;
+			margin-left: 5px;
+		}
+	</style>
+
+
+	<!-- style for delete button replaced with checkbox -->
+	<style>
+		  .fa-trash {
+			display: inline-block;
+			padding: 3px; 
+			cursor: pointer;
+		  }
+
+
+		  .image {
+			width: 100px;
+			height: 100px;
+			position: relative;
+			
+		}
+		  .btn-delete {
+			position: absolute;
+			left: 100%;
+			margin-left: -10px;
+			margin-top: 2px;
+			cursor: pointer;
+		}
+		.flex {
+			display: flex;
+		}
+	</style>
+	<style>
+		.form-control:disabled{
+			background-color: #e9e7f7 !important;
+		}
+	</style>
+	<!-- Style css -->
+	<link href="{{ url_for('static', filename='assets/css/style.css') }}" rel="stylesheet">
+	<link href="{{ url_for('static', filename='assets/css/plugins.css') }}" rel="stylesheet">
+
+	<!-- Icons css -->
+	<link href="{{ url_for('static', filename='assets/css/icons.css') }}" rel="stylesheet">
+
+
+	<!-- Animations css -->
+	<link href="{{ url_for('static', filename='assets/css/animate.css') }}" rel="stylesheet">
+
+    <!-- Toast Css -->
+	<link href="{{ url_for('static', filename='assets/css/toast.css') }}" rel="stylesheet">
+
+	<link href="{{ url_for('static', filename='assets/css/custom.css') }}" rel="stylesheet">
+
+	{% block css %}
+
+	{% endblock css %}
+	
+
+</head>
+
+<body class="main-body app sidebar-mini ltr">
+
+	<!-- Loader -->
+	<div id="global-loader">
+		<img src="{{ url_for('static', filename='assets/img/loaders/loader-4.svg') }}" class="loader-img" alt="Loader">
+	</div>
+	<!-- /Loader -->
+
+	<!-- page -->
+	<div class="page custom-index">
+
+		<!-- main-header -->
+		{% include 'header.html' %}
+		<!-- /main-header -->
+
+
+			<!-- main-sidebar -->
+			{% include 'sidebar.html' %}
+
+			
+
+		<!-- main-sidebar -->
+		{% include 'sidebar.html' %}
+		<!-- main-sidebar -->
+
+		<!-- main-content -->
+		<div class="main-content app-content">
+			<!-- container -->
+			<div class="main-container container-fluid">
+
+				{% block content %}
+
+				{% endblock content %}
+			</div>
+			<!-- /container -->
+		</div>
+		<!-- /main-content -->
+
+
+
+				<!--Sidebar-right-->
+				<div class="nav nav-item sidebar sidebar-right sidebar-animate" id="sidebar_filter">
+					<div class="panel panel-primary card mb-0">
+						<div class=" panel-body tabs-menu-body p-0 border-0">
+							<ul class="Date-time" style="padding: 6px;">
+								<div class="d-flex justify-content-between justify-content-center">
+									<div class="col-6 main-content-label mg-b-12 text-white mt-2">
+										Filters
+									  </div>
+									  
+									  <button class="btn btn-outline-primary main-content-label mg-b-5 mb-3"
+									  onclick="$('#sidebar_filter').toggleClass('sidebar-open')">
+									  <i class="fe fe-x text-white" data-bs-toggle="tooltip" title="" data-bs-original-title="fe fe-x"
+									  aria-label="fe fe-x"></i>
+									</button>
+								</div>
+							</ul>
+							<div class="card-body latest-tasks">
+								
+								{% block filters %}
+								
+								{% endblock filters %}
+							</div>
+							
+						</div>
+					</div>
+				</div>
+
+				<!-- right sidebar form -->
+				<div id="sidebar_form" class="sidebar sidebar-right sidebar-animate" style="width: 30%; overflow-y: scroll;">
+					<div class="panel panel-primary card mb-0">
+						<div class="panel-body tabs-menu-body p-0 border-0">
+							<div class="card-body latest-tasks">
+								
+								{% block form %}
+								
+								{% endblock form %}
+							</div>
+							
+						</div>
+					</div>
+				</div>
+				<!--/Sidebar-right-->
+
+				<div id="lg_sidebar_form" class="sidebar sidebar-right sidebar-animate" style="width: 50%; overflow-y: scroll;">
+					<div class="panel panel-primary card mb-0">
+						<div class="panel-body tabs-menu-body p-0 border-0">
+							<div class="card-body latest-tasks">
+								
+								{% block large_form %}
+								
+								{% endblock large_form %}
+							</div>
+							
+						</div>
+					</div>
+				</div>
+				
+				<!-- Footer opened -->
+		{% include 'footer.html' %}
+		<!-- Footer closed -->
+	</div>
+	<!-- page closed -->
+
+	<!--- JQuery min js --->
+	<script src="{{ url_for('static', filename='assets/plugins/jquery/jquery.min.js') }}"></script>
+
+	<!--- Datepicker js --->
+	<script src="{{ url_for('static', filename='assets/plugins/jquery-ui/ui/widgets/datepicker.js') }}"></script>
+
+	<!--- Bootstrap Bundle js --->
+	<script src="{{ url_for('static', filename='assets/plugins/bootstrap/popper.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='assets/plugins/bootstrap/js/bootstrap.min.js') }}"></script>
+
+	<!--- Ionicons js --->
+	<script src="{{ url_for('static', filename='assets/plugins/ionicons/ionicons.js') }}"></script>
+
+	<!--- Chart bundle min js --->
+	<script src="{{ url_for('static', filename='assets/plugins/chart.js/Chart.bundle.min.js') }}"></script>
+
+	<!--- JQuery sparkline js --->
+	<script src="{{ url_for('static', filename='assets/plugins/jquery-sparkline/jquery.sparkline.min.js') }}"></script>
+
+	<!--- Internal Sampledata js --->
+	<script src="{{ url_for('static', filename='assets/js/chart.flot.sampledata.js') }}"></script>
+
+	<!--- Eva-icons js --->
+	<script src="{{ url_for('static', filename='assets/js/eva-icons.min.js') }}"></script>
+
+	<!--- Moment js --->
+	<script src="{{ url_for('static', filename='assets/plugins/moment/moment.js') }}"></script>
+
+	<!--- Perfect-scrollbar js --->
+	<script src="{{ url_for('static', filename='assets/plugins/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='assets/plugins/perfect-scrollbar/p-scroll.js') }}"></script>
+
+	<!--- Sidebar js --->
+	<script src="{{ url_for('static', filename='assets/plugins/side-menu/sidemenu.js') }}"></script>
+
+	<!--- sticky js --->
+	<script src="{{ url_for('static', filename='assets/js/sticky.js') }}"></script>
+
+	<!-- right-sidebar js -->
+	<script src="{{ url_for('static', filename='assets/plugins/sidebar/sidebar.js') }}"></script>
+	<script src="{{ url_for('static', filename='assets/plugins/sidebar/sidebar-custom.js') }}"></script>
+
+	<!-- Morris js -->
+	<script src="{{ url_for('static', filename='assets/plugins/raphael/raphael.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='assets/plugins/morris.js/morris.min.js') }}"></script>
+
+
+
+	<!--- Scripts js --->
+	<script src="{{ url_for('static', filename='assets/js/script.js') }}"></script>
+
+	<!--- Index js --->
+	<script src="{{ url_for('static', filename='assets/js/index.js') }}"></script>
+
+	<!--themecolor js-->
+	<script src="{{ url_for('static', filename='assets/js/themecolor.js') }}"></script>
+
+	<!--swither-styles js-->
+	<script src="{{ url_for('static', filename='assets/js/swither-styles.js') }}"></script>
+
+	<!--- Custom js --->
+	<script src="{{ url_for('static', filename='assets/js/custom.js') }}"></script>
+
+	<!--- Toast js --->
+	<script src="{{ url_for('static', filename='assets/js/toast.js') }}"></script>
+
+	<script>
+        '{% if messages %}'
+        '{% for message in messages %}'
+            '{% if 'success' in message.tags %}'
+                $.toast({
+                    //heading: '{{message.title}}',
+                    text: '{{message.message}}',
+                    position: 'bottom-right',
+                    stack: false,
+                    icon: 'success',                    
+                })
+            '{% endif %}'
+            '{% if 'warning' in message.tags %}'
+                $.toast({
+                    //heading: 'UPDATED!',
+                    text: '{{message}}',
+                    position: 'bottom-right',
+                    stack: false,
+                    icon: 'warning'
+                })
+            '{% endif %}'
+            '{% if 'error' in message.tags %}'
+                $.toast({
+                    //heading: 'UPDATED!',
+                    text: '{{message}}',
+                    position: 'bottom-right',
+                    stack: false,
+                    icon: 'error'
+                })
+            '{% endif %}'
+        '{% endfor %}'
+    '{% endif %}'
+    </script>
+
+	<script src="{{ url_for('static', filename='assets/js/select2.min.js') }}"></script>
+
+	{% block script %}
+
+	{% endblock script %}
+
+
+
+</body>
+
+</html>

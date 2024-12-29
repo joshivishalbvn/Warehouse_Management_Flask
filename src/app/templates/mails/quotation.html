@@ -1,0 +1,171 @@
+{% load humanize %}
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Order #{{ order_id }}</title>
+        <style>
+            .btn {
+                display: inline-block;
+                font-weight: 400;
+                text-align: center;
+                white-space: nowrap;
+                vertical-align: middle;
+                user-select: none;
+                border: 1px solid transparent;
+                padding: 0.251rem 0.51rem;
+                font-size: 0.875rem;
+                border-radius: 3px;
+                line-height: 1.5;
+                transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            }
+
+            .text-start {
+                text-align: left !important;
+            }
+            
+            .text-end {
+                text-align: right !important;
+            }
+            
+            .text-center {
+                text-align: center !important;
+            }
+
+            .my-2 {
+                margin-top: 0.5rem !important;
+            }
+
+            .mx-2 {
+                margin-right: 0.5rem !important;
+            }
+            
+            .btn:hover {
+                text-decoration: none !important;
+            }
+            
+            .btn:focus {
+                text-decoration: none;
+                outline: none !important;
+                outline: 0;
+                box-shadow: none;
+            }
+            
+            .btn-primary {
+                color: #fff !important;
+                background-color: #3858f9;
+                border-color: #3858f9;
+            }
+            
+            .btn-primary:hover {
+                color: #fff;
+                background-color: #3d4bb7;
+                border-color: #3d4bb7;
+            }
+            
+            .btn-primary:focus,
+            .btn-primary.focus {
+                box-shadow: 0 0 0 0.2rem rgba(82, 125, 255, 0.5);
+                background-color: #3858f9;
+                border-color: #3858f9;
+            }
+
+            .d-flex {
+                display: flex !important;
+            }
+
+            .justify-content-between {
+                justify-content: space-between !important;
+            }
+
+            .text-muted {
+                color: #838294 !important;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between">
+                        {% if company_logo %}
+                        <img src="{{ company_logo }}" alt="company logo" style="width:60px; height:60px">
+                        {% endif %}
+                        <div class="my-2 mx-2">
+                            <h4>{{ company_name }}</h4>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <p><span class="text-muted">Date :</span> {% now "j M, Y"%}</p>
+                    <p><span class="text-muted">Order ID : </span>#<b>{{ order_id }}</b></p>
+                    <p><span class="text-muted">Order Date :</span> {{ order_date|date:"j M, Y" }}</p>
+                </div>
+            </div>
+        
+            <div>
+                Dear {{ customer_name }}, <br><br>
+
+                <p>
+                    We are greatly privileged to be given this chance to quote for <b>ORDER#{{ order_id }}</b>. We have evaluated the order in detail and we came up with a proposal that is appropriate for your needs.
+                </p>
+
+                <p>
+                    Please quote your ordinary product price for supplying these goods for volume purchases.
+                </p>
+            </div>
+
+            <div>
+                <table class="my-2 text-center">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Code</th>
+                            <th>Item</th>
+                            <th>Case Pack</th>
+                            <th>Case Qty</th>
+                            <th>Qty</th>
+                            <th>Rate ($)</th>
+                            <th>Total Price ($)</th>
+                            <th>Discount (%)</th>
+                            <th>Net Price ($)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <th>{{forloop.counter}}</th>
+                            <td>{{ product.product__code }}</td>
+                            <td>{{ product.product__name }}</td>
+                            <td>{{ product.case_pack }}</td>
+                            <td>{{ product.quantity }}</td>
+                            <td>{{ product.total_pieces }}</td>
+                            <td>{{ product.customer_price|intcomma }}</td>
+                            <td>{{ product.item_total|intcomma }}</td>
+                            <td>{{ product.discount }}</td>
+                            <td>{{ product.net_price|intcomma }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td class="text-end" colspan="9"><b>Discount (%) :</b></td>
+                            <td>{{ discount }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-end" colspan="9"><b>Grand Total ($) :</b></td>
+                            <td>{{ grand_total|intcomma }} /-</td>
+                        </tr> 
+                    </tfoot>
+                </table>
+            </div>
+            <p>
+                <a href="{{ order_detail_url }}"> <button class="btn btn-primary">View Quotation</button></a>
+            </p>
+            <p>For further questions and comments, please feel free to contact us on <a href="mailto:{{ company_email }}">{{ company_email }}</a> or <a href="call:{{ company_phone }}">{{ company_phone }}</a>.</p>
+            <p>
+                Sincerely,<br>
+                {{ company_name }}
+            </p>
+        </div>
+    </body>
+</html>

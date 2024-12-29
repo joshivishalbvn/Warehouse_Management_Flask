@@ -1,0 +1,62 @@
+{% load widget_tweaks %}
+
+{% for formset in inlines %}
+    {% for product_form in formset %}
+    <tr id="row-{{ forloop.counter0 }}">
+        <td class="hidden product-id">{{ product_form.id }}</td>
+        <td class="hidden">
+            {% render_field product_form.product|add_class:"hidden" %}
+        </td>
+        <td>
+            {{ product_form.instance.product.name }}
+            (<a id="row-{{ forloop.counter0 }}-product_name_display" href="{% url 'products:product_details' product_form.instance.product.id %}" title="Product code">
+                {{ product_form.instance.product.code }}
+            </a>)
+        </td>
+        <td>
+            {% render_field product_form.customer_price|attr:"disabled:disabled" %}
+        </td>
+        <td>
+            <div class="d-flex justify-content-end">
+                <select name="orders-{{ forloop.counter0 }}-case_pack" class="form-control case_changed"
+                        id="id_orders-{{ forloop.counter0 }}-case_pack" data-row="{{ forloop.counter0 }}" style="width:200px">
+                    {% for case in product_form.instance.product.product_case.all %}
+                        <option
+                            value="{{ case.id }}" {% if case.id == product_form.case_pack.value %} selected {% endif %}
+                            data-qty="{{ case.quantity }}">
+                            {{ case.quantity }} Qty, {{ case.weight }} Oz, {{ case.cubic_meter_volume }} CMV
+                        </option>
+                    {% endfor %}
+                </select>
+                <button type="button" class="btn btn-link text-dark add-case" data-row="{{ forloop.counter0 }}" data-bs-target="#ProductCaseForm" data-bs-toggle="modal"><i class="fa fa-plus"></i></button>
+            </div>
+            {% for error in product_form.case_pack.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </td>
+        <td>
+            {% render_field product_form.quantity|add_class:"case_qty_changed"|attr:"data-type:number" %}
+            {% for error in product_form.quantity.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </td>
+        <td>{% render_field product_form.total_pieces|attr:"disabled:disabled"|add_class:"pieces_changed" %}</td>
+        <td>{% render_field product_form.item_total|attr:"disabled:disabled" %}</td>
+        <td>
+            {% render_field product_form.discount|add_class:"change_discount" %}
+            {% for error in product_form.discount.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </td>
+        <td>{% render_field product_form.net_price|attr:"disabled:disabled" %}</td>
+        <td>
+            {% render_field product_form.DELETE|add_class:"hidden" %}
+            <button type="button" class="btn btn-link fa fa-trash button-delete text-danger" value="#{{formset.empty_form.DELETE.auto_id}}" data-row="#row-__prefix__"></button>
+        </td>
+    </tr>
+    {% empty %}
+    <tr class="no-product">
+        <td colspan="10">No product found</td>
+    </tr>
+    {% endfor %}
+{% endfor %}

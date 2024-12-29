@@ -1,0 +1,43 @@
+
+<div class="modal" id="ProductCaseForm">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content tx-size-sm">
+            <div class="modal-header">
+                <h5>Add New Product Case</h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body pd-x-20">
+                <b>Product : </b><span id="id_product_name"></span>
+                <form class="pd-y-10 mt-2" method="post" id="id_product_case_form" data-url="#">
+                    {% csrf_token %}
+                    <div class="mb-2">
+                        <span id="non_field_error" class="text-danger">{{ error }}</span>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label for="{{ product_case_form.weight.auto_id }}">{{ product_case_form.weight.label }}{% if product_case_form.weight.field.required %}<span class="asteriskField">*</span>{% endif %}</label>
+                            {% render_field product_case_form.weight|add_class:"form-control" %}
+                            <span class='text-danger'></span>
+                        </div>
+                        <div class="col-6">
+                            <label for="{{ product_case_form.quantity.auto_id }}">{{ product_case_form.quantity.label }}{% if product_case_form.quantity.field.required %}<span class="asteriskField">*</span>{% endif %}</label>
+                            {% render_field product_case_form.quantity|add_class:"form-control" %}
+                            <span class='text-danger'></span>
+                        </div>
+                        <div class="col-6">
+                            <label for="{{ product_case_form.cubic_meter_volume.auto_id }}">{{ product_case_form.cubic_meter_volume.label }}{% if product_case_form.cubic_meter_volume.field.required %}<span class="asteriskField">*</span>{% endif %}</label>
+                            {% render_field product_case_form.cubic_meter_volume|add_class:"form-control" %}
+                            <span class='text-danger'></span>
+                        </div>
+                        <div class="hidden">
+                        {% render_field product_case_form.product|add_class:"hidden" %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" form="id_product_case_form" class="btn btn-primary pd-x-25 float-end">Save</button>
+            </div>
+        </div>
+    </div>
+</div>

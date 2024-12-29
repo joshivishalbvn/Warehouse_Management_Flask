@@ -1,0 +1,187 @@
+{% load widget_tweaks static sekizai_tags %}
+
+{% addtoblock "css" %}
+<link rel="stylesheet" href="{% static 'cdns/jquery-ui.css' %}">
+{{ form.media.css }}
+<style>
+  #ui-datepicker-div{
+    z-index: 100000 !important;
+  }
+</style>
+{% endaddtoblock %}
+
+<form id="product_stock_form" hx-target="#product_stock_form" hx-post="{% url 'purchase_order:create_purchase_order_stock' %}"
+    novalidate onsubmit="manage_form()">
+    {% csrf_token %}
+    <div class="row my-3">
+        <div class="font-weight-bold">Stock details :</div>
+        
+        <input type="hidden" name="product" id="id_product" value="{{ product_id }}" />
+        <input type="hidden" name="order" id="id_order" value="{{ order_id }}" />
+        <input type="hidden" name="purchase_product" id="id_purchase_product" value="{{ purchase_product_id }}" />
+        <input type="hidden" name="product_case" id="id_product_case" value="{{ product_case_id }}" />
+        
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.warehouse.label }}{% if form.warehouse.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.warehouse %}
+            {% if form.warehouse.errors %}
+                {% for error in form.warehouse.errors %}
+                <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.zone.label }}{% if form.zone.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.zone %}
+            {% if form.zone.errors %}
+                {% for error in form.zone.errors %}
+                <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.manufacture_date.label }}{% if form.manufacture_date.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.manufacture_date|attr:"autocomplete:off" %}
+            {% for error in form.manufacture_date.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.expiry_date.label }}{% if form.expiry_date.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.expiry_date|attr:"autocomplete:off" %}
+            {% for error in form.expiry_date.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.no_of_case.label }}{% if form.no_of_case.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.no_of_case %}
+            {% for error in form.no_of_case.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="col-md-3 mt-3">
+            <label for="">Total Stock{% if form.affected_stock.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.affected_stock|attr:"disabled:true" %}
+        </div>
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.per_piece_price.label }}{% if form.per_piece_price.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.per_piece_price|attr:"value:{{ per_piece_price_id }}" %}
+            {% for error in form.per_piece_price.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.total_amount.label }}{% if form.total_amount.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.total_amount|attr:"disabled:true" %}
+        </div>
+
+        <div class="col-md-3 mt-3">
+            <label for="{{ form.dollar_price.auto_id }}">{{ form.dollar_price.label }}{% if form.dollar_price.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.dollar_price class+="form-control" %}
+            {% if form.dollar_price.errors %}
+                {% for error in form.dollar_price.errors %}
+                <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
+          </div>
+
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.per_piece_price_dollar.label }}{% if form.per_piece_price_dollar.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.per_piece_price_dollar|attr:"value:{{ per_piece_price_id }}"|attr:"disabled:true" %}
+        </div>
+    </div>
+    <div class="text-end mt-5">
+        <button type="submit" class="btn btn-primary">Unload product</button>
+        <button type="button" class="btn btn-secondary" onclick="$('#unloadForm').modal('hide');">Cancel</button>
+    </div>
+</form>
+
+{{ form.media.js }}
+
+{% addtoblock "script" %}
+<script src="{% static 'assets/zone/load_zone.js' %}"></script>
+<script src="{% static 'cdns/jquery-ui.js' %}"></script>
+
+<script>
+    var row=0;
+    
+    document.addEventListener('htmx:afterRequest', function(evt) {
+
+        if(evt.detail.xhr.status == 200){
+            row = evt.srcElement.getAttribute("data-row");
+            let product = evt.srcElement.getAttribute("data-product");
+            let piece_price = document.getElementById("id_purchase_order_products-"+row+"-per_piece_price").value;
+            let case_size = document.getElementById("id_purchase_order_products-"+row+"-case_size");
+            let case_quantity = document.getElementById("id_purchase_order_products-"+row+"-case_quantity").value;
+            let total_pieces = document.getElementById("id_purchase_order_products-"+row+"-total_pieces").value;
+
+            document.getElementById("id_case_size_text").innerHTML = case_size.options[case_size.selectedIndex].text;
+            document.getElementById("id_case_qty_text").innerHTML = case_quantity;
+            document.getElementById("id_affected_stock_text").innerHTML = total_pieces;
+            document.getElementById("id_case_size_text").setAttribute("data-qty", case_size.options[case_size.selectedIndex].getAttribute("data-qty"))
+            document.getElementById("id_case_size").setAttribute("value", case_size.options[case_size.selectedIndex].getAttribute("value"));
+            document.getElementById("product_display").innerHTML = product;
+            document.getElementById("id_per_piece_price").value = piece_price;
+            document.getElementById("id_product_case").value = case_size.options[case_size.selectedIndex].value;
+        }
+
+        $("#id_manufacture_date").datepicker({
+            maxDate: new Date(),
+        });
+        $("#id_expiry_date").datepicker();
+    });
+
+    document.body.addEventListener('htmx:responseError', function (evt) {
+        $.toast({
+            text: "Purchase order not found !!!",
+            position: 'bottom-right',
+            stack: false,
+            icon: "error",
+        });
+    });
+    
+    $(document).on("input", "#id_no_of_case, #id_per_piece_price", function(){
+        let unload_case_qty = parseInt($("#id_no_of_case").val());
+        let case_size = parseInt($("#id_case_size_text").data("qty"));
+        let piece_price = parseInt($("#id_per_piece_price").val());
+
+        $("#id_affected_stock").val(unload_case_qty * case_size);
+        $("#id_total_amount").val((unload_case_qty * case_size) * piece_price);
+
+        let dollar_price = parseInt($("#id_dollar_price").val());
+        $("#id_per_piece_price_dollar").val((piece_price / dollar_price).toFixed(2));
+    });
+
+    $(document).on("input", "#id_dollar_price", function(){
+        let dollar_price = parseInt($(this).val());
+        let per_piece_price_rupee = parseInt($("#id_per_piece_price").val());
+    
+        $("#id_per_piece_price_dollar").val((per_piece_price_rupee / dollar_price).toFixed(2));
+    });
+
+    document.body.addEventListener("ProductUnloaded", function(evt){
+        $('#unloadForm').modal('hide');
+        let unloaded = parseInt($("#id_purchase_order_products-"+row+"-unloaded_pieces").val());
+        let undelivered = parseInt($("#id_purchase_order_products-"+row+"-undelivered_pieces").val());
+        let total_undelivered = undelivered - evt.detail.unloaded_stock;
+        let total_unloaded = unloaded + evt.detail.unloaded_stock;
+
+        if (total_undelivered < 0){ total_undelivered=0 }
+        $("#id_purchase_order_products-"+row+"-undelivered_pieces").val(total_undelivered);
+        $("#id_purchase_order_products-"+row+"-unloaded_pieces").val(total_unloaded);
+
+        $.toast({
+            text: evt.detail.message,
+            position: 'bottom-right',
+            stack: false,
+            icon: evt.detail.level,
+        });
+    });
+
+    function manage_form(){
+        $("#product_stock_form").find(".form-control").prop("disabled", false);
+    }
+</script>
+
+{% endaddtoblock %}

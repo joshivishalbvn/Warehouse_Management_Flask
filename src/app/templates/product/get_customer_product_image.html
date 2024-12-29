@@ -1,0 +1,20 @@
+{% load static %}
+
+<span class="span-secondary hover-title mr-sm" title="Item image">
+    <button class="btn btn-secondary">
+        <i class="fas fa-image"></i>
+    </button>
+    <a target="_blank" href="{{img_url.image.url }}">
+        <div class="hover-image">
+            <img src="{{ img_url.image.url }}" alt="Item Image" style="max-height: 11rem; max-width: 11rem; " class="img-fluid" />
+        </div>
+    </a>
+</span>
+
+{% if obj.get_preview_url %}
+
+<a class="info p-0 ml-1" href="{{obj.get_preview_url}}"></a>
+{% else %}
+
+<a class="info p-0" href="{{obj.get_update_url}}"></a>
+{% endif %}

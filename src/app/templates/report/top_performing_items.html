@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/daterangepicker.css' %}" />
+{% endblock css %}
+
+{% block content %}
+
+<div class="row row-sm">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex flex-sm-row">
+                    <div class="col-6">
+                        <h4 class="card-title d-flex" style="float: left; margin-right:10px;">Top Performing Items</h4>
+                    </div>
+                    <div class="col-6">
+                        <div class="my-1 date_filter d-none" id="date_filter">
+                            <div class="d-flex justify-content-end">
+                                <b class="my-auto">Date Filter : </b>
+                                <input class="daterange_picker form-control w-25" type="text" name="daterange" id="date_range_unit" value="01/01/2024 - 11/06/2024" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="nav-tab-wrapper">
+                    <table id="top_performing_unit_sold" class="table border-top-0 table-striped  table-bordered text-nowrap border-bottom" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Sr. No.</th>
+                                <th class="text-center">Product Code</th>
+                                <th class="text-center">Product Name</th>
+                                <th class="text-center">Unit Sold</th>
+                                <th class="text-center">Value Sold ($)</th>
+                                <th class="text-center">Available Quantity</th>
+                                <th class="text-center">Average Stock Seating Days</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+
+{% block script %}
+
+<script src="{% static 'assets/js/daterangepicker.min.js' %}"></script>
+
+<script src="{% static 'assets/plugins/datatable/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatable/js/jszip.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatable/js/pdfmake.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatable/js/vfs_fonts.js' %}"></script>
+<script src="{% static 'assets/plugins/datatable/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatable/js/buttons.print.min.js' %}"></script>
+<script src="{% static 'assets/js/datatable_with_buttons.js' %}"></script>
+
+<script>
+    var title = "Top Performing Item Report"
+    var table_id = "#top_performing_unit_sold";
+    var url = "{% url 'report:top_performing_item_list_ajax' %}";
+    var columns = [
+        { data: 'id', name: 'id' },
+        { data: 'code', name: 'code' },
+        { data: 'name', name: 'name' },
+        { data: 'unit_sold', name: 'unit_sold' },
+        { data: 'value_sold', name: 'value_sold' },
+        { data: 'available_stock', name: 'available_stock' },
+        { data: 'avg_stock_sitting_days', name: 'avg_stock_sitting_days' },
+    ]
+    var to_center = "_all"
+    var invisible_columns = []
+    var order_false = "_all"
+</script>
+
+<script src="{% static 'assets/report/report_datatable.js' %}"></script>
+
+<script>
+    $('#date_range_unit').daterangepicker();
+    $('#date_range_unit').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD')).change();
+
+        $("#top_performing_unit_sold").DataTable().destroy();
+        init_datatable(days=0, custom_date=true);
+        $(".days-custom").addClass('btn-primary');
+    });
+</script>
+
+<script>
+    var hidden_columns = [];
+    let data = localStorage.getItem("hidden_columns");
+
+    if (data){
+        hidden_columns = JSON.parse(data);
+    }
+
+    $(document).ready(function(){
+        table = init_datatable();
+        
+        hidden_columns.forEach((col) => {
+            table.columns(col).visible(false);
+            document.getElementById("column-"+col).checked = false;
+        });
+    });
+</script>
+
+{% endblock script %}

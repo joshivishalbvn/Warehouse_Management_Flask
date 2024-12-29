@@ -1,0 +1,440 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static widget_tweaks %}
+{% load crispy_forms_tags %}
+{% load account %}
+
+    <div class="row row-sm">
+        <div class="col-12 d-flex ">
+            <div class="col-2">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <a href="JavaScript:void(0);" onclick="open_file()">
+                            <label for="id_logo" class="form-input" style="">
+                                <i class="fa-solid ft-edit fa-lg "></i>
+                            </label>
+                            <img id="image-preview" alt="" class="img-thumbnail" src="{% if user.image %} {{user.image.url}} {% else %}{% static 'assets/img/default user.png' %}{% endif %}" width=150 height=150 style="border:none;">
+                        </a>
+                        
+                        <input type="file" name="image" accept="image/*"  class="form-control clearablefileinput form-control-file" placeholder="User Image" id="id_company_logo_upload" style="display:none;" value="">
+                    </div>
+                </div>
+            </div>
+            <div class="col-10">
+                <div class="card">
+                    {% if is_customer %}
+                        <div class="card-body">
+                            <div class="row my-4 p-10 text-center">
+                                
+                                <div class="col-4 main-content-label2 active-div title" id="title1" style="padding:20px">Personal Information</div>
+                                <div class="col-4 main-content-label title" id="title2" style="padding:20px">Change Password</div>
+                                <div class="col-4 main-content-label title" id="title3" style="padding:20px">Addresses</div>
+                            </div>
+                            <div class="form-1">
+                                <form action="" method="post" enctype="multipart/form-data" novalidate>
+                                    {% csrf_token %}
+
+                                    <div class="col-sm-12 col-lg-12 col-12">
+                                        {{form.email | as_crispy_field}}
+                                    </div>
+                                    <div class="col-sm-12 col-lg-12 col-12">
+                                        {{form.first_name | as_crispy_field}}
+                                    </div>
+                                    <div class="col-sm-12 col-lg-12 col-12">
+                                        {{form.last_name | as_crispy_field}}
+                                    </div>
+                                    <div class="col-sm-12 col-lg-12 col-12">
+                                        {{form.mobile}}
+                                        {% for error in form.mobile.errors %}
+                                        <span class="text-danger">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="col-sm-12 col-lg-12 col-12" hidden>
+                                        {{form.image | as_crispy_field}}
+                                    </div>
+
+                                    <div class="col-sm-12 col-lg-12 col-12 my-3">
+                                        <button type="submit" class="btn btn-primary mr-2"><i class="ft-edit mr-1"></i>Change</button>
+                                        <a href="{% url 'dashboard' %}"><button type="button" class="btn btn-secondary"><i class="ft-x mr-1"></i>Cancel</button></a>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="form-2 hidden">
+                                {% include "users/change_password.html" %}
+                            </div>
+                            <div class="form-3 hidden">
+                                <div class="row p-2">
+                                    <div class="col-6 addressinfo table">
+                                        <div style="display:flex; flex-direction: row-reverse;" class="my-2">
+                                            <a class="btn btn-primary text-right" hx-get="{% url 'customers:customer_billing_address_add' %}" hx-vars="{'customer_id': '{{customer_obj.id|safe}}' }" hx-target="#sidebar_form" hx-swap="innerHTML" onclick="$('#sidebar_form').toggleClass('sidebar-open')">Add Billing Address</a>
+                                        </div>
+                                        <table border=1 cellspacing=50 class="w-100 h-20 table border-top-0 table-striped  table-bordered text-nowrap border-bottom" id="billing_add"  style="border-top: 0px !important">
+                                            <thead>
+                                                <tr>
+                                                    <th>SR No</th>
+                                                    <th>Billing Address</th>
+                                                    <th>Default</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                    
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <div class="col-6 addressinfo table">
+                                        <div style="display:flex; flex-direction: row-reverse;" class="my-2">
+                                            <a class="btn btn-primary text-right" hx-get="{% url 'customers:customer_shipping_address_add' %}" hx-vars="{'customer_id': '{{customer_obj.id|safe}}' }" hx-target="#sidebar_form" hx-swap="innerHTML" onclick="$('#sidebar_form').toggleClass('sidebar-open')">Add Shipping Address</a>
+                                        </div>
+                                            
+                                        <table border=1 cellspacing=50 class="w-100 h-20 table border-top-0 table-striped  table-bordered text-nowrap border-bottom" id="shipping_add" style="border-top: 0px !important">
+                                            <thead>
+                                                <tr>
+                                                    <th>SR No</th>
+                                                    <th>Shipping Address</th>
+                                                    <th>Default</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="card-body">
+                            <div class="mx-4 mb-4">
+                                <div class="row my-4 p-10 text-center">
+                                    <div class="col-6 main-content-label2 active-div title" id="title1" style="padding:20px">Personal Information</div>
+                                    <div class="col-6 main-content-label title" id="title2" style="padding:20px">Change Password</div>
+                                </div>
+                                <div class="form-1">
+                                    <form action="" method="post" enctype="multipart/form-data" novalidate>
+                                    {% csrf_token %}
+                                    {% comment %} {{form}} {% endcomment %}
+
+                                    <div class="col-sm-12 col-lg-12 col-12">
+                                        {{form.email | as_crispy_field}}
+                                    </div>
+                                    <div class="col-sm-12 col-lg-12 col-12">
+                                        {{form.first_name | as_crispy_field}}
+                                    </div>
+                                    <div class="col-sm-12 col-lg-12 col-12">
+                                        {{form.last_name | as_crispy_field}}
+                                    </div>
+                                    <div class="col-sm-12 col-lg-12 col-12">
+                                        {{form.mobile}}
+                                        {% for error in form.mobile.errors %}
+                                        <span class="text-danger">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="col-sm-12 col-lg-12 col-12" hidden>
+                                        {{form.image | as_crispy_field}}
+                                    </div>
+
+                                    <div class="col-sm-12 col-lg-12 col-12 my-3">
+                                        <button type="submit" class="btn btn-primary mr-2"><i class="ft-edit mr-1"></i>Change</button>
+                                        <a href="{% url 'dashboard' %}"><button type="button" class="btn btn-secondary"><i class="ft-x mr-1"></i>Cancel</button></a>
+                                    </div>
+                                </div>
+                                </form>
+                                <div class="form-2 hidden">
+                                    {% include "users/change_password.html" %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>  
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'assets/plugins/telephoneinput/telephoneinput.js' %}"></script>
+<script src="{% static 'assets/plugins/telephoneinput/inttelephoneinput.js' %}"></script>
+<script src="{% static 'assets/js/htmx_1.9.4.min.js' %}"></script>
+<script src="{% static 'assets/webapp/change_password.js' %}"></script>
+
+<script>
+    $("#title1").click(function(){
+        $(this).addClass("active-div");
+        $(this).addClass("main-content-label2");
+        $(this).removeClass("main-content-label");
+
+        $(".form-1").removeClass("hidden");
+        $(".form-2").addClass("hidden");
+        $(".form-3").addClass("hidden");
+
+        $("#title2").removeClass("active-div");
+        $("#title2").addClass("main-content-label");
+        $("#title3").removeClass("active-div");
+        $("#title2").removeClass("main-content-label2");
+        $("#title3").removeClass("main-content-label2");
+    })
+
+    $("#title2").click(function(){
+        $(this).addClass("active-div");
+        $(this).addClass("main-content-label2");
+        $(this).removeClass("main-content-label");
+
+        $(".form-2").removeClass("hidden");
+        $(".form-1").addClass("hidden");
+        $(".form-3").addClass("hidden");
+
+        $("#title3").removeClass("active-div");
+        $("#title3").removeClass("main-content-label2");
+        $("#title3").addClass("main-content-label");
+
+        $("#title1").removeClass("active-div");
+        $("#title1").removeClass("main-content-label2");
+        $("#title1").addClass("main-content-label");
+    })
+    
+    $("#title3").click(function(){
+        $(this).addClass("active-div");
+        $(this).addClass("main-content-label3");
+        $(this).removeClass("main-content-label");
+
+        $(".form-3").removeClass("hidden");
+        $(".form-1").addClass("hidden");
+        $(".form-2").addClass("hidden");
+
+        $("#title1").removeClass("active-div");
+        $("#title1").removeClass("main-content-label2");
+        $("#title1").addClass("main-content-label");
+
+        $("#title2").removeClass("active-div");
+        $("#title2").removeClass("main-content-label2");
+        $("#title2").addClass("main-content-label");
+    })
+
+    $('.title').hover(function() {
+        $(this).css('cursor','pointer');
+    });
+
+    $(document).on('click', '.shipping-address-delete-btn', function (e) {
+		var id = $(this).data("id");
+		var name = $(this).data("title");
+
+		if (name == "None") {
+			name = ""
+		}
+		var url = $(this).data("url");
+		var delete_ele = $(this);
+
+		Swal.fire({
+			html: `Are you sure you want to delete <b>${name}</b> ?`,
+			icon: 'question',
+			showCloseButton: true,
+			showCancelButton: true,
+			confirmButtonColor: "#7442DB",
+		}).then((result) => {
+
+			if (result.isConfirmed) {
+				$.ajax({
+					type: "POST",
+					url: url,
+					data: {
+						"id": id,
+						"csrfmiddlewaretoken": '{{ csrf_token }}'
+					},
+					success: function (data) {
+						$('#shipping_add').DataTable().ajax.reload(null, false);
+						if (data["message"]) {
+							$.toast({
+								text: data.message,
+								position: 'bottom-right',
+								stack: false,
+								icon: 'success',
+							})
+						}
+					}
+				});
+			}
+		})
+	});
+
+    $(document).on('click', '.billing-address-delete-btn', function (e) {
+		var id = $(this).data("id");
+		var name = $(this).data("title");
+
+		if (name == "None") {
+			name = ""
+		}
+		var url = $(this).data("url");
+		var delete_ele = $(this);
+
+		Swal.fire({
+			html: `Are you sure you want to delete <b>${name}</b> ?`,
+			icon: 'question',
+			showCloseButton: true,
+			showCancelButton: true,
+			confirmButtonColor: "#7442DB",
+		}).then((result) => {
+
+			if (result.isConfirmed) {
+				$.ajax({
+					type: "POST",
+					url: url,
+					data: {
+						"id": id,
+						"csrfmiddlewaretoken": '{{ csrf_token }}'
+					},
+					success: function (data) {
+						$('#billing_add').DataTable().ajax.reload(null, false);
+						if (data["message"]) {
+							$.toast({
+								text: data.message,
+								position: 'bottom-right',
+								stack: false,
+								icon: 'success',
+							})
+						}
+					}
+				});
+			}
+		})
+	});
+
+    $(document).on('click', '.update-shipping-address' , function (e) {
+        url = $(this).data("url");
+        htmx.ajax('GET', url, {
+            target:'#sidebar_form', swap:'innerHTML',
+        }).then(() => {
+            $('#sidebar_form').toggleClass('sidebar-open')
+        });
+    });
+
+    $(document).on('click', '.update-billing-address' , function (e) {
+        let url = $(this).data("url");
+        htmx.ajax('GET', url, {
+            target:'#sidebar_form', swap:'innerHTML',
+        }).then(() => {
+            $('#sidebar_form').toggleClass('sidebar-open')
+        });
+    });
+
+    document.body.addEventListener("DocumentUpdated", function(evt){
+        let table_id = evt.detail.table;
+        $(document).find("#sidebar_form").removeClass('sidebar-open');
+        $(table_id).DataTable().ajax.reload(null, false);
+
+        $.toast({
+            text: evt.detail.message,
+            position: 'bottom-right',
+            stack: false,
+            icon: evt.detail.level,
+        });
+    });
+
+    document.body.addEventListener("ContactPersonCreated", function(evt){
+        let table_id = evt.detail.table;
+        $(document).find("#sidebar_form").removeClass('sidebar-open');
+        $(table_id).DataTable().ajax.reload(null, false);
+
+        $.toast({
+            text: evt.detail.message,
+            position: 'bottom-right',
+            stack: false,
+            icon: evt.detail.level,
+        });
+    });
+    
+</script>
+
+<script>
+    function open_file() {
+        document.getElementById('id_image').click();
+    }
+  
+    document.getElementById('id_image').addEventListener('change', function() {
+        var preview = document.getElementById('image-preview');
+        var file = this.files[0];
+        var reader = new FileReader();
+
+        reader.onloadend = function() {
+            preview.src = reader.result;
+        };
+
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = "";
+        }
+    });
+</script>
+
+<script>
+    var role = true;
+    if ("{{request.user.role}}" == "company admin") {
+        role = false;
+    }
+    if ("{{request.user.role}}" == "sales representative") {
+        role = false;
+    };
+    var i = 1;
+    var table_id = '#billing_add'
+    var filter_id = $("");
+    var to_center = "_all"
+    var invisible_columns = []
+    var order_false = [1,2,-1]
+    var url = '{% url "customers:billing_address_list" %}';
+    var scrollX = false
+
+    var columns = [
+        // data: json key from prepare_results, name: model field name
+        { data: 'id', name: 'id' },
+        { data: 'address', name: 'address' },
+        { data: 'default', name: 'default' },
+        { data: 'actions', name: 'actions' },
+    ]
+
+    function set_filters() {
+        var data = {}
+        data["customer_id"] = "{{ customer_obj.id|safe }}";
+        return data;
+    }
+
+    initailize_datatables();
+</script>
+
+
+<script>
+    var role = true;
+    if ("{{request.user.role}}" == "company admin") {
+        role = false;
+    }
+    if ("{{request.user.role}}" == "sales representative") {
+        role = false;
+    };
+    var i = 1;
+    var table_id = '#shipping_add'
+    var filter_id = $("");
+    var to_center = "_all"
+    var invisible_columns = []
+    var order_false = [1,2,-1]
+    var url = '{% url "customers:shipping_address_list" %}';
+
+    var columns = [
+        // data: json key from prepare_results, name: model field name
+        { data: 'id', name: 'id' },
+		{ data: 'address', name: 'address' },
+		{ data: 'default', name: 'default' },
+        { data: 'actions', name: 'actions' },
+    ]
+
+    function set_filters() {
+        var data = {}
+        data["customer_id"] = "{{ customer_obj.id|safe }}";
+        return data;
+    }
+
+    initailize_datatables();
+</script>
+
+{% endblock script %}

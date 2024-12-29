@@ -1,0 +1,64 @@
+<div class="row p-2 d-flex">
+    <div class="text-center w-100">
+        <div>
+            <div class="header"><h5>Case Size :</h5></div>
+            <div class="body">
+                <table class="table border-top-0 table-striped table-bordered text-nowrap border-bottom" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Weight</th>
+                            <th class="text-center">CMV</th>
+                            <th class="text-center">QTY</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if case_size %}
+                            {% for case in case_size %}
+                            <tr>
+                                <td class="text-center">{{case.weight}} (Oz)</td>
+                                <td class="text-center">{{case.cubic_meter_volume}}</td>
+                                <td class="text-center">{{case.quantity}} (Qty)</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td class="text-center">0</td>
+                                <td class="text-center">0</td>
+                                <td class="text-center">0</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-start mt-2" >
+
+        <div id="product_stock_info-{{ product.id }}" style="position: fixed; z-index: 10; display:none;">
+            <div class="card p-3" style="border:2px solid lightblue; width: 200px; height: 135px; border-radius: 5px;">
+                <div class="text-muted mt-1"><h5>Quantity details : </h5></div>
+                <div class="px-2">
+                    <div class="mt-1">
+                        <li><b class="text-primary">Total QTY : {{ total_qty }}</b></li>
+                    </div>
+                    <div>
+                        <li><b class="text-danger">Locked QTY: {{ locked_qty }}</b></li>
+                    </div>
+                    <div>
+                        <li><b class="text-success">Saleable QTY: {{ saleable_qty }}</b></li>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+           <button class="btn text-white py-1" style="background-color: #0981b5;" onmouseover="hoverdiv(event,'product_stock_info-{{ product.id }}')" onmouseout="hoverdiv(event,'product_stock_info-{{ product.id }}')">
+               <b>QTY : {{total_qty}}</b>
+           </button>
+        </div>
+    </div>
+
+</div>
+
+

@@ -1,0 +1,7 @@
+
+{% if obj.status|lower == "pending" %}
+    <button class="btn btn-warning disabled btn-sm">Pending</button>
+{% else %}
+    <button class="btn btn-success disabled btn-sm">{{obj.status|capfirst}}</button>
+{% endif %}
+    

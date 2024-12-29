@@ -1,0 +1,241 @@
+
+<div class="panel panel-primary card mb-0">
+   <div class="panel-body tabs-menu-body p-0 border-0">
+      <ul class="Date-time" style="padding:2px;">
+       <div class="d-flex justify-content-between justify-content-center mt-3">
+         <div class="col-6 main-content-label mg-b-5 text-white mt-2">
+           Add Vendor
+         </div>
+         <button class="btn btn-primary  main-content-label mg-b-5 mb-3"
+           onclick="$('#lg_sidebar_form').toggleClass('sidebar-open')">
+           <i class="fe fe-x" data-bs-toggle="tooltip" title="" data-bs-original-title="fe fe-x" aria-label="fe fe-x"></i>
+         </button>
+        </div>
+      </ul>
+   </div>
+ </div>
+
+ <div class="row">
+   <div class="col-md-12 col-xl-12 col-xs-12 col-sm-12">
+       <div class="card">
+         <div class="card-body">
+             <form id="vendor-form" class="row g-3 p-3" enctype="multipart/form-data" novalidate>
+              {{ form.hidden_tag() }}
+
+
+              <div class="row">
+
+                <div class="col-md-12 col-12">
+                  {{ form.company_id.label(class="form-control-label") }}
+                  {{ form.company_id(class="form-control select2", placeholder="Select Company") }}
+                  {% if form.company_id.errors %}
+                  <ul class="errors">
+                    {% for error in form.company_id.errors %}
+                    <small class="form-text text-danger">{{ error }}</small>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
+                </div>
+                
+                <div class="col-md-12 col-12">
+                  {{ form.email.label(class="form-control-label") }}
+                  {{ form.email(class="form-control", placeholder="Enter Email") }}
+                  {% if form.email.errors %}
+                  <ul class="errors">
+                    {% for error in form.email.errors %}
+                    <small class="form-text text-danger">{{ error }}</small>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
+                </div>
+                
+                <div class="col-md-12 col-12">
+                  {{ form.phone.label(class="form-control-label") }}
+                  {{ form.phone(class="form-control", placeholder="Enter Phone Number") }}
+                  {% if form.phone.errors %}
+                  <ul class="errors">
+                    {% for error in form.phone.errors %}
+                    <small class="form-text text-danger">{{ error }}</small>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
+                </div>
+                
+                <div class="col-md-12 col-12">
+                  {{ form.full_name.label(class="form-control-label") }}
+                  {{ form.full_name(class="form-control", placeholder="Enter Full Name") }}
+                  {% if form.full_name.errors %}
+                  <ul class="errors">
+                    {% for error in form.full_name.errors %}
+                    <small class="form-text text-danger">{{ error }}</small>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
+                </div>
+                
+                <div class="col-md-12 col-12">
+                  {{ form.website.label(class="form-control-label") }}
+                  {{ form.website(class="form-control", placeholder="Enter Website") }}
+                  {% if form.website.errors %}
+                  <ul class="errors">
+                    {% for error in form.website.errors %}
+                    <small class="form-text text-danger">{{ error }}</small>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
+                </div>
+                
+                <div class="col-md-12 col-12">
+                  {{ form.address_line_1.label(class="form-control-label") }}
+                  {{ form.address_line_1(class="form-control", placeholder="Enter Address Line 1") }}
+                  {% if form.address_line_1.errors %}
+                  <ul class="errors">
+                    {% for error in form.address_line_1.errors %}
+                    <small class="form-text text-danger">{{ error }}</small>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
+                </div>
+                
+                <div class="col-md-12 col-12">
+                  {{ form.address_line_2.label(class="form-control-label") }}
+                  {{ form.address_line_2(class="form-control", placeholder="Enter Address Line 2") }}
+                  {% if form.address_line_2.errors %}
+                  <ul class="errors">
+                    {% for error in form.address_line_2.errors %}
+                    <small class="form-text text-danger">{{ error }}</small>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
+                </div>
+                </div>
+                
+                <div class="col-md-12 col-12">
+                  {{ form.zip_code.label(class="form-control-label") }}
+                  {{ form.zip_code(class="form-control", placeholder="Enter Zip Code") }}
+                  {% if form.zip_code.errors %}
+                  <ul class="errors">
+                    {% for error in form.zip_code.errors %}
+                    <small class="form-text text-danger">{{ error }}</small>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
+                </div>
+                
+                <div class="col-md-12 col-12">
+                  {{ form.city.label(class="form-control-label") }}
+                  {{ form.city(class="form-control", placeholder="Enter City") }}
+                  {% if form.city.errors %}
+                  <ul class="errors">
+                    {% for error in form.city.errors %}
+                    <small class="form-text text-danger">{{ error }}</small>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
+                </div>
+                
+                <div class="col-md-12 col-12">
+                  {{ form.state.label(class="form-control-label") }}
+                  {{ form.state(class="form-control", placeholder="Enter State") }}
+                  {% if form.state.errors %}
+                  <ul class="errors">
+                    {% for error in form.state.errors %}
+                    <small class="form-text text-danger">{{ error }}</small>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
+                </div>
+                
+                <div class="col-md-12 col-12">
+                  {{ form.country.label(class="form-control-label") }}
+                  {{ form.country(class="form-control", placeholder="Enter Country") }}
+                  {% if form.country.errors %}
+                  <ul class="errors">
+                    {% for error in form.country.errors %}
+                    <small class="form-text text-danger">{{ error }}</small>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
+                </div>
+                
+                <div class="col-md-12 col-12">
+                  {{ form.status.label(class="form-control-label") }}
+                  {{ form.status(class="form-control", placeholder="Select Status") }}
+                  {% if form.status.errors %}
+                  <ul class="errors">
+                    {% for error in form.status.errors %}
+                    <small class="form-text text-danger">{{ error }}</small>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
+                </div>
+
+                
+            
+
+               <div class="row">
+                  <div class="col-md-12">
+                    <button id="vendor_create_form_submit" 
+                      class="btn btn-primary mr-2" hx-encoding="multipart/form-data">
+                      Save
+                    </button>
+                      <button type="button" onclick="$('#lg_sidebar_form').toggleClass('sidebar-open')" class="btn btn-secondary">Cancel</button>
+                  </div>
+              </div>
+
+            </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0/js/select2.min.js"></script>
+<script>
+  $(document).ready(function() {
+      $('.select2').select2({
+          width: '100%' // Adjust width as needed
+      });
+  });
+</script>
+<script>
+  $(document).ready(function() {
+    $('#vendor_create_form_submit').on('click', function(e) {
+        e.preventDefault(); 
+        var $btn = $(this);
+        var form = $('#vendor-form')[0];
+        var formData = new FormData(form);
+        console.log("formData",formData)
+        var table = $('#vendor_table').DataTable()
+        $btn.prop('disabled', true);
+        $.ajax({
+            url: "{{ url_for('vendor_bp.create_vendor') }}",
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                $('#lg_sidebar_form').removeClass('sidebar-open');
+                  table.ajax.reload();
+            },
+            error: function(xhr) {
+                console.error('Form submission failed:', xhr.status, xhr.statusText);
+                var response = xhr.responseJSON;
+                if (response && response.errors) {
+                    $('#vendor-form .form-text.text-danger').remove();
+                    for (var field in response.errors) {
+                        var errors = response.errors[field];
+                        if (errors.length > 0) {
+                            var $field = $('#vendor-form [name="' + field + '"]');
+                            $field.after('<small class="form-text text-danger">' + errors.join('<br>') + '</small>');
+                        }
+                    }
+                }
+                $btn.prop('disabled', false);
+            }
+        });
+    });
+});
+</script>
+
+{% endblock script %}

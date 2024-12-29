@@ -1,0 +1,91 @@
+<div class="row mt-3">
+    <div class="col-md-12 col-xl-12 col-xs-12 col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                <form action="" method="post" enctype="multipart/form-data" id="barcode-create-form" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div class="row">
+
+
+
+                        <div class="col-md-12 col-12">
+                            {{ form.number.label(class="form-control-label") }}
+                            {{ form.number(class="form-control", placeholder="Enter Barcode Number") }}
+                            {% if form.number.errors %}
+                            <ul class="errors">
+                                {% for error in form.weight.errors %}
+                                <small class="form-text text-danger">{{ error }}</small>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </div>
+
+                        <div class="my-3">
+                            {% if obj and obj.id %}
+                                <button id="btn_submit_barcode" data-url="{{ url_for('product_bp.update_product_barcode', id=obj.id) }}" class="btn btn-primary mr-2">
+                                    Save
+                                </button>
+                            {% else %}
+                                <button id="btn_submit_barcode" data-url="{{ url_for('product_bp.create_barcode') }}" class="btn btn-primary mr-2">
+                                    Save
+                                </button>
+                            {% endif %}
+
+                            <button type="button" class="btn btn-secondary"
+                                onclick="$('#sidebar_form').toggleClass('sidebar-open')">Cancel</button>
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% block script %}
+<script>
+
+
+    $(document).ready(function () {
+        $('#btn_submit_barcode').on('click', function (e) {
+            e.preventDefault();
+            var table = $('#barcode-table').DataTable()
+            var product_id = $("#id_product_2").val()
+            var $btn = $(this);
+            var form = $('#barcode-create-form')[0];
+            var formData = new FormData(form);
+            var url  = $("#btn_submit_barcode").attr("data-url")
+            formData.append('product_id', product_id);
+            $btn.prop('disabled', true);
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    $('#sidebar_form').removeClass('sidebar-open');
+                    table.ajax.reload();
+                },
+                error: function (xhr) {
+                    console.error('Form submission failed:', xhr.status, xhr.statusText);
+                    var response = xhr.responseJSON;
+                    if (response && response.errors) {
+                        $('#barcode-create-form .form-text.text-danger').remove();
+                        for (var field in response.errors) {
+                            var errors = response.errors[field];
+                            if (errors.length > 0) {
+                                var $field = $('#barcode-create-form [name="' + field + '"]');
+                                $field.after('<small class="form-text text-danger">' + errors.join('<br>') + '</small>');
+                            }
+                        }
+                    }
+                    $btn.prop('disabled', false);
+                }
+            });
+        });
+    });
+</script>
+{% endblock script %}
+
+

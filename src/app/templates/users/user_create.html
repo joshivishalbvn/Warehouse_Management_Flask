@@ -1,0 +1,166 @@
+
+<div class="panel panel-primary card mb-0">
+  <div class="panel-body tabs-menu-body p-0 border-0">
+    <ul class="Date-time" style="padding:1px;">
+      <div class="d-flex justify-content-between justify-content-center mt-3">
+        <div class="col-6 main-content-label mg-b-5 text-white mt-2">
+          Add User
+        </div>
+        <button class="btn btn-primary  main-content-label mg-b-5 mb-3"
+          onclick="$('#sidebar_form').toggleClass('sidebar-open')">
+          <i class="fe fe-x" data-bs-toggle="tooltip" title="" data-bs-original-title="fe fe-x"
+            aria-label="fe fe-x"></i>
+        </button>
+      </div>
+  </div>
+</div>
+<div class="row mt-3">
+  <div class="col-md-12 col-xl-12 col-xs-12 col-sm-12">
+    <div class="card">
+      <div class="card-body">
+        <form action="" method="post" enctype="multipart/form-data" id="user-create-form" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="row">
+
+            <div class="col-md-12 col-12">
+              {{ form.company_id.label(class="form-control-label") }}
+              {{ form.company_id(class="form-control select2",) }}
+              {% if form.company_id.errors %}
+              <ul class="errors">
+                {% for error in form.company_id.errors %}
+                <small class="form-text text-danger">{{ error }}</small>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </div>
+            
+
+          <div class="col-md-12 col-12">
+              {{ form.first_name.label(class="form-control-label") }}
+              {{ form.first_name(class="form-control", placeholder="Enter First Name") }}
+              {% if form.first_name.errors %}
+                  <ul class="errors">
+                      {% for error in form.first_name.errors %}
+                          <small class="form-text text-danger">{{ error }}</small>
+                      {% endfor %}
+                  </ul>
+              {% endif %}
+          </div>
+
+          <div class="col-md-12 col-12">
+              {{ form.last_name.label(class="form-control-label") }}
+              {{ form.last_name(class="form-control", placeholder="Enter Last Name") }}
+              {% if form.last_name.errors %}
+                  <ul class="errors">
+                      {% for error in form.last_name.errors %}
+                          <small class="form-text text-danger">{{ error }}</small>
+                      {% endfor %}
+                  </ul>
+              {% endif %}
+          </div>
+
+          <div class="col-md-12 col-12">
+              {{ form.email.label(class="form-control-label") }}
+              {{ form.email(class="form-control", placeholder="Enter Email") }}
+              {% if form.email.errors %}
+                  <ul class="errors">
+                      {% for error in form.email.errors %}
+                          <small class="form-text text-danger">{{ error }}</small>
+                      {% endfor %}
+                  </ul>
+              {% endif %}
+          </div>
+
+          <div class="col-md-12 col-12">
+              {{ form.mobile.label(class="form-control-label") }}
+              {{ form.mobile(class="form-control", placeholder="Enter Mobile") }}
+              {% if form.mobile.errors %}
+                  <ul class="errors">
+                      {% for error in form.mobile.errors %}
+                          <small class="form-text text-danger">{{ error }}</small>
+                      {% endfor %}
+                  </ul>
+              {% endif %}
+          </div>
+
+          <div class="col-md-12 col-12">
+              {{ form.role.label(class="form-control-label") }}
+              {{ form.role(class="form-control", placeholder="Select Role") }}
+              {% if form.role.errors %}
+                  <ul class="errors">
+                      {% for error in form.role.errors %}
+                          <small class="form-text text-danger">{{ error }}</small>
+                      {% endfor %}
+                  </ul>
+              {% endif %}
+          </div>
+
+          <div class="my-3">
+            <button id="btn_submit_user" class="btn btn-primary mr-2 user_create_form_submit">
+              Save
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="$('#sidebar_form').toggleClass('sidebar-open')">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+{% block script %}
+<script src="{{ url_for('static', filename='assets/js/toast.js') }}"></script>
+
+<script>
+  $(document).ready(function() {
+      $('.select2').select2({
+          width: '100%' 
+      });
+  });
+</script>
+
+<script>
+  $(document).ready(function() {
+      var table = $('#user_table').DataTable()
+      $('#btn_submit_user').on('click', function(e) {
+          var $btn = $(this);
+          var form = $('#user-create-form')[0];
+          var formData = new FormData(form);
+          $btn.prop('disabled', true);
+          $.ajax({
+              url: "{{ url_for('user_bp.create_user') }}",
+              type: 'POST',
+              data: formData,
+              processData: false,
+              contentType: false,
+              success: function(response) {
+                  $('#sidebar_form').removeClass('sidebar-open');
+                  table.ajax.reload(); 
+                  $.toast({
+                    text: "User Created Sucessfully !!!",
+                    position: 'bottom-right',
+                    stack: false,
+                    icon: 'success',
+                  });
+              },
+              error: function(xhr) {
+                console.error('Form submission failed:', xhr.status, xhr.statusText);
+                var response = xhr.responseJSON;
+                if (response && response.errors) {
+                    $('#company-create-form .form-text.text-danger').remove();
+                    for (var field in response.errors) {
+                        var errors = response.errors[field];
+                        if (errors.length > 0) {
+                            var $field = $('#company-create-form [name="' + field + '"]');
+                            $field.after('<small class="form-text text-danger">' + errors.join('<br>') + '</small>');
+                        }
+                    }
+                }
+                $btn.prop('disabled', false);
+            }
+          });
+      });
+  });
+</script>
+{% endblock script %}

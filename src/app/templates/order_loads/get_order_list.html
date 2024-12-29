@@ -1,0 +1,5 @@
+
+{% for id in  order_list %}
+    <span><b>Order: &nbsp;</b></span><a href="{% url 'customers:purchase_order_request_details' id.order_product__order__id %}">{{id.order_product__order__order_id}}</a></br>
+{% endfor %}
+    

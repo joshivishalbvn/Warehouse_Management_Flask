@@ -1,0 +1,46 @@
+{% load static %}
+<div class="dropdown">
+<select name="cases"  aria-haspopup="true" class="form-control ripple" id="cases-{{product_id}}"  onchange="generateCartoonprice({{product_id}})">
+<!-- <option value="0">Select Case Size</option> -->
+<option  value="0"  aria-haspopup="true" class="ripple form-control" data-bs-toggle="dropdown" type="button">Select Case<i class="fas fa-caret-down ms-1 text-end"></i></option>
+<div class="dropdown-menu tx-13">
+  {% for case in product_cases%}
+  <option  class="dropdown-item bg-white" value="{{case.id}}">{{ case.quantity }} Qty, {{ case.weight }}(Oz) Weight , {{ case.cubic_meter_volume }} CMV</option>
+  
+  {% endfor %} 
+</div>
+</select>
+</div>
+
+
+
+
+
+{% block script %}
+<script src="{%  static 'assets/plugins/jquery/jquery.min.js' %}"></script>
+
+<script>
+
+  function generateCartoonprice(rowId) {
+    var case_size_id = $('#cases-' + rowId).val()
+    $.ajax({
+      url: '{% url "products:generate_cartton_price" %}',
+      type: "get",
+      dataType: "json",
+      data: {
+        'case_size_id': case_size_id,
+      },
+      success: function (data) {
+        $("#row-cartoon-price-" + rowId).text(data.cartton_rice)
+      },
+      error: function (xhr, ajaxOptions, thrownError) {
+        console.log(thrownError);
+      }
+    });
+  }
+
+</script>
+
+
+
+{% endblock script %}

@@ -1,0 +1,128 @@
+{% load static %}
+{% load widget_tweaks sekizai_tags %}
+
+<div class="panel panel-primary card mb-0">
+    <div class="panel-body tabs-menu-body p-0 border-0">
+      <ul class="Date-time" style="padding:2px;">
+        <div class="d-flex justify-content-between justify-content-center mt-3">
+          <div class="col-6 main-content-label mg-b-5 text-white mt-2">
+            Update job work
+          </div>
+          <button class="btn btn-primary  main-content-label mg-b-5 mb-3"
+            onclick="$('#sidebar_form').toggleClass('sidebar-open')">
+            <i class="fe fe-x" data-bs-toggle="tooltip" title="" data-bs-original-title="fe fe-x" aria-label="fe fe-x"></i>
+          </button>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 col-xl-12 col-xs-12 col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" hx-post="{% if form %}{% url 'order:update_job_work' form.instance.id %} {% else %} {% url 'order:update_job_work' 1 %} {% endif %}" hx-include="#update_job_work_form" hx-target="#sidebar_form" hx-swap="innerHTML" hx-encoding="multipart/form-data" id="update_job_work_form" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    {% render_field form.ordered_product|attr:"hidden:true" %}
+
+                    <div class="col-12">
+                      <label for="{{ form.quantity.auto_id }}">
+                        {% if request.user.role != request.user.CUSTOMER %}
+                          Select Quantity{% if form.quantity.field.required %}<span class="asteriskField">*</span>{% endif %}
+                        {% else %}
+                          {{ form.quantity.label }}{% if form.quantity.field.required %}<span class="asteriskField">*</span>{% endif %}
+                        {% endif %}
+                      </label>
+                      <input type="number" name="quantity" value="{{ form.quantity.value }}" min="0" max="{{ job_work_qty }}" data-max="{{ job_work_qty }}" class="form-control" required="" id="id_quantity">
+                      {% for error in form.quantity.errors %}
+                      <span class='text-danger'>{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                    <div class="col-12 mt-3">
+                      <label for="{{ form.type.auto_id }}">{{ form.type.label }}{% if form.type.field.required %}<span class="asteriskField">*</span>{% endif %} :</label>
+                      {% render_field form.type|add_class:"form-control" %}
+                      {% for error in form.type.errors %}
+                      <span class='text-danger'>{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                    <div class="col-12 mt-3">
+                      <label for="{{ form.voice_note.auto_id }}">{{ form.voice_note.label }}{% if form.voice_note.field.required %}<span class="asteriskField">*</span>{% endif %} :</label>
+                      <input type="file" name="voice_note" class="form-control" hidden id="id_voice_note" />
+                      
+                      <audio id="id_audio-999-"></audio>
+                      <div>
+                        <button class="btn btn-danger btn-recorder" onclick="startRecording('-999-')" type="button" id="start-999-" title="Record">
+                          <i class="fa fa-microphone"></i>
+                        </button>
+                        <button class="btn btn-default" type="button" onclick="stopRecording('-999-')" id="stop-999-" title="Stop" disabled="true">
+                          <i class="fa fa-stop"></i>
+                        </button>
+                        <button class="btn btn-default" type="button" onclick="playRecording('-999-')" id="play-999-" title="Play" disabled="true">
+                          <i class="fa fa-play"></i>
+                        </button>
+                        <div class="output" id="output-999-" data-form_id="-999-"></div>
+                      </div>
+                      {% if form.instance.voice_note %}
+                        <audio controls>
+                            <source src="{{ form.instance.voice_note.url }}" type="audio/webm">
+                            Your browser does not support the audio element.
+                        </audio>
+                      {% endif %}
+                        
+                      {% for error in form.voice_note.errors %}
+                      <span class='text-danger'>{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                    <div class="col-12 mt-2">
+                        <label for="{{ form.file.auto_id }}">{{ form.file.label }}{% if form.file.field.required %}<span class="asteriskField">*</span>{% endif %} :</label>
+                        <input type="file" name="file" class="form-control" accept="image/png, image/gif, image/jpeg" id="id_file">
+                        <div class="row">
+                          <div class="gallery col-4 my-1">
+                            {% if form.instance.file %}
+                              <div class="image">
+                                  <img src="{{ form.instance.file.url }}" width="100%" />
+                                </div>
+                              {% endif %}
+                          </div>
+                        </div>
+                        {% for error in form.file.errors %}
+                        <span class='text-danger'>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="col-12 mt-2">
+                        <label for="{{ form.comment.auto_id }}">{{ form.comment.label }}{% if form.comment.field.required %}<span class="asteriskField">*</span>{% endif %} :</label>
+                        {% render_field form.comment|add_class:"form-control"|attr:"rows:3" %}
+                        {% for error in form.comment.errors %}
+                        <span class='text-danger'>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="text-end my-4">
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </div>
+                </form> 
+            </div>
+        </div>
+    </div>
+</div>
+
+{% addtoblock "script" %}
+<script src="{% static 'assets/js/product_image_add_update.js' %}"></script>
+
+<script>
+    $(document).on("change", '#id_file', function () {
+        $(document).find("div.image").remove();
+        imagesPreview2(this, 'div.gallery');
+    });
+
+    $(document).on("input", "#id_quantity", function(){
+      let value = parseInt($(this).val());
+      let max = document.getElementById("id_quantity").getAttribute("data-max");
+  
+      if(value > max){
+        $(this).val(max);
+      }
+    });
+</script>
+
+{% endaddtoblock %}

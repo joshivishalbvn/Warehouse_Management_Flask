@@ -1,0 +1,9 @@
+{% if order.status == order.CREATED %}
+    <div class="btn btn-warning btn-sm disabled"><span>Created</span></div>
+{% elif order.status == order.UNLOADING %}
+    <div class="btn btn-primary btn-sm disabled"><span>Unloading</span></div>
+{% elif order.status == order.COMPLETED %}
+    <div class="btn btn-success btn-sm disabled"><span>Completed</span></div>
+{% elif order.status == order.CANCELLED %}
+    <div class="btn btn-danger btn-sm disabled"><span>Cancelled</span></div>
+{% endif %}

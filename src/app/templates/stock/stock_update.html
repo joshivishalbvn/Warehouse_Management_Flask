@@ -1,0 +1,135 @@
+{% load sekizai_tags widget_tweaks static %}
+
+{% addtoblock "css" %}
+<style>
+  .form-control:disabled{
+    background-color: #e9e7f7;
+  }
+</style>
+{% endaddtoblock %}
+
+<div class="panel panel-primary card mb-0">
+  <div class="panel-body tabs-menu-body p-0 border-0">
+    <ul class="Date-time" style="padding:2px;">
+      <div class="d-flex justify-content-between justify-content-center mt-3">
+        <div class="col-6 main-content-label mg-b-5 text-white mt-2">
+          Update Stock
+        </div>
+        <button class="btn btn-primary  main-content-label mg-b-5 mb-3"
+          onclick="$('#sidebar_form').toggleClass('sidebar-open')">
+          <i class="fe fe-x" data-bs-toggle="tooltip" title="" data-bs-original-title="fe fe-x" aria-label="fe fe-x"></i>
+        </button>
+      </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12 col-xl-12 col-xs-12 col-sm-12">
+    <div class="card">
+      <div class="card-body">
+        <form id="stock-update-form" onsubmit="manage_form()" hx-post="{% if form %} {% url 'manage_stock:stock_update' form.instance.id %} {% else %} {% url 'manage_stock:stock_update' 1 %} {% endif %}" hx-include="#stock-update-form" hx-target="#sidebar_form" hx-swap="innerHTML" hx-encoding="multipart/form-data" novalidate class="mt-4">
+          {% csrf_token %}
+          <div class="row">
+
+            <input type="hidden" id="id_modified_by" name="modified_by" class="form-control" value="{{ request.user.id }}" />
+
+            <div class="col-md-12 mt-3">
+              <div class="row">
+                <div class="col-10">
+                  <label for="{{ form.product_case.auto_id }}">{{ form.product_case.label }}{% if form.product_case.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+                  <select name="product_case" class="form-control case_changed" id="{{ form.product_case.auto_id }}">
+                    {% for case in product_case_list %}
+                        <option
+                        value = "{{ case.id }}" {% if case.id == form.instance.product_case.id %} selected {% endif %}
+                        data-qty = "{{ case.quantity }}">
+                            {{ case.quantity }} Qty, {{ case.weight }} Oz, {{ case.cubic_meter_volume }} CMV
+                        </option>
+                    {% endfor %}
+                  </select>
+                  {% for error in form.product_case.errors %}
+                  <span class="text-danger">{{ error }}</span>
+                  {% endfor %}
+                </div>
+                <div class="col-2 mt-auto">
+                  <button type="button" class="btn btn-link text-dark mt-3" data-bs-target="#ProductCaseForm"
+                  data-bs-toggle="modal" hx-get="{% url 'products:create_product_case' %}" hx-vals="js:{'product_id': {{ object.product.id }} }" hx-target="#add_product_case_modal"><i class="fa fa-plus"></i></button>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-12 mt-3">
+              <label for="{{ form.no_of_case.auto_id }}">{{ form.no_of_case.label }}{% if form.no_of_case.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+                {% render_field form.no_of_case|attr:"disabled:true" %}
+                {% for error in form.no_of_case.errors %}
+                <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="col-md-12 mt-3">
+              <label for="{{ form.affected_stock.auto_id }}">{{ form.affected_stock.label }}{% if form.affected_stock.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+                {% render_field form.affected_stock|attr:"disabled:true" class+="form-control" %}
+                {% for error in form.affected_stock.errors %}
+                <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+          </div>
+          <div class="row mt-4">
+            <div>
+              <button type="submit" class="btn btn-primary">Update</button>
+              <button type="button" class="btn btn-secondary" onclick="$('#sidebar_form').toggleClass('sidebar-open')">Cancel</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% addtoblock "script" %}
+<div class="modal" id="ProductCaseForm">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content tx-size-sm">
+      <div class="modal-header">
+        <h5>Add New Product Case</h5>
+        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body pd-x-20" id="add_product_case_modal">
+        
+      </div>
+      <div class="modal-footer">
+          <button type="submit" form="id_product_case_form" class="btn btn-primary pd-x-25 float-end">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.body.addEventListener("productCaseCreate", function(evt){
+    $("#id_product_case").append(evt.detail.option);
+    $('#ProductCaseForm').modal('hide');
+  });
+
+  $(document).on("change", "#id_product_case", function(){
+    let case_size = parseInt($("#id_product_case option:selected").data("qty"));
+    let total_stock = parseInt($("#id_affected_stock").val());
+
+    $("#id_no_of_case").val(total_stock / case_size);
+  });
+
+  function manage_form(){
+    $("#stock-update-form").find(".form-control").prop("disabled", false);
+  }
+</script>
+
+<script>
+  document.body.addEventListener('stockUpdated', function(evt) {
+    $(document).find("#sidebar_form").removeClass('sidebar-open');
+    
+    localStorage.setItem("is_stock_updated", "true");
+    localStorage.setItem("message", evt.detail.message);
+    localStorage.setItem("level", evt.detail.level);
+    window.location.reload();
+  });
+</script>
+{% endaddtoblock %}

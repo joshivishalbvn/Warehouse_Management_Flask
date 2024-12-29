@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/daterangepicker.css' %}" />
+{% endblock css %}
+
+{% block content %}
+<div class="row row-sm">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex flex-sm-row">
+                    <div class="col-6">
+                        <h4 class="card-title d-flex" style="float: left; margin-right:10px;">Product Report</h4> 
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="mx-4 mb-4">
+                    <table id="product_report" class="table border-top-0 w-100 table-striped  table-bordered text-nowrap border-bottom">
+                        <thead>
+                            <tr>
+                                <th class="text-center" id="id_warehouse" >Warehouse</th>
+                                <th class="text-center" id="id_product_name" >Product</th>
+                                <th class="text-center" id="id_stock_sitting" >Stock Sitting</th>
+                                <th class="text-center" id="id_total_stock_quantity" >Total Stock Quantity</th>
+                                <th class="text-center" id="id_lock_quantity" >Lock Quantity</th>
+                                <th class="text-center" id="id_sealable_quantity" >Saleable Quantity</th>
+                                <th class="text-center" id="id_previous_cost_price" >Previous Cost Price ($)</th>
+                                <th class="text-center" id="id_current_cost_price" >Current Cost Price ($)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+{% block script %}
+<script src="{% static 'assets/js/daterangepicker.min.js' %}"></script>
+<script src="{% static 'assets/webapp/tabbing.js' %}"></script>
+<script src="{% static 'assets/plugins/datatable/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatable/js/jszip.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatable/js/pdfmake.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatable/js/vfs_fonts.js' %}"></script>
+<script src="{% static 'assets/plugins/datatable/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatable/js/buttons.print.min.js' %}"></script>
+
+<script>
+    var title = "Product Report"
+    var table_id = '#product_report'
+    var url = '{% url "report:product_report_ajax" %}'
+</script>
+
+<script src="{% static 'assets/js/datatable_with_buttons.js' %}"></script>
+<script src="{% static 'assets/js/product_report.js' %}"></script>
+
+{% endblock script %}

@@ -1,0 +1,42 @@
+<div class="mt-2">
+
+    <div id="case_stock_info-{{ stock.id }}" style="position: fixed; z-index: 10; display:none; ">
+        <div class="card p-3" style="border:2px solid lightblue; width: 100%; height: auto; border-radius: 5px;">
+            <div class="my-1"><h5>Product Case Stock</h5></div>
+            <div class="px-2">
+                <table class="table table-bordered" id="month">
+                    <thead>
+                        <tr class="text-center">
+                            <th>Weight</th>
+                            <th>Quantity</th>
+                            <th class="text-center" style="width:50px">CMV</th>
+                            <th>Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for case in stock.product.product_case.all %}
+                        <tr class="text-center">
+                            <td>{{case.weight}}</td>
+                            <td>{{case.quantity}}</td>
+                            <td>{{case.cubic_meter_volume}}</td>
+                            <td>{{case.get_total_stock}}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr class="text-center">
+                            <td colspan="3" class="text-end"><b>Total</b></td>
+                            <td><b>{{ stock.product.get_total_available_stock }}</b></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div>
+       <button class="btn text-white py-1" style="background-color: #0981b5;" onmouseover="hoverdiv(event,'case_stock_info-{{ stock.id }}')" onmouseout="hoverdiv(event,'case_stock_info-{{ stock.id }}')">
+           <b>Total Stock : {{ stock.product.get_total_available_stock }}</b>
+       </button>
+    </div>
+</div>

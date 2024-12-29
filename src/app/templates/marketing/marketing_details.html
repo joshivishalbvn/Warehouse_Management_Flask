@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<style>
+    .main-footer{
+        display:none;
+    }
+    .input-large {
+        width: 100%; 
+        padding: 10px;
+        font-size: 16px;
+    }
+</style>
+<!-- row -->
+<div class="row row-sm">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-body h-100">
+                <div class="row row-sm ">
+                    <h5>Detail Template</h5>
+                    <br>
+                    <br>
+                    <br>
+
+                    <form method="POST" class="">
+                        {% csrf_token %}
+                        {{ form.media }}
+                        <div class="form-group row">
+                            <label for="{{ form.template_id.id_for_label }}" class="col-md-2 col-form-label"><b>{{ form.template_id.label_tag }}</b></label>
+                            <div class="col-md-7">
+                                {{ form.template_id }}
+                            </div>                           
+                        </div>
+                        <div class="form-group row">
+                            <label for="{{ form.template_name.id_for_label }}" class="col-md-2 col-form-label"><b>{{ form.template_name.label_tag }}</b></label>
+                            <div class="col-md-7">
+                                {{ form.template_name }}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="{{ form.app_name.id_for_label }}" class="col-md-2 col-form-label"><b>{{ form.app_name.label_tag }}</b></label>
+                            <div class="col-md-7">
+                                {{ form.app_name }}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="{{ form.company.id_for_label }}" class="col-md-2 col-form-label"><b>{{ form.company.label_tag }}</b></label>
+                            <div class="col-md-7">
+                                {{ form.company }}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="{{ form.zone.id_for_label }}" class="col-md-2 col-form-label"><b>{{ form.zone.label_tag }}</b></label>
+                            <div class="col-md-7">
+                                {{ form.zone }}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="{{ form.accocation.id_for_label }}" class="col-md-2 col-form-label"><b>{{ form.accocation.label_tag }}</b></label>
+                            <div class="col-md-7">
+                                {{ form.accocation }}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="{{ form.subject.id_for_label }}" class="col-md-2 col-form-label"><b>{{ form.subject.label_tag }}</b></label>
+                            <div class="col-md-7">
+                                {{ form.subject }}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="{{ form.recipient.id_for_label }}" class="col-md-2 col-form-label"><b>{{ form.recipient.label_tag }}</b></label>
+                            <div class="col-md-7">
+                                {{ form.recipient }}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="{{ form.delivery_method.id_for_label }}" class="col-md-2 col-form-label"><b>{{ form.delivery_method.label_tag }}</b></label>
+                            <div class="col-md-7">
+                                {{ form.delivery_method }}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="{{ form.template_content.id_for_label }}" class="col-md-2 col-form-label"><b>{{ form.template_content.label_tag }}</b></label>
+                            <div class="col-md-7">
+                                {{ form.template_content }}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /row -->
+
+
+{% endblock %}
+
+{% block filters %}
+<div class="event">
+    <div class="row rounded py-2 mb-2 mx-n2">
+
+        <div class="col-12 col-sm-12 col-lg-12">
+            <label for="id_company">Status</label>
+            <fieldset class="form-group">
+                <select id="id_status" class="select2-data-array form-control select2-list">
+                    <option value="">All</option>
+                    {% comment %} {% for obj in object_list|slice:":1" %}
+                    <option value="{{obj.STATUS_CHOICES.0.0}}">{{obj.STATUS_CHOICES.0.1|capfirst}}</option>
+                    <option value="{{obj.STATUS_CHOICES.1.0}}">{{obj.STATUS_CHOICES.1.1|capfirst}}</option>
+                    {% endfor %} {% endcomment %}
+                </select>
+            </fieldset>
+        </div>
+        {% if request.user.role == "Super Admin" %}
+        <div class="col-12 col-sm-12 col-lg-12">
+            <label for="id_company">Company</label>
+            <fieldset class="form-group">
+                <select id="id_company" class="select2-data-array form-control select2-list">
+                    <option value="">All</option>
+                    {% for company in company_list %}
+                    <option value="{{company.id}}">{{company.name|capfirst}}</option>
+                    {% endfor %}
+                </select>
+            </fieldset>
+        </div>
+        {% endif %}
+        <div class="col-12 col-sm-12 col-lg-12">
+        </div>
+        <div class="col-12 col-sm-12 col-lg-12 d-flex align-items-center justify-content-between mt-2">
+            <button type="reset" class="btn btn-primary btn-block glow mb-0 list-clear">Clear</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- stock filters -->
+
+        <div class="event">
+          
+          {% if request.user.is_superuser or requser.user.role == "Super Admin" %}
+          <div class="col-12 col-sm-12 col-lg-12">
+            <label for="filter_company">Company</label>
+            <fieldset class="form-group">
+              <select id="filter_company" class="select2-data-array form-control select2-list">
+                <option value="" disabled selected hidden>---Select---</option>
+                {% for company in companies %}
+                  <option value="{{company.id}}">{{company.name|title}}</option>     
+                {% endfor %}     
+              </select>
+            </fieldset>
+          </div>
+          {% endif %}
+
+          <div class="row rounded py-2 mb-2 mx-n2">
+            <div class="col-12 col-sm-12 col-lg-12">
+             <label for="users-list-role">Product</label>
+              <fieldset class="form-group">
+                <select id="id_role" class="form-control">
+                  <option value="" disabled selected hidden>---Select---</option>
+                </select>
+              </fieldset> 
+            </div>
+            <div class="col-12 col-sm-12 col-lg-12">
+            </div>
+            <div class="col-12 col-sm-12 col-lg-12 d-flex align-items-center justify-content-between mt-2">
+              <button type="reset" class="btn btn-primary btn-block users-list-clear glow mb-0" id="clear_search_filter">Clear</button>
+            </div>
+          </div>
+
+        </div>
+{% endblock filters %}
+

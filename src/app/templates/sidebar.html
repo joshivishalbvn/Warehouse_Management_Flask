@@ -1,0 +1,147 @@
+<div class="sticky">
+	<aside class="app-sidebar sidebar-scroll" style="overflow-y: scroll;">
+		<div class="main-sidebar-header active">
+			<a class="desktop-logo logo-light active" href="#">
+				<h4 class="main-logo">
+					<center>current user company name</center>
+				</h4>
+			</a>
+			<a class="logo-icon mobile-logo icon-light active" href="#">
+				<img src="{{ url_for('static', filename='assets/img/brand/favicon.png') }}"
+					alt=" current_user.company.name ">
+			</a>
+		</div>
+
+		<div class="main-sidemenu">
+			<div class="main-sidebar-loggedin">
+				<div class="app-sidebar__user"></div>
+			</div>
+			<div class="slide-left disabled" id="slide-left">
+				<svg xmlns="http://www.w3.org/2000/svg" fill="#7b8191" width="24" height="24" viewBox="0 0 24 24">
+					<path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" />
+				</svg>
+			</div>
+			<ul class="side-menu">
+				<li class="slide">
+					<a class="side-menu__item {{ 'dashboard/' in request.path and 'active' or '' }}" href="#">
+						<i class="side-menu__icon fe fe-grid"></i><span class="side-menu__label">Dashboard</span>
+					</a>
+				</li>
+
+				<li class="slide">
+					<a class="side-menu__item {{ 'users/' in request.path and 'active' or '' }}" href="{{ url_for('user_bp.user_list') }}">
+						<i class="side-menu__icon fe fe-users"></i><span class="side-menu__label">Users</span>
+					</a>
+				</li>
+
+				<li class="slide">
+					<a class="side-menu__item {{ 'companies/' in request.path and 'active' or '' }}" href="{{ url_for('company_bp.company_list') }}">
+						<i class="side-menu__icon fe fe-server"></i><span class="side-menu__label">Companies</span>
+					</a>
+				</li>
+
+				<li class="slide">
+					<a class="side-menu__item {{ 'warehouses/' in request.path and 'active' or '' }}" href="{{ url_for('wh_bp.warehouse_list') }}">
+						<i class="side-menu__icon fe fe-home"></i><span class="side-menu__label">Warehouses</span>
+					</a>
+				</li>
+
+				<li class="slide">
+					<a class="side-menu__item {{ 'products/' in request.path and 'active' or '' }}" href="{{ url_for('product_bp.product_list') }}">
+						<i class="side-menu__icon fe fe-package"></i><span class="side-menu__label">Products</span>
+					</a>
+				</li>
+				<li class="slide">
+					<a class="side-menu__item {{ 'orders/' in request.path and 'active' or '' }}" href="#">
+						<i class="side-menu__icon fe fe-shopping-cart"></i><span class="side-menu__label">Orders</span>
+					</a>
+				</li>
+
+				<li class="slide">
+					<a class="side-menu__item {{ 'job-works/' in request.path and 'active' or '' }}" href="#">
+						<i class="side-menu__icon fa fa-tasks"></i><span class="side-menu__label">Job Works</span>
+					</a>
+				</li>
+
+				<li class="slide">
+					<a class="side-menu__item {{ 'customers/' in request.path and 'active' or '' }}" href="{{ url_for('customer_bp.customer_list') }}">
+						<i class="side-menu__icon fe fe-user"></i><span class="side-menu__label">Customers</span>
+					</a>
+				</li>
+
+				<li class="slide">
+					<a class="side-menu__item {{ 'purchase-orders/' in request.path and 'active' or '' }}"
+						data-bs-toggle="slide" href="{{ url_for('po_bp.purchase_order') }}">
+						<i class="side-menu__icon fe fe-shopping-bag"></i><span class="side-menu__label">Purchase
+							Orders</span><i class="angle fe fe-chevron-down  hor-angle"></i>
+					</a>
+				</li>
+				<li class="slide">
+					<a class="side-menu__item {{ 'vendors/' in request.path and 'active' or '' }}" href="{{ url_for('vendor_bp.vendor_list') }}">
+						<i class="side-menu__icon fe fe-truck"></i><span class="side-menu__label">Vendors</span>
+					</a>
+				</li>
+
+				<li class="slide">
+					<a class="side-menu__item {{ '/order/' in request.path or '/order-details/' in request.path and 'active' or '' }}"
+						href="#">
+						<i class="side-menu__icon fe fe-shopping-cart"></i><span class="side-menu__label">Orders</span>
+					</a>
+				</li>
+
+				<li class="slide">
+					<a class="side-menu__item {{ '/loading/' in request.path and 'active' or '' }}" href="#">
+						<i class="side-menu__icon fe fe-truck"></i><span class="side-menu__label">Loading</span>
+					</a>
+				</li>
+
+				<li class="slide">
+					<a class="side-menu__item {{ '/products/list/' in request.path and 'active' or '' }}" href="#">
+						<i class="side-menu__icon fe fe-package"></i><span class="side-menu__label">Product List</span>
+					</a>
+				</li>
+
+				<li class="slide {{ '/loads/' in request.path and 'active is-expanded' or '' }}">
+					<a class="side-menu__item" data-bs-toggle="slide" href="javascript:void(0);">
+						<i class="side-menu__icon fe fe-package"></i><span class="side-menu__label">Loading</span><i
+							class="angle fe fe-chevron-down"></i>
+					</a>
+					<ul class="slide-menu">
+						<li><a class="slide-item {{ '/loads/' in request.path and not '/loads/invoices/' in request.path and 'active' or '' }}"
+								href="#">Loading List</a></li>
+						<li><a class="slide-item {{ '/loads/invoices/' in request.path and 'active is-expanded' or '' }}"
+								href="#">Invoice List</a></li>
+					</ul>
+				</li>
+
+				<li class="slide {{ '/reports/' in request.path and 'active is-expanded' or '' }}">
+					<a class="side-menu__item" data-bs-toggle="slide" href="javascript:void(0);">
+						<i class="side-menu__icon fe fe-file"></i><span class="side-menu__label">Reports</span><i
+							class="angle fe fe-chevron-down"></i>
+					</a>
+					<ul class="slide-menu">
+						<li><a class="slide-item {{ '/reports/products/' in request.path and 'active is-expanded' or '' }}"
+								href="#">Product Report</a></li>
+						<li><a class="slide-item {{ '/reports/client/' in request.path and 'active is-expanded' or '' }}"
+								href="#">Client Report</a></li>
+						<li><a class="slide-item {{ '/reports/client-sales-report/' in request.path and 'active is-expanded' or '' }}"
+								href="#">Client Sales Report</a></li>
+						<li><a class="slide-item {{ '/reports/sales/' in request.path and 'active is-expanded' or '' }}"
+								href="#">Sales Report</a></li>
+						<li><a class="slide-item {{ '/reports/purchase-report/' in request.path and 'active is-expanded' or '' }}"
+								href="#">Purchase Report</a></li>
+						<li><a class="slide-item {{ '/reports/top-performing-items/' in request.path and 'active is-expanded' or '' }}"
+								href="#">Top Performing Items</a></li>
+						<li><a class="slide-item {{ '/reports/client-top-performing-items/' in request.path and 'active is-expanded' or '' }}"
+								href="#">Client's Favourite</a></li>
+					</ul>
+				</li>
+			</ul>
+			<div class="slide-right" id="slide-right">
+				<svg xmlns="http://www.w3.org/2000/svg" fill="#7b8191" width="24" height="24" viewBox="0 0 24 24">
+					<path d="M10.707 17.707 16.414 12l-5.707-5.707-1.414 1.414L13.586 12l-4.293 4.293z" />
+				</svg>
+			</div>
+		</div>
+	</aside>
+</div>

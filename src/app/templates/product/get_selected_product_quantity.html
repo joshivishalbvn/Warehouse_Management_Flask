@@ -1,0 +1,81 @@
+{% load static %}
+
+
+{% if request.user.role != "Customer" %}
+
+<div class="number">
+	<input class="product_quantity form-control"  min="0" type="number"value="{{item.quantity}}" id="qty-{{ item.id }}" onchange="adjustQty({{item.id}})">
+</div>
+{% else %}
+
+{% endif %}
+
+
+{% block script %}
+<script src="{%  static 'assets/plugins/jquery/jquery.min.js' %}"></script>
+
+<script>
+
+        function adjustQty (rowId) {
+			var value = $("#qty-"+rowId).val();
+			var case_size_id = $('#case-'+rowId).val()
+			var price = $("#row-fix-"+rowId).val();
+			var cart_id = rowId;
+			$("#row-total-"+rowId).val(value*price);
+			$.ajax({
+                url: '{% url "products:updated_cart_product" %}',
+                type: "get",
+                dataType: "json",
+                data: {
+					'case_size_id': case_size_id,
+                    'cart_id': cart_id,
+					"quantity":value,
+                    
+                },
+                success: function (data) {
+
+                    $("#id_total_amount").val(data.grand_total)
+                    $("#selected-final-price-"+rowId).text(data.product_total)
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    console.log(thrownError);
+                }
+            });
+        }
+
+		function minusQty (rowId) {
+			var value = $("#qty-"+rowId).val();
+			var case_size_id = $('#case-'+rowId).val()
+            var count = parseInt(value) - 1;
+			var price = $("#row-fix-"+rowId).val();
+			var cart_id = $('.prd-'+rowId).attr("data-cart-id")
+			$("#qty-"+rowId).val(count);
+			$("#row-total-"+rowId).val(count*price);
+			$.ajax({
+                url: '{% url "products:updated_cart_product" %}',
+                type: "get",
+                dataType: "json",
+                data: {
+					'case_size_id': case_size_id,
+                    'cart_id': cart_id,
+					"quantity":count,
+                    
+                },
+                success: function (data) {
+
+                    $("#id_total_amount").val(data.grand_total)
+                    $("#selected-final-price-"+rowId).text(data.product_total)
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    console.log(thrownError);
+                }
+            });
+        }
+
+
+</script>
+
+
+
+{% endblock script %}
+

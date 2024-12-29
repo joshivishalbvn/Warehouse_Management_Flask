@@ -1,0 +1,42 @@
+.buttons-print{
+    border-color: white !important;
+}
+
+.blink {
+    animation: blinker 1.5s linear infinite;
+    font-family: sans-serif;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 50%;
+    }
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content .active {
+    display: block;
+}
+
+.a_tag {
+    margin-left: 0;
+    padding-top:2px;
+    font-family: Verdana; 
+    color: black; 
+    font-size: 15px; 
+    text-decoration: none; 
+    display: block; 
+    cursor: pointer;
+}
+
+.filter_active, .a_tag:hover {
+    font-family: Verdana;
+    color: black;
+    background-color: lightblue;
+    border-radius: 50px;
+    font-size: 15px;
+    text-decoration: none;
+}

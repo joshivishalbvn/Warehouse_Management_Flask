@@ -1,0 +1,134 @@
+{% load static widget_tweaks sekizai_tags %}
+<div class="panel panel-primary card mb-0">
+    <div class="panel-body tabs-menu-body p-0 border-0">
+      <ul class="Date-time" style="padding:2px;">
+        <div class="d-flex justify-content-between justify-content-center mt-3">
+          <div class="col-6 main-content-label mg-b-5 text-white mt-2">
+            Add Payment
+          </div>
+          <button class="btn btn-primary  main-content-label mg-b-5 mb-3"
+            onclick="$('#sidebar_form').toggleClass('sidebar-open')">
+            <i class="fe fe-x" data-bs-toggle="tooltip" title="" data-bs-original-title="fe fe-x" aria-label="fe fe-x"></i>
+          </button>
+        </div>
+    </div>
+  </div>
+
+<div class="row mt-3">
+    <div class="col-md-12 col-xl-12 col-xs-12 col-sm-12">
+      <div class="card">
+        <div class="card-body">
+          
+          <form id="use-credit-form" hx-include="#use-credit-form" hx-swap="innerHTML" hx-encoding="multipart/form-data"
+                hx-target="#sidebar_form" hx-post="{% url 'customers:use_credit_for_loading' %}" novalidate>
+  
+            {% csrf_token %}
+            <div class="row">
+
+              <div class="col-md-12 col-12 ">
+                <div class="form-group row form-group has-danger mg-b-0">
+                  <label class="col-md-12 col-form-label" for="horizontal-form-1">Invoice Id</label>
+                  <div class="col-md-12">
+                    <input type="text" name="loading_id" value="{{loading_id}}" step="any" class="form-control" required="" id="loading_id" disabled>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-md-12 col-12 ">
+                <div class="form-group row form-group has-danger mg-b-0">
+                  <label class="col-md-12 col-form-label" for="horizontal-form-1">Customer</label>
+                  <div class="col-md-12">
+                    <input type="text" name="customer" value="{{customer_name}}" step="any" class="form-control" required="" id="cusrtomer_id" disabled>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-md-12 col-12 ">
+                <div class="form-group row form-group has-danger mg-b-0">
+                  <label class="col-md-12 col-form-label" for="horizontal-form-1">Customer's Available Credit</label>
+                  <div class="col-md-12">
+                    <input type="number" name="customer" value="{{total_available_credits}}" step="any" class="form-control" required="" id="loading_credits" disabled>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-md-12 col-12 ">
+                <div class="form-group row form-group has-danger mg-b-0">
+                  <label class="col-md-12 col-form-label" for="horizontal-form-1">Invoice Credit</label>
+                  <div class="col-md-12">
+                    <input type="number" name="customer" value="{{loading_credits}}" step="any" class="form-control" required="" id="loading_credits" disabled>
+                  </div>
+                </div>
+              </div>
+              
+              
+              <input type="hidden" name="customer_id" value="{{ customer_id }}" />
+              <div class="col-md-12 col-12 ">
+                <div class="form-group row form-group has-danger mg-b-0">
+                  <label class="col-md-12 col-form-label" for="horizontal-form-1">{{form.amount.label}}{% if form.amount.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                  <div class="col-md-12">
+                    {{form.amount}}
+                    {% if form.amount.errors %}
+                    {% for error in form.amount.errors %}
+                    <p style="color: red;">{{error}}</p>
+                    {% endfor %}
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+  
+              <div class="col-md-12 col-12 ">
+                <div class="form-group row form-group has-danger mg-b-0">
+                  <label class="col-md-12 col-form-label" for="horizontal-form-1">{{form.due_amount.label}}{% if form.due_amount.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                  <div class="col-md-12">
+                    {{form.due_amount}}
+                    {% if form.due_amount.errors %}
+                    {% for error in form.due_amount.errors %}
+                    <p style="color: red;">{{error}}</p>
+                    {% endfor %}
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-4">
+                <button id="btn_submit_document" type="submit" class="btn btn-primary mr-2 use-credit-form-submit">Save</button>
+                <button type="button" class="btn btn-secondary" onclick="$('#sidebar_form').toggleClass('sidebar-open')">Cancel</button>
+              </div>
+          </form>
+
+          <input type="hidden" id="id_due_amount_from_context" name="due_amount" value="{{due_amount}}">
+          <input type="hidden" id="id_load_order" name="load_order" value="{{load_order_id}}">
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+{% addtoblock "script" %}
+  <script>
+      document.addEventListener('htmx:afterRequest', function(evt) {
+        $( document ).ready(function() {
+            var due_amount = $("#id_due_amount_from_context").val();
+            $("#id_due_amount").val(due_amount)
+            $("#id_amount").attr("max",due_amount)
+        });
+    })
+    function CheckMaxAmount(){
+        var amount = $("#id_amount").val()
+        var due_amount =  $("#id_due_amount_from_context").val();
+        var credits = $("#loading_credits").val()
+        var max_val = Math.min(credits,due_amount)
+        if (parseInt(max_val)>0) {
+            if (parseFloat(amount)>parseFloat(max_val)) {
+                $("#id_amount").val(parseFloat(max_val))
+            }
+        }
+        if (parseFloat(amount)>max_val) {
+          $("#id_amount").val(max_val)
+        }
+    }
+
+  </script>
+
+{% endaddtoblock "script" %}

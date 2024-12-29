@@ -1,0 +1,172 @@
+
+<div class="panel panel-primary card mb-0">
+  <div class="panel-body tabs-menu-body p-0 border-0">
+    <ul class="Date-time" style="padding:2px;">
+      <div class="d-flex justify-content-between justify-content-center mt-3">
+        <div class="col-6 main-content-label mg-b-5 text-white mt-2">
+          {% if object %}
+            Update Contact Person
+          {% else %}
+            Add Contact Person
+          {% endif %}
+        </div>
+        <button class="btn btn-primary  main-content-label mg-b-5 mb-3" onclick="$('#sidebar_form').toggleClass('sidebar-open')">
+          <i class="fe fe-x" data-bs-toggle="tooltip" data-bs-original-title="fe fe-x" aria-label="fe fe-x"></i>
+        </button>
+      </div>
+  </div>
+</div>
+<div class="row mt-3">
+  <div class="col-md-12 col-xl-12 col-xs-12 col-sm-12">
+    <div class="card">
+      <div class="card-body">
+        
+        <form id="contact-create-form" novalidate enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+          <div class="row">
+            
+            <div class="col-md-12 col-12">
+              {{ form.name.label(class="form-control-label") }}
+              {{ form.name(class="form-control",) }}
+              {% if form.name.errors %}
+              <ul class="errors">
+                {% for error in form.name.errors %}
+                <small class="form-text text-danger">{{ error }}</small>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </div>
+
+            <div class="col-md-12 col-12">
+              {{ form.email.label(class="form-control-label") }}
+              {{ form.email(class="form-control",) }}
+              {% if form.email.errors %}
+              <ul class="errors">
+                {% for error in form.email.errors %}
+                <small class="form-text text-danger">{{ error }}</small>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </div>
+           
+            <div class="col-md-12 col-12">
+              {{ form.phone.label(class="form-control-label") }}
+              {{ form.phone(class="form-control",) }}
+              {% if form.phone.errors %}
+              <ul class="errors">
+                {% for error in form.phone.errors %}
+                <small class="form-text text-danger">{{ error }}</small>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </div>
+
+
+            <div class="mt-4">
+              {% if instance %}
+              <button type="submit" class="btn btn-primary" data-url="{{ url_for('customer_bp.update_contacts' ,id=instance.id) }}" id="update_contact">Save</button>
+              {% else %}
+              <button type="submit" class="btn btn-primary" data-url="{{ url_for('customer_bp.add_contacts') }}"
+                id="create_contact">Save</button>
+            {% endif %}
+              <button type="button" class="btn btn-secondary" onclick="$('#sidebar_form').toggleClass('sidebar-open')">cancel</button>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block script %}
+<script src="{{ url_for('static', filename='assets/js/toast.js') }}"></script>
+
+<script>
+  $(document).ready(function () {
+    var table = $('#contacts_table').DataTable()
+    var customer_id = $("#id_customer_2").val()
+
+    $('#create_contact').on('click', function (e) {
+      var $btn = $(this);
+      var form = $('#contact-create-form')[0];
+      var formData = new FormData(form);
+      var url = $(this).attr("data-url");
+      formData.append('customer_id', customer_id);
+      $btn.prop('disabled', true);
+      $.ajax({
+        url: url,
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+          $('#sidebar_form').removeClass('sidebar-open');
+          table.ajax.reload();
+          $.toast({
+            text: "Contact Created Sucessfully !!!",
+            position: 'bottom-right',
+            stack: false,
+            icon: 'success',
+          });
+        },
+        error: function (xhr) {
+          console.error('Form submission failed:', xhr.status, xhr.statusText);
+          var response = xhr.responseJSON;
+          if (response && response.errors) {
+            $('#contact-create-form .form-text.text-danger').remove();
+            for (var field in response.errors) {
+              var errors = response.errors[field];
+              if (errors.length > 0) {
+                var $field = $('#ccontact-create-form [name="' + field + '"]');
+                $field.after('<small class="form-text text-danger">' + errors.join('<br>') + '</small>');
+              }
+            }
+          }
+          $btn.prop('disabled', false);
+        }
+      });
+    });
+
+    $('#update_contact').on('click', function (e) {
+        var url = $(this).attr("data-url")
+        var $btn = $(this);
+        var form = $('#contact-create-form')[0];
+        var formData = new FormData(form);
+        formData.append('customer_id', customer_id);
+        $btn.prop('disabled', true);
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                $('#sidebar_form').removeClass('sidebar-open');
+                table.ajax.reload();
+                $.toast({
+                    text: "Contact Updated Sucessfully !!!",
+                    position: 'bottom-right',
+                    stack: false,
+                    icon: 'success',
+                });
+            },
+            error: function (xhr) {
+                console.error('Form submission failed:', xhr.status, xhr.statusText);
+                var response = xhr.responseJSON;
+                if (response && response.errors) {
+                    $('#contact-create-form .form-text.text-danger').remove();
+                    for (var field in response.errors) {
+                        var errors = response.errors[field];
+                        if (errors.length > 0) {
+                            var $field = $('#contact-create-form [name="' + field + '"]');
+                            $field.after('<small class="form-text text-danger">' + errors.join('<br>') + '</small>');
+                        }
+                    }
+                }
+                $btn.prop('disabled', false);
+            }
+        });
+    });
+
+  });
+</script>
+{% endblock script %}

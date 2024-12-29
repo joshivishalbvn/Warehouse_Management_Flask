@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block title %} 
+	Users
+{% endblock title %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="/static/plugins/sweetalert2/sweetalert2.all.min.js"></script>
+
+{% endblock css %}
+
+{% block content %}
+<div class="row row-sm">
+	<div class="col-lg-12">
+		<div class="card">
+			<div class="card-header">
+				<div class="d-flex flex-sm-row flex-column justify-content-between">
+					<h4 class="card-title d-flex">Users<i class="fas fa-filter" onclick="filter_button()" style="display: block !important; cursor: pointer; margin-left: 10px;"></i></h4>
+					<button type="button" hx-get="{{ url_for('user_bp.create_user') }}" hx-target="#sidebar_form" hx-swap="innerHTML" onclick="$('#sidebar_form').toggleClass('sidebar-open')" class="btn btn-primary" >Add</button>
+				</div>
+			</div>
+			<div class="card-body">
+				<div class="table-responsive">
+					<table class="table border-top-0 table-striped  table-bordered text-nowrap border-bottom"
+						id="user_table" style="width:100%">
+						<thead>
+							<tr>
+								<th class="text-center wd-5p border-bottom-0 ">SR NO.</th>
+								<th class="text-center wd-20p border-bottom-0">Email</th>
+								<th class="text-center wd-15p border-bottom-0">Full name</th>
+								<th class="text-center wd-15p border-bottom-0">Mobile</th>
+								<th class="text-center wd-10p border-bottom-0">Role</th>
+								<th class="text-center wd-5p border-bottom-0">Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block filters %}
+<div class="event">
+
+	<div class="row rounded py-2 mb-2 mx-n2">
+
+		<div class="col-12 col-sm-12 col-lg-12">
+			<label for="id_company">Company</label>
+			<fieldset class="form-group">
+				<select id="id_company" class="select2-data-array form-control select2-list">
+					<option value="">All</option>
+					{% if company_list %}
+						{% for company in company_list %}
+						<option value="{{company.id}}">{{company.name}}</option>
+						{% endfor %}
+					{% endif %}
+				</select>
+			</fieldset>
+		</div>
+		
+		<div class="col-12 col-sm-12 col-lg-12">
+			<label for="users-list-role">Role</label>
+			<fieldset class="form-group">
+				<select id="id_role" class="form-control">
+					<option value="">All</option>
+					<option value="Super Admin">Super Admin</option>
+					<option value="Company Admin">Company Admin</option>
+					<option value="Sales Representative">Sales Representative</option>
+					<option value="Warehouse Manager">Warehouse Manager</option>
+				</select>
+			</fieldset>
+		</div>
+		<div class="col-12 col-sm-12 col-lg-12">
+		</div>
+		<div class="col-12 col-sm-12 col-lg-12 d-flex align-items-center justify-content-between mt-2">
+			<button type="reset" class="btn btn-primary btn-block glow mb-0 list-clear">Clear</button>
+		</div>
+	</div>
+
+</div>
+{% endblock filters %}
+
+{% block form %}
+<div class="adduserform  adduser-animate">
+</div>
+{% endblock form %}
+
+
+{% block script %}
+<script src="{{ url_for('static', filename='assets/js/sidebar_open.js') }}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+<script>
+	$(document).ready(function() {
+        var table = $('#user_table').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": "/api/users",
+                    "data": function (d) {
+						d.role = $('#id_role').val();
+						d.company = $('#id_company').val();
+					}
+				},
+                "columns": [
+                    { "data": "id" },
+                    { "data": "email" },
+                    { "data": "full_name" },
+                    { "data": "mobile" },
+                    { "data": "role" },
+                    { "data": "actions" }
+                ]
+            });
+
+			$('#id_role').on('change', function() {
+				table.ajax.reload(); 
+			});
+
+			$('#id_company').on('change', function() {
+				table.ajax.reload(); 
+			});
+
+			$(document).on('click', '.list-clear', function () {
+				$("#id_company").val(null).trigger('change');
+				$("#id_role").val(null).trigger('change');
+			})
+
+			$(document).on('click', '.delete-btn', function (e) {
+				var url = $(this).attr("data-url"); 
+				swal({
+					title: "Are you sure?",
+					text: "Once deleted, you will not be able to recover this item!",
+					icon: "warning",
+					buttons: true,
+					dangerMode: true,
+				})
+				.then((willDelete) => {
+					if (willDelete) {
+						$.ajax({
+							url: url,
+							method: 'POST',
+							headers: {
+								'X-CSRFToken': $('meta[name="csrf-token"]').attr('content') 
+							},
+							success: function(response) {
+								swal("Poof! Item has been deleted!", {
+									icon: "success",
+								}).then(() => {
+									table.ajax.reload(); 
+								});
+							},
+							error: function(xhr, status, error) {
+								swal("Error", "An error occurred while deleting the item", "error");
+							}
+						});
+					}
+				});
+			});
+
+			$(document).on('click', '.update_this_user' , function (e) {
+				url = $(this).data("url")
+				console.log("url",url)
+				htmx.ajax('GET', url, {
+					target:'#sidebar_form', swap:'innerHTML',
+				}).then(() => {
+					$('#sidebar_form').toggleClass('sidebar-open')
+					$.toast({
+						text: "User Updated Sucessfully !!!",
+						position: 'bottom-right',
+						stack: false,
+						icon: 'sucess',
+					});
+				});
+			});
+
+
+			document.addEventListener('htmx:afterRequest', function(event) {
+				const xhr = event.detail.xhr;
+				const trigger = xhr.getResponseHeader('HX-Trigger');
+				
+				if (trigger) {
+					const data = JSON.parse(trigger);
+					if (data.userResponse) {
+						// Assuming you have a `userResponse` event listener
+						const event = new CustomEvent('userResponse', {
+							detail: {
+								message: data.userResponse.message,
+								level: data.userResponse.level
+							}
+						});
+						document.body.dispatchEvent(event);
+					}
+				}
+			});
+
+			
+
+    });
+
+</script>
+<script src="{{ url_for('static', filename='assets/js/htmx_1.9.4.min.js') }}"></script>
+{% endblock script %}

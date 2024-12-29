@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags static %}
+
+{% block css %}
+<link href="{%  static 'assets/plugins/bootstrap/css/modal.css' %}" rel="stylesheet" id="style" />
+{% endblock css %}
+
+{% block content %}
+
+<div class="card match-height">
+
+    
+    <div class="card-body">
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header text-center"><b><h5>{{load_obj.loading_id}} ({{load_obj.status|capfirst}})</h5></b></div>
+                    <div class="col-12 card-body">
+
+                        {% if not request.user.role == request.user.CUSTOMER %}
+                            <div class="row">
+                                
+                                <div class="col-md-4">
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label" for="horizontal-form-2">Loading Date :</label>
+                                        <div class="col-md-9">
+                                        <input type="text" class="form-control square" id="horizontal-form-2" name="last-name" data-available-credit="{{available_credits}}" value="{{ load_obj.created_at.date }}" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            
+                                <div class="col-md-4">
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label" for="horizontal-form-2">Customer :</label>
+                                        <div class="col-md-9">
+                                        <input type="text" class="form-control square" id="horizontal-form-2" name="last-name" data-available-credit="{{available_credits}}" value="{{load_obj.customer.user.first_name|capfirst}} {{load_obj.customer.user.last_name|capfirst}}" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {% if request.user.is_superuser or requser.user.role == "Super Admin" %}
+                                <div class="col-md-4">
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label" for="horizontal-form-2">Company :</label>
+                                        <div class="col-md-9">
+                                        <input type="text" class="form-control square" id="horizontal-form-2" name="last-name" data-available-credit="{{available_credits}}" value="{{load_obj.company.name}}" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                            </div>
+
+
+                        {% else %}
+
+                        <div class="row">
+                            
+                            <div class="col-md-4">
+                                <div class="form-group row">
+                                    <label class="col-md-3 col-form-label" for="horizontal-form-2">Loading Date :</label>
+                                    <div class="col-md-9">
+                                    <input type="text" class="form-control square" id="horizontal-form-2" name="last-name" data-available-credit="{{available_credits}}" value="{{ load_obj.created_at.date }}" disabled>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        {% endif %}
+                        
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading_items">
+            
+            <table class="table table-striped table-bordered file-export" style="width: 100%;"id="loading_order_products_table">
+            <thead>
+                <tr>
+                    <th >Sr No.</th>
+                    <th >Product Name</th>
+                    <th >Quantity</th>
+                    <th style="width: 18%;">Case Pack</th>
+                    <th >Unit Price ($)</th>
+                    <th >Item Total ($)</th>
+                    <th >Discount (%)</th>
+                    <th >Net Price ($) {{is_quotation}}</th>
+                </tr>
+            </thead>
+                <tbody>
+                
+                </tbody>
+            </table>
+        </div>
+
+</div>
+</div>
+
+
+{% endblock %}
+    
+
+{% block script %}
+<script src="{% static 'assets/js/htmx_1.9.4.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatable/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatable/js/jszip.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatable/js/pdfmake.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatable/js/vfs_fonts.js' %}"></script>
+<script src="{% static 'assets/plugins/datatable/js/buttons.print.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatable/js/buttons.html5.min.js' %}"></script>
+<script>
+    var table_id = '#loading_order_products_table'
+    var url = '{% url "order_loads:loading_products_list_ajax" %}';
+    var load_order_id = "{{ load_obj.id|safe }}";
+    var title = "{{ load_obj.customer.user.first_name|safe }} {{ load_obj.customer.user.last_name|safe }} {{ load_obj.loading_id|safe }}";
+    
+</script>
+<script src="{% static 'assets/js/datatable_with_buttons.js' %}"></script>
+<script src="{% static 'assets/js/pending_loading.js' %}"></script>
+{% endblock script %}

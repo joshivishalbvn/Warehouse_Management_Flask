@@ -1,0 +1,21 @@
+<div class="row" style="width: 330px;">
+
+    <div class="col-12 text-start d-flex flex-nowrap">
+        <b>{{ product.name }} (<span {% if product.status == 'Active' %} style="color:#1e750b !important;"{% else %} style="color: red;"{% endif %}><b>{{ product.status }}</b></span>)</b>
+    </div>
+
+    <div class="col-12 text-start d-flex flex-nowrap mt-2">
+        Product Code :  &nbsp;&nbsp; <h5 class="product_code_copy" id="code-{{ product.code }}" style="color:blue">{{ product.code }}</h5> &nbsp;&nbsp; <a title="Copy" onclick="copyToClipboard('#code-{{ product.code }}')" style="cursor: pointer;"><i class="fa fa-clone"></i></a>
+    </div>
+    
+    {% if barcode_obj %}
+    <div class="col-12 text-start d-flex flex-nowrap mt-2">
+        Barcode :  &nbsp;&nbsp; <h5 class="product_code_copy" id="barcode-{{ barcode_obj.number }}" style="color:blue">{{ barcode_obj.number }}</h5> &nbsp;&nbsp; <a title="Copy" onclick="copyToClipboard('#barcode-{{ barcode_obj.number }}')" style="cursor: pointer;"><i class="fa fa-clone"></i></a>
+    </div>
+
+    <div class="mt-1">
+        <img src="{{ url_for('static', filename=img_url) }}" alt="avatar" height="{{ height }}" width="{{ width }}">
+    </div>
+    {% endif %}
+
+</div>

@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/daterangepicker.css' %}" />
+{% endblock css %}
+
+{% block content %}
+
+<div class="row row-sm">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex flex-sm-row">
+                    <div class="col-6">
+                        <h4 class="card-title d-flex" style="float: left; margin-right:10px;">Purchase Report</h4>
+                    </div>
+                    <div class="col-6">
+                        <div class="my-1 date_filter d-none" id="date_filter">
+                            <div class="d-flex justify-content-end">
+                                <b class="my-auto">Date Filter : </b>
+                                <input class="daterange_picker form-control w-25" type="text" name="daterange" id="date_range_unit" value="01/01/2024 - 11/06/2024" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <table id="purchase_order_report_table" class="table border-top-0 table-striped  table-bordered text-nowrap border-bottom" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Sr. No.</th>
+                            <th class="text-center">Product</th>
+                            <th class="text-center">Case Size</th>
+                            <th class="text-center">Order Date</th>
+                            <th class="text-center">Total Stock</th>
+                            <th class="text-center">Cost Price ($)</th>
+                            <th class="text-center">Profit ($)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+
+{% block script %}
+
+<script src="{% static 'assets/js/daterangepicker.min.js' %}"></script>
+<script src="{%  static 'assets/js/sidebar_open.js' %}"></script>
+
+<script src="{% static 'assets/plugins/datatable/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatable/js/jszip.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatable/js/pdfmake.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatable/js/vfs_fonts.js' %}"></script>
+<script src="{% static 'assets/plugins/datatable/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatable/js/buttons.print.min.js' %}"></script>
+<script src="{% static 'assets/js/datatable_with_buttons.js' %}"></script>
+
+<script>
+    var title = "Purchase Report"
+    var table_id = "#purchase_order_report_table";
+    var url = "{% url 'report:purchase_order_report_ajax' %}";
+    var columns = [
+        { data: 'id', name: 'id' },
+        { data: 'product', name: 'product' },
+        { data: 'case_size', name: 'case_size' },
+        { data: 'created_at', name: 'created_at' },
+        { data: 'total_pieces', name: 'total_pieces' },
+        { data: 'amount', name: 'amount' },
+        { data: 'profit', name: 'profit' },
+    ]
+    var to_center = "_all"
+    var invisible_columns = []
+    var order_false = [-1]
+</script>
+
+<script src="{% static 'assets/report/report_datatable.js' %}"></script>
+
+<script>
+    $('#date_range_unit').daterangepicker();
+    $('#date_range_unit').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD')).change();
+
+        $("#purchase_order_report_table").DataTable().destroy();
+        init_datatable(days=0, custom_date=true);
+        $(".days-custom").addClass('btn-primary');
+    });
+</script>
+
+<script>
+    var table;
+    var hidden_columns = [];
+    let data = localStorage.getItem("hidden_columns");
+
+    if (data){
+        hidden_columns = JSON.parse(data);
+    }
+
+    $(document).ready(function(){
+        table = init_datatable();
+        
+        hidden_columns.forEach((col) => {
+            table.columns(col).visible(false);
+            document.getElementById("column-"+col).checked = false;
+        });
+    });
+</script>
+
+{% endblock script %}

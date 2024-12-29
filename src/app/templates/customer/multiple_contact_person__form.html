@@ -1,0 +1,101 @@
+{% load static %}
+{% load sekizai_tags widget_tweaks %}
+
+
+<div class="col-md-2 mt-3">
+  <label class="label-control mt-2 font-weight-bold" for="id_additional_charges">Contact Person :</label>
+</div>
+
+<div class="col-md-12">
+  {{inlines.management_form}}
+  {% for extra_fields in inlines %}
+      {{extra_fields.management_form}}
+      {% for form in extra_fields %}
+        {{form.id}}
+        <div class="extra-fields-wrap">
+          <div class="row extra-fields extra-fields-main mt-2" id="row-0-">
+            <div class="hidden">
+              {{ form.customer }}
+            </div>
+            <div class="col-md-3">
+              <label for="{{ form.weight.auto_id }}">{{ form.name.label }}{% if form.name.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+              {{ form.name }}
+              {% if form.name.errors %}
+                  {% for error in form.name.errors %}
+                  <span class="error text-danger">{{ error }}</span>
+                  {% endfor %}
+              {% endif %}
+            </div>
+            
+            <div class="col-md-4">
+              <label for="{{ form.weight.auto_id }}">{{ form.email.label }}{% if form.email.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+              {{ form.email }}
+              {% if form.email.errors %}
+                  {% for error in form.email.errors %}
+                  <span class="error text-danger">{{ error }}</span>
+                  {% endfor %}
+              {% endif %}
+            </div>
+            
+            <div class="col-md-4">
+              <label for="{{ form.weight.auto_id }}">{{ form.phone.label }}{% if form.phone.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+              {% render_field form.phone|add_class:"regionalphonenumberwidget" %}
+              {% if form.phone.errors %}
+                  {% for error in form.phone.errors %}
+                  <span class="error text-danger">{{ error }}</span>
+                  {% endfor %}
+              {% endif %}
+            </div>
+
+            <div class="col-md-1 d-flex align-items-center pt-4">
+              <label for="{{form.DELETE.auto_id}}" class="delete-button-wrap text-danger hidden">
+                {{form.DELETE}}
+                <i class="fa fa-trash delete_button" id="{{form.DELETE.auto_id}}" data-row="#row-0-"></i>
+              </label>
+            </div>
+
+          </div>
+        </div>
+      {% endfor %}
+    <div class="extra-fields-added">
+    </div>
+  {% endfor %}
+  <div class="text-end my-2">
+    <button class="btn btn-default pull-right" type="button" id="add-case-inline" onclick="AddForm()"><i class="fa fa-plus" id=""></i> Add more</button>
+  </div>
+</div>
+<div>
+
+
+{% addtoblock "script" %}
+
+<script>
+
+  function AddForm() {
+    var total_forms = parseInt($("#id_customer_details-TOTAL_FORMS").val());
+
+    clone_group = $(".extra-fields-wrap").first().clone();
+    html_text = clone_group.html()
+    _html_text = html_text.replaceAll("-0-", "-" + total_forms + "-");
+    final_template = $.parseHTML(_html_text);
+
+    $(".extra-fields-added").append(final_template);
+    $(".regionalphonenumberwidget").intlTelInput();
+    $(".extra-fields-added").find(".extra-fields-main").removeClass("extra-fields-main").addClass("extra-fields-main-" + total_forms);
+    $(".extra-fields-main-" + total_forms).find(".form-control").val("");
+    $(".extra-fields-main-" + total_forms).find(".delete-button-wrap").show();
+
+    $("#id_customer_details-TOTAL_FORMS").val(++total_forms);
+  }
+
+  $(document).on("click", ".delete_button", function(){
+    let row = $(this).data("row");
+    $(row).remove();
+
+    var total_forms = parseInt($("#id_customer_details-TOTAL_FORMS").val());
+    $("#id_customer_details-TOTAL_FORMS").val(--total_forms);
+  });
+
+</script>
+
+{% endaddtoblock "script" %}

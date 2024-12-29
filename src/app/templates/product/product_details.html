@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+
+{% block css %}
+<style>
+.product_preview {
+    background-image: url("{{ url_for('static', filename='assets/img/placeholder-380x250.png') }}");
+    /* background-color: rgba(0, 0, 0, 0) !important; */
+    display: inline-block;
+}
+.case_table th, .case_table td {
+    text-align: center; 
+}
+.dataTables_length {
+    display: none;
+}
+</style>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="/static/plugins/sweetalert2/sweetalert2.all.min.js"></script>
+{% endblock css %}
+
+{% block content %}
+
+<div class="row row-sm">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-body h-100">
+                <div class="row row-sm ">
+                    <div class="col-xl-1 col-lg-12 col-md-12">
+                        <ul>
+                            {% for image in product_images %}
+                                <li class="{% if loop.first %}active{% endif %}">
+                                    <a class="image-tab" data-target="#pic-{{ loop.index }}"><img src="{{ url_for('static', filename=image.image_url) }}" alt="image"/></a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        
+                    </div>
+                    <div class="col-xl-4 col-lg-12 col-md-12">
+                        <div class="text-center">
+                            {% for image in product_images %}
+                            <div class="tab-pane {% if not loop.first %}hidden{% endif %}" id="pic-{{ loop.index }}">
+                                <img src="{{ url_for('static', filename=image.image_url) }}" class="product-image" alt="image"/>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="details col-xl-6 col-lg-12 col-md-12 mt-4 mt-xl-0">
+                        <div class="d-flex justify-content-between mx-1">
+                            <h4 class="product-title">{{product.name}}</h4>
+                            <button onclick="$('#lg_sidebar_form').toggleClass('sidebar-open')" hx-swap="innerHTML" 
+                                hx-target="#lg_sidebar_form" hx-get="{{url_for('product_bp.update_product', id=product.id)}}"
+                                class="btn btn-link">
+                            <i class="fa fa-edit float-end"></i></button>
+                        </div>
+                        <hr />
+                        <div class="row mx-1">
+                            <div class="col-sm-3 col-lg-3 col-3">
+                                <div class="mg-xl-t-9-f">
+                                    <label for=""><b>Code:</b>
+                                        <span class="">{{product.code}} </span>
+                                    </label>
+                                </div>
+                                <div class="mg-xl-t-9-f">
+                                    <label for="" class=" "><b>Status:</b>
+                                        <span class="">{{product.status}} </span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-sm-9 col-lg-9 col-9">
+                                <h5><b>Case Size
+                                    <button onclick="$('#sidebar_form').toggleClass('sidebar-open')" hx-swap="innerHTML" 
+                                    hx-target="#sidebar_form" hx-get="{{url_for('product_bp.create_product_case', id=product.id)}}"
+                                    class="btn btn-link"> <i class="fa fa-plus"></i></button>
+                                </b>
+                                    
+                               </h5>
+                                <table class="table table-bordered case_table" id="month">
+                                    <thead>
+                                        <tr>
+                                            <th><b>Actions</b></th>
+                                            <th><b>Weight</b></th>
+                                            <th><b>Quantity</b></th>
+                                            <th><b>CMB</b></th>
+                                            <th><b>Stock</b></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="4" class="text-end"><b>Total</b></td>
+                                            <td><b>{{ product.get_total_available_stock  }}</b></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row mt-auto mx-2">
+                            <div class="col-6 text-start">
+                                {% if next_product %}
+                                <a class="btn btn-primary" href="{{url_for('product_bp.product_details', id=next_product )}}">
+                                    
+                                    <i class="text-white fas fa-arrow-left"></i>
+                                </a> 
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-6 text-end">
+                                {% if previous_product %}
+                                <a class="btn btn-primary" href="{{url_for('product_bp.product_details', id=previous_product )}}">
+                                    
+                                    <i class="text-white fas fa-arrow-right"></i>
+                                </a> 
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row ">
+    <div class="col-6">
+    {% include 'product/barcode_list.html' %}
+    </div>
+    <div class="col-6">
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-bordered sales_table" id="month">
+                    <h4 class="text-center">Sales Statistics</h4>
+                    <thead>
+                        <tr>
+                            <th><b>Last 6 months</b></th>
+                            <th><b>Total Sale</b></th>
+                            <th><b>Total Price</b></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    
+                    {% if sales_statics %}
+                    {% for statics in sales_statics %}
+                        <tr>
+                            <td>{{statics.month |month_name}}</td>
+                            <td>{{statics.sales_sum}}</td>
+                            <td>{{statics.total}}</td>
+                        </tr>
+                    {% endfor %}
+                        
+                    {% else %}
+                    <tr>
+                        <td>---</td>
+                        <td>---</td>
+                        <td>---</td>
+                    </tr>
+                        
+                    {% endif %}
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="number" hidden value="{{product.id}}" id="id_product_2">
+
+{% endblock %} 
+
+
+{% block form %}
+<div class="addbarcode addbarcode-animate">
+</div>
+{% endblock form %}
+
+
+
+{% block script %} 
+<script src="{{ url_for('static', filename='assets/js/htmx_1.9.4.min.js') }}"></script>
+
+<script src="{{ url_for('static', filename='assets/js/sidebar_open.js') }}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+
+<script>
+    var product_id = "{{product.id|safe}}";
+    var case_table_url = "{{ url_for('product_bp.product_case_data_table') }}";
+    console.log("product_id,",product_id)
+	$(document).ready(function() {
+        console.log("in ready function")
+        var case_table = $('.case_table').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": case_table_url,
+                "data": function(d) {
+                    d.product_id = product_id;
+                }
+            },
+            "columns": [
+                { data: 'actions', name: 'actions' },
+                { data: 'weight', name: 'weight' },
+                { data: 'quantity', name: 'quantity' },
+                { data: 'cubic_meter_volume', name: 'cubic_meter_volume' },
+                { data: 'stock', name: 'stock' },
+            ],
+            "language": {
+                "emptyTable": "No data available"
+            },
+            "pageLength": 3,
+            "lengthMenu": [5],
+            "searching": false 
+        });
+
+        var barcode_table_url = "{{ url_for('product_bp.product_barcode_data_table') }}";
+            var barcode_table = $('#barcode-table').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": barcode_table_url,
+                    "data": function(d) {
+                        d.product_id = product_id;
+                    }
+                },
+                "columns": [
+                    { data: 'id', name: 'id' },
+                    { data: 'number', name: 'number' },
+                    { data: 'barcode', name: 'barcode' },
+                    { data: 'actions', name: 'actions' },
+                ],
+                "language": {
+                    "emptyTable": "No data available"
+                },
+                "pageLength": 3,
+                "lengthMenu": [5],
+                "searching": false 
+            });
+
+			$(document).on('click', '.delete-btn', function (e) {
+				var url = $(this).attr("data-url"); 
+				swal({
+					title: "Are you sure?",
+					text: "Once deleted, you will not be able to recover this item!",
+					icon: "warning",
+					buttons: true,
+					dangerMode: true,
+				})
+				.then((willDelete) => {
+					if (willDelete) {
+						$.ajax({
+							url: url,
+							method: 'POST',
+							headers: {
+								'X-CSRFToken': $('meta[name="csrf-token"]').attr('content') 
+							},
+							success: function(response) {
+								swal("Poof! Item has been deleted!", {
+									icon: "success",
+								}).then(() => {
+									barcode_table.ajax.reload(); 
+									case_table.ajax.reload(); 
+								});
+							},
+							error: function(xhr, status, error) {
+								swal("Error", "An error occurred while deleting the item", "error");
+							}
+						});
+					}
+				});
+			});
+
+			$(document).on('click', '.update_this_case' , function (e) {
+				url = $(this).data("url")
+				console.log("url",url)
+				htmx.ajax('GET', url, {
+					target:'#sidebar_form', swap:'innerHTML',
+				}).then(() => {
+					$('#sidebar_form').toggleClass('sidebar-open')
+                    case_table.ajax.reload()
+				});
+			});
+    });
+</script>
+
+{% endblock script %}

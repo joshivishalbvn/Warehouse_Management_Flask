@@ -1,0 +1,26 @@
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th class="text-center">Sr. No.</th>
+            <th class="text-center">Product</th>
+            <th class="text-center">Stock</th>
+        </tr>
+    </thead>
+    {% if not is_stock_found %}
+    <tr>
+        <td colspan="3">No product found.</td>
+    </tr>
+    {% else %}
+        {% for item in stock_list %}
+        <tr>
+            <td class="text-center">{{ loop.index }}</td>
+            <td class="text-center">{{ item.product.name }} ( <a href="#">{{ item.product.code }}</a> ) </td>
+            <td class="text-center">{{ item.get_zone_wise_current_stock }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="3">No product found.</td>
+        </tr>
+        {% endfor %}
+    {% endif %}
+</table>

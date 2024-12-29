@@ -1,0 +1,28 @@
+<div class="text-nowrap">
+
+    {{ product.name }} (<a href="{% url 'products:product_details' product.id %}">{{ product.code }}</a>)
+
+    <div class="my-2">
+        {% if job_work.status == job_work.REQUESTED or job_work.status == "pending" %}
+        <div class="text-warning">
+            <span class="font-weight-bold text-dark"> Total Requested Quantity : </span> {{ ordered_product.get_requested_job_work_quantity }}
+        </div>
+        {% endif %}
+        <div class="text-primary">
+            <span class="font-weight-bold text-dark"> Total Approved Quantity : </span> {{ ordered_product.get_approve_job_work_quantity }}
+        </div>
+        <div class="text-success">
+            <span class="font-weight-bold text-dark"> Total Packed Quantity : </span> {{ ordered_product.get_packed_job_work_quantity }}
+        </div>
+    </div>
+    <div class="my-2">
+        <div class="text-start font-weight-bold">
+            Progress :
+        </div>
+        <div class="progress">
+            <div class="progress-bar bg-success" role="progressbar" style="width: {{ progress }}%; height:20px" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        {{ progress }}%
+    </div>
+
+</div>

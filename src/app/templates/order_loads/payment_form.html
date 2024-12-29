@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header text-center"><b>Use Credits</b></div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 ">
+                        <div class="form-group row">
+                          <label class="col-md-3 col-form-label" for="horizontal-form-2">Customer :</label>
+                          <div class="col-md-9">
+                            <input type="text" class="form-control square" id="horizontal-form-2" name="last-name" value="{{customer.user.first_name}} {{customer.user.last_name}}" disabled>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label" for="horizontal-form-2">Available Credit :</label>
+                            <div class="col-md-9">
+                            <input type="text" class="form-control square" id="horizontal-form-2" name="last-name" data-available-credit="{{available_credits}}" value="{{available_credits}}" disabled>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 ">
+                        <div class="form-group row">
+                          <label class="col-md-3 col-form-label" for="horizontal-form-2">Due Amount :</label>
+                          <div class="col-md-9">
+                            <input type="text" class="form-control square" id="horizontal-form-2" name="last-name" value="{{customer_due}}" disabled>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label" for="horizontal-form-2">Use Credit :</label>
+                            <div class="col-md-9">
+                            <input type="number" class="form-control square used_creadit" id="horizontal-form-2" name="last-name"  data-remaining-credit="0" value="0" min="0" max="{{available_credits}}" oninput="RemoveDisableFromCehckBox()">
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header"><b>Invoice List</b></div>
+            <div class="card-body">
+                <div class="table-responsive">
+					<table id="load_order_table" class="table border-top-0 table-striped  table-bordered text-nowrap w-100 border-bottom">
+						<thead>
+							<tr>
+								<th class="border-bottom-0 text-center">Sr No</th>
+								<th class="border-bottom-0 text-center">Invoices</th>
+								<th class="border-bottom-0 text-center">Bill Amount</th>
+								<th class="border-bottom-0 text-center">Paid Amount</th>
+								<th class="border-bottom-0 text-center">Due Amount</th>
+								<th class="border-bottom-0 text-center">Select Check Box</th>
+								<th class="border-bottom-0 text-center">Pay Amount</th>
+								<th class="border-bottom-0 text-center">Due Balance</th>
+							</tr>
+						</thead>
+						<tbody>
+                            {% for object in object_list %}
+                                <tr data-id="{{object.id}}" customer-id={{object.customer.id}} purchase-order-customer_bill_id={{object.purchase_order.id}} class="customer-row">
+                                <td  class="text-center" id="id_object_td">{{forloop.counter}} <input type="hidden" id="id_{{object.id}}__object_id" value="{{object.id}}" name = 'customer_bill_{{object.id}}__object_id'> </td>
+                                <td class="text-center" >{{object.loading_id}}</td>
+                                <td class="text-center" >{{object.get_final_order_total}}</td>
+                                <td class="text-center" >{{object.get_credited_amount}}</td>
+                                <td class="text-center" >{{object.get_due_amount}} <input type="hidden" name="customer_{{object.id}}_due_amount" value="{{object.get_due_amount}}" class='' id="id_{{object.id}}__due_amount" > </td>
+                                <td class="text-center"  id="id_{{object.id}}__checkbox_td"> <input type="checkbox" class="checkbox invoice-checkbox" disabled onchange="AdjustCredit({{object.id}})" name = 'customer_{{object.id}}_checkbox' id ="id_checkbox"> </td>
+                                <td class="text-center" > <input type="number" name="customer_{{object.id}}__paid_amount" value="" class='form-control' id="id_{{object.id}}__paid_amount" readonly> </td>
+                                <td class="text-center" > <input type="number" name="customer_{{object.id}}__due_balance" value="" class='form-control' id="id_{{object.id}}__due_balance" readonly>  </td>
+                                </tr>
+                            {% endfor %}
+						</tbody>
+					</table>
+            </div>
+        </div>
+    </div>
+    <div class="my-4 text-end">
+        <button class="btn btn-primary mr-2" id="submit-button" disabled onclick="AddPayment()">Save</button>
+        <a href="{% url 'customers:customer_details' customer.id %}"><button type="button" class="btn btn-secondary">Cancel</button></a>
+    </div>
+</div>
+
+{% csrf_token %}
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+var add_payment_to_loading = "{% url 'customers:add_payment_to_loading' %}"
+var payment_complte_url = "{% url 'customers:customer_list' %}"
+function ajax_call_setup() {
+    csrf_token = $("input[name='csrfmiddlewaretoken']").val();
+    $.ajaxSetup({
+        headers: { "X-CSRFToken": csrf_token }
+    });
+
+}
+
+    function RemoveDisableFromCehckBox(){
+        var value = $(".used_creadit").val()
+        if (value>0) {
+            $(".checkbox").removeAttr("disabled")
+            var max_value = $(".used_creadit").attr("max")
+            if (parseFloat(value)>parseFloat(max_value)) {
+                $(".used_creadit").val(max_value)
+                value = max_value
+            }
+        } else {
+            $(".checkbox").attr("disabled",true)
+        }
+        $(".used_creadit").attr("data-remaining-credit",value)
+    }
+
+    var paid_loadings = {}
+
+    function AdjustCredit(load_order_id){
+        var remaining_credit = $(".used_creadit").attr("data-remaining-credit")
+
+
+        let d = document.querySelectorAll(".invoice-checkbox");
+        let isChecked = false
+        d.forEach((eve)=>{
+            if (eve.checked)
+                isChecked = true
+        })
+        if(isChecked){
+            $(".used_creadit").attr("disabled",true)
+            $("#submit-button").attr('disabled',false)
+        } else {
+            $(".used_creadit").attr("disabled",false)
+            $("#submit-button").attr('disabled',true)
+        }
+
+        if (event.currentTarget.checked) {
+            // $(".used_creadit").attr("disabled",true)
+            var used_credit = $(".used_creadit").attr("data-remaining-credit")
+            var due_amount = $(`#id_${load_order_id}__due_amount`).val()
+            var paid_amount = Math.min(due_amount, used_credit)
+            if (paid_amount>0) {
+                paid_loadings[parseInt(load_order_id)] = paid_amount
+            }
+            var remaining_credit = parseFloat(used_credit) - parseFloat(paid_amount)
+            $(".used_creadit").attr("data-remaining-credit",parseFloat(remaining_credit))
+            final_due_amount = parseFloat(due_amount) - parseFloat(paid_amount)
+            $(`#id_${load_order_id}__paid_amount`).val(parseFloat(paid_amount))
+            $(`#id_${load_order_id}__due_balance`).val(parseFloat(final_due_amount))
+            
+
+            
+        } else {
+            var remaining_credit = $(".used_creadit").attr("data-remaining-credit")
+            var used_amount = $(`#id_${load_order_id}__paid_amount`).val()
+            var restore_amount = parseFloat(remaining_credit) + parseFloat(used_amount)
+            $(".used_creadit").attr("data-remaining-credit",restore_amount)
+            // $(".used_creadit").attr("disabled",false)
+            if (load_order_id in paid_loadings) {
+                delete paid_loadings[load_order_id]
+            }
+            $(`#id_${load_order_id}__paid_amount`).val("")
+            $(`#id_${load_order_id}__due_balance`).val("")
+        }
+
+    }
+
+    function AddPayment(){
+        ajax_call_setup()
+        $.ajax({
+            url: add_payment_to_loading,
+            type: "post",
+            dataType: "json",
+            data: {
+                'paid_loadings': JSON.stringify(paid_loadings),
+            },
+            success: function (data) {
+                $.toast({
+                text: "Payment Added Sucessfully...",
+                position: 'bottom-right',
+                stack: false,
+                icon: 'success',
+            })
+            setTimeout(function() {
+                window.location.href = payment_complte_url;
+            }, 3000);
+                
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                $.toast({
+                    text: "Something Went Wrong...",
+                    position: 'bottom-right',
+                    stack: false,
+                    icon: 'error',
+                })
+            }
+        });
+    }
+</script>
+
+    
+{% endblock script %}

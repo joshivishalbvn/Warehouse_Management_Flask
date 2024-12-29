@@ -1,0 +1,453 @@
+{% extends 'base.html' %}
+
+{% block title %} 
+    {{ customer.user.get_full_name | title }}'s Details
+{% endblock title %}
+
+{% block css %}
+<style>
+    .info-item {
+        margin-bottom: 20px;
+    }
+    .profile-picture-circle {
+        border-radius: 10%;
+        overflow: hidden;
+        width: 100px;
+        height: 100px;
+    }
+    .table-bordered {
+        width: 100% !important;
+    } 
+    .product-img
+    {
+        object-fit: cover;
+        width: 100%;
+        height: 85px;
+        overflow: hidden;
+    }
+
+</style>
+<style>
+
+    table#priceLevel {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    table#priceLevel, table#priceLevel th, table#priceLevel td {
+        border: 1px solid black;
+    }
+
+    table#priceLevel th, table#priceLevel td {
+        padding: 8px;
+    }
+
+    table#priceLevel th {
+        background-color: #f2f2f2;
+    }
+</style>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="/static/plugins/sweetalert2/sweetalert2.all.min.js"></script>
+{% endblock css %}
+
+{% block content %}
+<div class="col-lg-12">
+    <div class="card">
+        <div class="card-body">
+            <div class="mx-4 mb-4">
+
+
+                <div id="user_details" class="tabcontent">
+                    <div class="row">
+                        <div class="card">
+                            <div class="row mt-2">
+                                <div class="col-lg-1">
+                                    <div class="profile-picture profile-picture-circle">
+                                        <img src="{{ url_for('static', filename='assets/img/default user.png') }}" alt="user-img" class="rounded-circle mCS_img_loaded h-50 w-50"> 
+                                        
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-3">
+                                    <div class="info-item">
+                                        <b>Name:</b>
+                                        <span>{{ customer.user.get_full_name | title }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <b>Type:</b>
+                                        <span>{{ customer.type | title }}</span>
+                                    </div>
+                                    <div class="info-item">             
+                                        <b>Company Name:</b>
+                                        <span>{{ customer.user.company | title }}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-3">
+                                    <div class="info-item">
+                                        <b>Email:</b>
+                                        <span>{{ customer.user.email }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <b>Available Credit:</b>
+                                        <span>{{ availabe_credits }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="info-item">
+                                        <b>Mobile No</b>
+                                        <span>{{ customer.get_customer_phone_number }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                    <div class="mt-3 d-flex">
+                        <span data-id="#table-1" class="btn btn-outline-primary tab-2 ml-sm-0 mt-3 list_button nav-tab-active">Order List</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span data-id="#table-2" class="btn btn-outline-primary tab-2 ml-sm-0 mt-3 nav-tab list_button">Credits</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span data-id="#table-3" class="btn btn-outline-primary tab-2 ml-sm-0 mt-3 nav-tab list_button">Documents</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span data-id="#table-4" class="btn btn-outline-primary tab-2 ml-sm-0 mt-3 nav-tab list_button">Contacts</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span data-id="#table-5" class="btn btn-outline-primary tab-2 ml-sm-0 mt-3 nav-tab list_button">Address Info</span>&nbsp;&nbsp;&nbsp;&nbsp;<br><br>
+                    </div>
+
+                    <section id="table-1" class="tab-content active">
+                        <table border="1" class="table border-top-0 table-striped w-100  table-bordered text-nowrap border-bottom" id="orderlist">
+                            <thead>
+                                <tr class="w-100">
+                                    <th>Sr. No.</th>
+                                    <th>Order ID</th>
+                                    <th>Date</th>
+                                    <th>Profit ($)</th>
+                                    <th>Profit Margin (%)</th>
+                                    <th>Status</th>
+                                    <th>Total Amount ($)</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                            </tbody>
+                        </table>
+                    </section>
+                    
+                    <section id="table-2" class="tab-content">
+                        <div style="display:flex; flex-direction: row-reverse;">
+                            <button type="button" data-bs-target="#creditModal" data-bs-toggle="modal" hx-get="#" hx-target="#credits_form" hx-vars="{'customer_id': '{{ customer.id }}' }" class="btn btn-primary ml-sm-1 text-ri mb-1 btn-rounded">Add Credits</button>
+                            <a href="#"><button style="margin-right: 10px;" type="button"  class="btn btn-primary ml-sm-1 text-ri mb-1 btn-rounded">Use Credits</button></a>
+                        </div> 
+                        <table border="1" cellspacing="50" class="w-100 h-20 table border-top-0 table-striped  table-bordered text-nowrap border-bottom" id="paymenthistory">
+                            <thead>
+                                <tr class="w-100">
+                                    <th>Sr No</th>
+                                    <th>Payment Date</th>
+                                    <th>Total Paid Amount ($)</th>
+                                    <th>Payment Mode</th>
+                                    <th>Reference Id</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                               
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section id="table-3" class="tab-content">
+                        <div class="row">
+                            <div class="col-12 ">
+                                <div style="display:flex; flex-direction: row-reverse;">
+                                    <button type="button" hx-get="{{ url_for('customer_bp.add_document') }}" hx-vars="{'customer_id': '{{customer.id|safe}}' }" hx-target="#sidebar_form" hx-swap="innerHTML" onclick="$('#sidebar_form').toggleClass('sidebar-open')" class="btn btn-primary" >Add</button>
+                                </div> 
+                                <table border="1" cellspacing="50" class="w-100 h-20 table border-top-0 table-striped  table-bordered text-nowrap border-bottom" id="documents_table">
+                                    <thead>
+                                        <tr class="w-100">
+                                            <th>SR No</th>
+                                            <th>Document Name</th>
+                                            <th>Document</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="table-4" class="tab-content">
+                        <div class="row">
+                            <div class="col-12">
+                                <div style="display:flex; flex-direction: row-reverse;" class="my-2">
+                                    <a class="btn btn-primary text-right" hx-get="{{ url_for('customer_bp.add_contacts') }}" hx-vars="{'customer_id': '{{customer.id|safe}}' }"
+                                    hx-target="#sidebar_form" hx-swap="innerHTML" onclick="$('#sidebar_form').toggleClass('sidebar-open')">Add</a>
+                                </div>
+                                <table border='1' cellspacing=50 class="w-100 h-20 table border-top-0 table-striped table-bordered text-nowrap border-bottom" id="contacts_table">
+                                    <thead>
+                                        <tr class="w-100">
+                                            <th>SR No</th>
+                                            <th>Contact Name</th>
+                                            <th>Email</th>
+                                            <th>Mobile</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="table-5" class="tab-content">
+                        <div class="row">
+                            <div class="col-6 addressinfo table">
+                                <div style="display:flex; flex-direction: row-reverse;" class="my-2">
+                                    <a class="btn btn-primary text-right" hx-get="{{ url_for('customer_bp.add_billing_add') }}" hx-vars="{'customer_id': '{{customer.id|safe}}' }" hx-target="#sidebar_form" hx-swap="innerHTML" onclick="$('#sidebar_form').toggleClass('sidebar-open')">Add Billing Address</a>
+                                </div>
+                                <table border=1 cellspacing=50 class="w-100 h-20 table border-top-0 table-striped  table-bordered text-nowrap border-bottom" id="billing_add_table"  style="border-top: 0px !important">
+                                    <thead>
+                                        <tr class="w-100">
+                                            <th>SR No</th>
+                                            <th>Billing Address</th>
+                                            <th>Default</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                            
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="col-6 addressinfo table">
+                                <div style="display:flex; flex-direction: row-reverse;" class="my-2">
+                                    <a class="btn btn-primary text-right" hx-get="{{ url_for('customer_bp.add_shipping_add') }}" hx-vars="{'customer_id': '{{customer.id|safe}}' }" hx-target="#sidebar_form" hx-swap="innerHTML" onclick="$('#sidebar_form').toggleClass('sidebar-open')">Add Shipping Address</a>
+                                </div>
+                                    
+                                <table border=1 cellspacing=50 class="w-100 h-20 table border-top-0 table-striped  table-bordered text-nowrap border-bottom" id="shipping_add" style="border-top: 0px !important">
+                                    <thead>
+                                        <tr class="w-100">
+                                            <th>SR No</th>
+                                            <th>Shipping Address</th>
+                                            <th>Default</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                       
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+            <a href="javascript:history.go(-1);" class="btn btn-dark"><span class="bi bi-arrow-return-left"></span> Back</a>
+        </div>
+    </div>                
+    
+</div>
+
+<div class="modal" id="creditModal">
+    <div class="modal-lg modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content tx-size-sm">
+            <div class="modal-header">
+                <h5>Add Credits</h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
+            </div>    
+            <div class="modal-body pd-x-20">
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="number" hidden value="{{customer.id}}" id="id_customer_2">
+
+{% endblock %}
+
+
+{% block form %}
+{% endblock form %}
+
+
+{% block script %}
+<script src="{{ url_for('static', filename='assets/webapp/tabbing.js') }}"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+<script src="{{ url_for('static', filename='assets/js/htmx_1.9.4.min.js') }}"></script>
+
+
+<script>
+    $(document).ready(function () {
+        var customer_id = "{{customer.id|safe}}";
+        var document_list_url = "{{ url_for('customer_bp.customer_docs_data_table') }}"
+        var contacts_list_url = "{{ url_for('customer_bp.customer_contacts_data_table') }}"
+        var billing_add_list_url = "{{ url_for('customer_bp.customer_billing_add_data_table') }}"
+        var shipping_add_list_url = "{{ url_for('customer_bp.customer_shipping_add_data_table') }}"
+
+        var document_table = $('#documents_table').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": document_list_url,
+                "data": function (d) {
+                    d.customer_id = customer_id;
+                }
+            },
+            "columns": [
+                { data: 'id', name: 'id' },
+                { data: 'name', name: 'name' },
+                { data: 'attachment', name: 'attachment' },
+                { data: 'actions', name: 'actions' },
+            ]
+        });
+        
+        var billing_add_table = $('#billing_add_table').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "searching": false,        
+            "lengthChange": false,  
+            "pageLength": 3, 
+            "ajax": {
+                "url": billing_add_list_url,
+                "data": function (d) {
+                    d.customer_id = customer_id;
+                }
+            },
+            "columns": [
+                { data: 'id', name: 'id' },
+                { data: 'address', name: 'address' },
+                { data: 'default', name: 'default' },
+                { data: 'actions', name: 'actions' },
+            ]
+        });
+        
+        var shipping_add_table = $('#shipping_add').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "searching": false,        
+            "lengthChange": false,  
+            "pageLength": 3, 
+            "ajax": {
+                "url": shipping_add_list_url,
+                "data": function (d) {
+                    d.customer_id = customer_id;
+                }
+            },
+            "columns": [
+                { data: 'id', name: 'id' },
+                { data: 'address', name: 'address' },
+                { data: 'default', name: 'default' },
+                { data: 'actions', name: 'actions' },
+            ]
+        });
+        
+        var contacts_table = $('#contacts_table').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": contacts_list_url,
+                "data": function (d) {
+                    d.customer_id = customer_id;
+                }
+            },
+            "columns": [
+                { data: 'id', name: 'id' },
+                { data: 'name', name: 'name' },
+                { data: 'email', name: 'email' },
+                { data: 'phone', name: 'phone' },
+                { data: 'actions', name: 'actions' },
+            ]
+        });
+
+        $(document).on('click', '.update_element' , function (e) {
+            url = $(this).data("url")
+            htmx.ajax('GET', url, {
+                target:'#sidebar_form', swap:'innerHTML',
+            }).then(() => {
+                $('#sidebar_form').toggleClass('sidebar-open')
+            });
+        });
+
+        $(document).on('click', '.delete-btn', function (e) {
+            var url = $(this).attr("data-url"); 
+            var table_name = $(this).attr("data-table");
+            var text_data = $(this).attr("data-text");
+            var table = $(table_name).DataTable()
+            swal({
+                title: "Are you sure?",
+                text: "Once deleted, you will not be able to recover this item!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': $('meta[name="csrf-token"]').attr('content') 
+                        },
+                        success: function(response) {
+                            swal("Poof! Item has been deleted!", {
+                                icon: "success",
+                            }).then(() => {
+                                table.ajax.reload(); 
+                                $.toast({
+                                    text: text_data,
+                                    position: 'bottom-right',
+                                    stack: false,
+                                    icon: 'success',
+                                });
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            swal("Error", "An error occurred while deleting the item", "error");
+                        }
+                    });
+                }
+            });
+        });
+
+    });
+</script>
+
+<script>
+	function editableInput(el){
+		if($($(el).data("code-id")).prop('checked')==true){
+			$(el).parent().find('input').attr('disabled', false);
+			$(el).parent().find('input').focus();
+		}
+		else{
+			$.toast({
+				text: "First select the product !!!",
+				position: 'bottom-right',
+				stack: false,
+				icon: 'warning',
+			});
+		}
+	}
+	function disableInput(el){
+		$(el).attr('disabled', true);
+	}
+</script>
+
+<script>
+    $(document).on('click', '#clear_search_filter' , function (){
+        $("#id_customer").val(null).trigger('change');
+        $("#id_product").val(null).trigger('change');
+    })
+</script>
+
+
+
+
+{% endblock script %}

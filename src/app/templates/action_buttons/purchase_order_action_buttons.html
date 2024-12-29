@@ -1,0 +1,18 @@
+<td class="">
+    {% if is_purchase_list %}
+        <div class="text-primary">
+            {% if status == "created" %}
+            <a href="{% url 'purchase_order:detail_purchase_order' purchase_order.id %}"><i class="fa fa-eye mr-2"></i></a>
+            <a href="{% url 'purchase_order:update_purchase_order' purchase_order.id %}"><i class="fa fa-edit mr-2"></i></a>
+            <label data-title=" " data-id="{{purchase_order.id}}" title="Delete" data-url="{% url 'purchase_order:delete_purchase_order' %}" class="delete-btn text-center"><i class="fa fa-trash text-danger"></i></label>
+            {% elif status == "unloading" %}
+            <a href="{% url 'purchase_order:detail_purchase_order' purchase_order.id %}"><i class="fa fa-eye mr-2"></i></a>
+            <a href="{% url 'purchase_order:unload_purchase_order' purchase_order.id %}"><i class="fa fa-edit mr-2"></i></a>
+            {% else %}
+            <a href="{% url 'purchase_order:detail_purchase_order' purchase_order.id %}"><i class="fa fa-eye mr-2"></i></a>
+            {% endif %}
+        </div>
+    {% else %}
+    <a href="{% url 'purchase_order:detail_purchase_order' purchase_order.id %}"><span class="fa fa-eye text-primary"></span></a>
+    {% endif %}
+</td>

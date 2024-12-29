@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% block title %} 
+	Customers
+{% endblock title %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="/static/plugins/sweetalert2/sweetalert2.all.min.js"></script>
+
+{% endblock css %}
+
+{% block content %}
+
+<div class="row row-sm">
+	<div class="col-lg-12">
+		<div class="card">
+			<div class="card-header">
+				<div class="d-flex flex-sm-row flex-column justify-content-between">
+					<h4 class="card-title align-self-center d-flex">Customers</h4>
+
+
+					<button onclick="$('#lg_sidebar_form').toggleClass('sidebar-open')" hx-swap="innerHTML" hx-target="#lg_sidebar_form"
+                    hx-get="{{ url_for('customer_bp.create_customer') }}" class="btn btn-primary ml-sm-1">Add</button>
+
+				</div>
+			</div>
+			<div class="card-body">
+				<div class="table-responsive">
+					<table class="table border-top-0  table-striped table-bordered text-nowrap border-bottom"
+					id="customer_table" style="width: 100%;">
+						<thead>
+							<tr>
+								<th class="text-center">Sr No.</th>
+								<th class="text-center">Name</th>
+								<th class="text-center">Email</th>
+								<th class="text-center">Customer Type</th>
+								<th class="text-center">Total Orders</th>
+								<th class="text-center">Total Order Amount ($)</th>
+								
+								<th class="text-center">Profit ($)</th>
+								<th class="text-center">Profit Margin (%)</th>
+
+								<th class="text-center">Last Order Date</th>
+								<th class="text-center">Status</th>
+								<th class="text-center">Actions</th>
+							</tr>
+						</thead>
+						<tbody class="text-center">
+
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+
+
+{% block large_form %}
+{% endblock large_form %}
+
+{% block script %}
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="{{ url_for('static', filename='assets/js/toast.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/js/htmx_1.9.4.min.js') }}"></script>
+<script>
+	var element_table_id = '#customer_table'
+	var csrf = "{{ csrf_token }}";
+</script>
+
+<script>
+	$(document).ready(function() {
+		var customer_datatable_url = "{{ url_for('customer_bp.customer_data_table') }}";
+		var table = $('#customer_table').DataTable({
+			"processing": true,
+			"serverSide": true,
+			"ajax": {
+				"url": customer_datatable_url,
+				"data": function (d) {
+					d.role = $('#id_role').val();
+					d.company = $('#id_company').val();
+				}
+			},
+			"columns": [
+				{data: 'id',name: 'id'},
+				{data: 'full_name',name: 'full_name'},
+				{data: 'email',name: 'email'},
+				{data: 'type',name: 'type'},
+				{data: 'total_orders',name: 'total_orders'},
+				{data: 'total_orders_amount',name: 'total_orders_amount'},
+				{data: 'profit',name: 'profit'},
+				{data: 'margin',name: 'margin'},
+				{data: 'last_order_date',name: 'last_order_date'},
+				{data: 'status',name: 'status'},
+				{data: 'actions',name: 'actions'}
+			]
+		});
+
+		$('#id_role').on('change', function() {
+			table.ajax.reload(); 
+		});
+
+		$('#id_company').on('change', function() {
+			table.ajax.reload(); 
+		});
+	});
+
+	$(document).on('click', '.list-clear', function () {
+		$("#id_company").val(null).trigger('change');
+		$("#id_role").val(null).trigger('change');
+	})
+
+	$(document).on('click', '.update_customer' , function (e) {
+        let url = $(this).data("url");
+
+        htmx.ajax('GET', url, {
+            target:'#lg_sidebar_form',
+            swap:'innerHTML',
+        }).then(() => {
+            $('#lg_sidebar_form').toggleClass('sidebar-open');
+        });
+    });
+
+	$(document).on('click', '.delete-btn', function (e) {
+		var table = $('#customer_table').DataTable()
+		var url = $(this).attr("data-url"); 
+		var customer_name = $(this).attr("data-title"); 
+		swal({
+			title: "Are you sure?",
+			text: `Once deleted, you will not be able to recover ${customer_name}!`,
+			icon: "warning",
+			buttons: true,
+			dangerMode: true,
+		})
+		.then((willDelete) => {
+			if (willDelete) {
+				$.ajax({
+					url: url,
+					method: 'POST',
+					headers: {
+						'X-CSRFToken': $('meta[name="csrf-token"]').attr('content') 
+					},
+					success: function(response) {
+						swal("Poof! Item has been deleted!", {
+							icon: "success",
+						}).then(() => {
+							table.ajax.reload(); 
+							$.toast({
+								text: "Customer Deleted Sucessfully !!!",
+								position: 'bottom-right',
+								stack: false,
+								icon: 'success',
+								});
+						});
+					},
+					error: function(xhr, status, error) {
+						swal("Error", "An error occurred while deleting the item", "error");
+					}
+				});
+			}
+		});
+	});
+	
+</script>
+
+<script>
+
+	
+</script>
+{% endblock script %}

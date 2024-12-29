@@ -1,0 +1,24 @@
+<table id="order_history_table" class="table border-top-0 table-striped  table-bordered text-nowrap border-bottom" style="width:100%;">
+    <thead>
+        <tr>
+            <th class="text-center">Sr. No.</th>
+            <th class="text-center">Updated Date</th>
+            <th class="text-center">Updated By</th>
+            <th class="text-center">Action</th>
+        </tr>
+    </thead>
+    <tbody class="text-center">
+        {% for item in history %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ item.created_at|date:"j M, Y" }}</td>
+            <td>{{ item.created_by.first_name }} {{ item.created_by.last_name }}</td>
+            <td>{{ item.action|upper }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">No order history found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

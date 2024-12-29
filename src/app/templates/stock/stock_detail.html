@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-content">
+                <div class="card-body">
+                    <div class="my-4">
+                        <h4 class="card-title align-self-center">Stock Details</h4>
+                    </div>
+                    <div class="d-flex">
+                        <div class="mr-4">
+                            <span class="font-weight-bold">Product name : </span>
+                            {{ object.product.name }}
+                        </div>
+                        <div class="mx-4">
+                            <span class="font-weight-bold">Product code : </span>
+                            {{ object.product.code }}
+                        </div>
+                        <div class="mx-4">
+                            <span class="font-weight-bold">Total stock : </span>
+                            {{ object.total_stock }}
+                        </div>
+                        <div class="mx-4">
+                            <span class="font-weight-bold">Total locked stock : </span>
+                            <span class="text-danger">{{ object.get_locked_stock }}</span>
+                        </div>
+                        <div class="mx-4">
+                            <span class="font-weight-bold">Total saleable stock : </span>
+                            <span class="text-success">{{ total_saleable_stock }}</span>
+                        </div>
+                    </div>
+                    <div class="my-4">
+                        <h2 class="nav-tab-wrapper">
+                            <span data-id="#tab-0" class="btn btn-outline-primary ml-sm-0 tab-2 nav-tab-active">All</span>
+                            {% for zone in zone_list %}
+                                <span data-id="#tab-{{ forloop.counter }}" class="btn btn-outline-primary ml-sm-0 tab-2 nav-tab">{{ zone.0 }}</span>
+                            {% endfor %}
+                        </h2>
+                    </div>
+                    <section id="tab-0" class="tab-content active">
+                        <table class="table border-top-0 table-striped table-bordered border-bottom" style="width: 100%;" id="product_case_stock_table">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Sr No.</th>
+                                    <th class="text-center">Weight</th>
+                                    <th class="text-center">Cubic Meter Volume (CMV)</th>
+                                    <th class="text-center">Quantity</th>
+                                    <th class="text-center">Available Stock</th>
+                                    <th class="text-center">Last Added Stock Date</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center">
+                            </tbody>
+                        </table>
+                    </section>
+                    {% for zone in zone_list %}
+                        <section id="tab-{{ forloop.counter }}" class="tab-content">
+                            <table class="table border-top-0 table-striped table-bordered border-bottom" style="width: 100%;" id="stock_detail_zone_{{ forloop.counter }}">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Sr No.</th>
+                                        <th class="text-center">Date</th>
+                                        <th class="text-center">Modifed By</th>
+                                        <th class="text-center">Manufacture Date</th>
+                                        <th class="text-center">Expiry Date</th>
+                                        <th class="text-center">Case Size</th>
+                                        <th class="text-center">Piece Per Price (₹)</th>
+                                        <th class="text-center">Piece Per Price ($)</th>
+                                        <th class="text-center" style="width:100px">Affected Stock</th>
+                                        <th class="text-center">Locked Stock</th>
+                                        <th class="text-center">Total Amount (₹)</th>
+                                        <th class="text-center">IN / OUT</th>
+                                        <th class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-center">
+                                </tbody>
+                            </table>
+                        </section>
+                        {% empty %}
+                        <p>No stock available </p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row row-sm">
+    <div class="col-lg-12">
+        <a href="{% url 'products:product_list' %}" class="btn btn-dark"><span class="bi bi-arrow-return-left"></span> Back</a>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block form %}
+    {% include 'stock/stock_update.html' %}
+{% endblock form %}
+
+
+{% block script %}
+<script src="{% static 'assets/webapp/tabbing.js' %}"></script>
+<script src="{% static 'assets/js/htmx_1.9.4.min.js' %}"></script>
+
+<script>
+    $('#product_case_stock_table').DataTable({
+        columnDefs: [{
+            orderable: true,
+            targets: -1
+        },
+        {
+            orderable: false,
+            targets: [-1],
+        },
+        ],
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: '{% url "manage_stock:product_case_stock_ajax" %}',
+            type: 'get',
+            data: {
+                'product_id':{{ object.product.id|safe }},
+            }
+        },
+        columns: [
+            { data: 'id', name: 'id' },
+            { data: 'weight', name: 'weight' },
+            { data: 'cubic_meter_volume', name: 'cubic_meter_volume' },
+            { data: 'quantity', name: 'quantity' },
+            { data: 'stock', name: 'stock' },
+            { data: 'last_stock_date', name: 'last_stock_date' },
+        ],
+        rowCallback: function(nRow, aData, iDisplayIndex) {
+            var oSettings = this.fnSettings();
+            $("td:first", nRow).html(oSettings._iDisplayStart + iDisplayIndex + 1);
+            return nRow;
+        },
+    });
+    {% for zone in zone_list %}
+        $('#stock_detail_zone_{{ forloop.counter }}').DataTable({
+            columnDefs: [{
+                orderable: true,
+                targets: -1
+            },
+            {
+                orderable: false,
+                targets: [-1],
+            },
+            ],
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '{% url "manage_stock:stock_detail_products_ajax" %}',
+                type: 'get',
+                data: {
+                    'zone_id':{{ zone.1|safe }},
+                    'product_id':{{ object.product.id|safe }},
+                }
+            },
+            order: [0 , "desc"],
+            columns: [
+                { data: 'id', name: 'id' },
+                { data: 'created_at', name: 'created_at' },
+                { data: 'modified_by', name: 'modified_by' },
+                { data: 'stock__manufacture_date', name: 'stock__manufacture_date' },
+                { data: 'stock__expiry_date', name: 'stock__expiry_date' },
+                { data: 'product_case', name: 'product_case' },
+                { data: 'per_piece_price', name: 'per_piece_price' },
+                { data: 'stock__per_piece_price_dollar', name: 'stock__per_piece_price_dollar' },
+                { data: 'affected_stock', name: 'affected_stock' },
+                { data: 'stock__locked_quantity', name: 'stock__locked_quantity' },
+                { data: 'total_amount', name: 'total_amount' },
+                { data: 'stock_type', name: 'stock_type' },
+                { data: 'actions', name: 'actions' },
+            ],
+            rowCallback: function(nRow, aData, iDisplayIndex) {
+                var oSettings = this.fnSettings();
+                $("td:first", nRow).html(oSettings._iDisplayStart + iDisplayIndex + 1);
+                return nRow;
+            },
+        });
+    {% endfor %}
+
+    $(document).ready(function(){
+        var is_stock_updated = localStorage.getItem("is_stock_updated");
+        if(is_stock_updated == "true"){
+            $.toast({
+                text: localStorage.getItem("message"),
+                position: 'bottom-right',
+                stack: false,
+                icon: localStorage.getItem("level"),
+            });
+            localStorage.setItem("is_stock_updated", "false");
+        }
+    })
+</script>
+
+<script>
+    $(document).on('click', '.update_stock' , function (e) {
+        let url = $(this).data("url");
+
+        htmx.ajax('GET', url, {
+            target:'#sidebar_form',
+            swap:'innerHTML',
+        }).then(() => {
+            $('#sidebar_form').toggleClass('sidebar-open');
+        });
+    });
+</script>
+{% endblock script %}

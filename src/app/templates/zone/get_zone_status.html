@@ -1,0 +1,5 @@
+{% if zone.get_status_display == 'Active' %}
+<center><span class=" bg-light-success text-success">Active</span></center>
+{% elif zone.get_status_display == 'Inactive' %}
+<center><span class=" bg-light-danger text-danger">In-Active</span></center>
+{% endif %}

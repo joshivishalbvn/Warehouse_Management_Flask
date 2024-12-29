@@ -1,0 +1,748 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+    {% comment %} <div class="card match-height">
+            <div class="card-header">
+            <div class="row my-4 p-10 text-center nav-tab-wrapper">
+                <div data-id="sale_order_request_tab"class="col-6 main-content-label2 active-div title" id="title1" style="padding:20px ">Order Details</div>
+                <div data-id="sale_order_tab" class="col-6 main-content-label title" id="title3" style="padding:20px">Job Work</div>
+            </div> {% endcomment %}
+    {% comment %} <div class="nav-tab-wrapper " style="margin-bottom:4px;">
+            <span data-id="tab-1" class="btn btn-outline-primary ml-sm-0 order_tab nav-tab-active ">Order Details</Det></span>
+            <span data-id="tab-2" class="btn btn-outline-primary ml-sm-0 order_tab nav-tab">Job Work</span>
+    </div> {% endcomment %}
+   
+        <!-- order detail cart -->
+           <div id="sale_order_request_tab" class="sale-content active form-1">
+                <div class="row row-sm">
+                        <div class="col-lg-12">
+                            <div class="card">
+                            {% comment %} <div class="card-header">
+                                <div class="d-flex flex-sm-row flex-column justify-content-between">
+                                    <h4 class="card-title align-self-center">Order Details</h4>
+                                </div>
+                            </div> {% endcomment %}
+                        
+                        
+                                <div class="row card-body">
+
+
+                                    <div class="col-md-3 row">
+                                        <div class="col-md-6 row">
+                                            <div class="col-md-12">
+                                                <b>Order Date :</b>
+                                            </div>
+                                            <div class="col-md-12 mt-3">
+                                                <b>Order Id: </b>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 row">
+                                            <div class="col-md-12">
+                                                07/07/2022
+                                            </div>
+                                            <div class="col-md-12 mt-3">
+                                                101
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                    <div class="col-md-3 row">
+                                        <div class="col-md-6 row">
+                                            <div class="col-md-12">
+                                                <b>Warehouse :</b>
+                                            </div>
+                                            <div class="col-md-12 mt-3">
+                                                <b>Payment Method : </b>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 row">
+                                            <div class="col-md-12" >
+                                                VERONICA ROME LTD
+                                            </div>
+                                            <div class="col-md-12 mt-3">
+                                                Money Order
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 row">
+                                        <div class="col-md-6 row">
+                                            <div class="col-md-12">
+                                                <b>Customer :</b>
+                                            </div>
+                                            <div class="col-md-12 mt-3">
+                                                <b>Reference No.: </b>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 row">
+                                            <div class="col-md-12">
+                                                Jhose
+                                            </div>
+                                            <div class="col-md-12 mt-3">
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 row">
+                                        <div class="col-md-6 row">
+                                            <div class="col-md-12">
+                                                <b>Grand Total :</b>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <b>Status:</b>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 row">
+                                            <div class="col-md-12">
+                                                10,289
+                                            </div>
+                                            <div class="col-md-12 " style="color:red;">
+                                                New
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 row">
+                                        <div class="col-md-6 row">
+                                            {% if request.user.is_superuser or requser.user.role == "Super Admin" %}
+                                            <div class="col-md-12">
+                                                <b>Company:</b>
+                                            </div>
+                                            {% endif %}
+                                          
+                                        </div>
+
+                                        <div class="col-md-6 row">
+                                            {% if request.user.is_superuser or requser.user.role == "Super Admin" %}
+                                            <div class="col-md-12">
+                                                Hindustan Unilever
+                                            </div>
+                                            {% endif %}
+                                            
+                                            <div class="col-md-12 mt-3">
+                                                
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                </div>
+
+                    <!-- Product List cart -->
+                <div class="row row-sm">
+                    <div class="col-lg-12" >
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="d-flex flex-sm-row flex-column justify-content-between">
+                                    <h4 class="card-title align-self-center">Product List</h4>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table border-top-0  table-striped table-bordered text-nowrap border-bottom" id="stock_table">
+                                        <thead>
+                                            <tr>
+                                                <th>Sr No.</th>
+                                                <th>Product Name</th>
+                                                <th>Case Size</th>
+                                                <th>Quantity</th>
+                                                <th>Total Pieces</th>
+                                                <th>Unit Price ($)</th>
+                                                <th>Item Total ($)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>Creamy Cheese Triangles</td>
+                                                <td><input class="form-control" disabled value="5"></td>
+                                                <td><input class="form-control" min=0 type="number" id="quantity" name="quantity" value="10"></td>
+                                                <td><input class="form-control" min=0 type="number" id="total_pieces" name="total_pieces" value="50"></td>
+                                                <td><input class="form-control" min=0 type="number" id="unit_price" name="unit_price"value="10"></td>
+                                                <td><input class="form-control" min=0 type="number" id="item_total" disabled name="item_total" value="500"></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>2</td>
+                                                <td>Chocolate Health Drink</td>
+                                                <td><input class="form-control" disabled value="12"></td>
+                                                <td><input class="form-control" min=0 type="number" id="quantity" name="quantity" value="10"></td>
+                                                <td><input class="form-control" min=0 type="number" id="total_pieces" name="total_pieces" value="120"></td>
+                                                <td><input class="form-control" min=0 type="number" id="unit_price" name="unit_price"value="8"></td>
+                                                <td><input class="form-control" min=0 type="number" id="item_total" disabled name="item_total" value="960"></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>3</td>
+                                                <td>Almond/Badam - Californian  Giri Bold</td>
+                                                <td><input class="form-control" disabled value="15"></td>
+                                                <td><input class="form-control" min=0 type="number" id="quantity" name="quantity" value="5"></td>
+                                                <td><input class="form-control" min=0 type="number" id="total_pieces" name="total_pieces" value="75"></td>
+                                                <td><input class="form-control" min=0 type="number" id="unit_price" name="unit_price"value="15"></td>
+                                                <td><input class="form-control" min=0 type="number" id="item_total" disabled name="item_total" value="1125"></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>4</td>
+                                                <td>Original Extra Virgin Olive Oil</td>
+                                                <td><input class="form-control" disabled value="8"></td>
+                                                <td><input class="form-control" min=0 type="number" id="quantity" name="quantity" value="10"></td>
+                                                <td><input class="form-control" min=0 type="number" id="total_pieces" name="total_pieces" value="80"></td>
+                                                <td><input class="form-control" min=0 type="number" id="unit_price" name="unit_price"value="10"></td>
+                                                <td><input class="form-control" min=0 type="number" id="item_total" disabled name="item_total" value="800"></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>5</td>
+                                                <td>100% Natural & Pure Groundnut Oil - Unrefined</td>
+                                                <td><input class="form-control" disabled value="12"></td>
+                                                <td><input class="form-control" min=0 type="number" id="quantity" name="quantity" value="15"></td>
+                                                <td><input class="form-control" min=0 type="number" id="total_pieces" name="total_pieces" value="180"></td>
+                                                <td><input class="form-control" min=0 type="number" id="unit_price" name="unit_price"value="15"></td>
+                                                <td><input class="form-control" min=0 type="number" id="item_total" disabled name="item_total" value="2700"></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>6</td>
+                                                <td>Kitkat - Coated Wafer Bar  Share Bag</td>
+                                                <td><input class="form-control" disabled value="15"></td>
+                                                <td><input class="form-control" min=0 type="number" id="quantity" name="quantity" value="7"></td>
+                                                <td><input class="form-control" min=0 type="number" id="total_pieces" name="total_pieces" value="105"></td>
+                                                <td><input class="form-control" min=0 type="number" id="unit_price" name="unit_price"value="9"></td>
+                                                <td><input class="form-control" min=0 type="number" id="item_total" disabled name="item_total" value="945"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>7</td>
+                                                <td>Cashews - Whole  100% Natural Premium</td>
+                                                <td><input class="form-control" disabled value="20"></td>
+                                                <td><input class="form-control" min=0 type="number" id="quantity" name="quantity" value="5"></td>
+                                                <td><input class="form-control" min=0 type="number" id="total_pieces" name="total_pieces" value="100"></td>
+                                                <td><input class="form-control" min=0 type="number" id="unit_price" name="unit_price"value="13"></td>
+                                                <td><input class="form-control" min=0 type="number" id="item_total" disabled name="item_total" value="1300"></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>8</td>
+                                                <td>Greek Yogurt - Strawberry  High In Protein  N</td>
+                                                <td><input class="form-control" disabled value="25"></td>
+                                                <td><input class="form-control" min=0 type="number" id="quantity" name="quantity" value="3"></td>
+                                                <td><input class="form-control" min=0 type="number" id="total_pieces" name="total_pieces" value="75"></td>
+                                                <td><input class="form-control" min=0 type="number" id="unit_price" name="unit_price"value="9"></td>
+                                                <td><input class="form-control" min=0 type="number" id="item_total" disabled name="item_total" value="675"></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>9</td>
+                                                <td>Premium Roasted & Salted Californian Pistachi</td>
+                                                <td><input class="form-control" disabled value="15"></td>
+                                                <td><input class="form-control" min=0 type="number" id="quantity" name="quantity" value="4"></td>
+                                                <td><input class="form-control" min=0 type="number" id="total_pieces" name="total_pieces" value="60"></td>
+                                                <td><input class="form-control" min=0 type="number" id="unit_price" name="unit_price"value="12"></td>
+                                                <td><input class="form-control" min=0 type="number" id="item_total" disabled name="item_total" value="720"></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>10</td>
+                                                <td>Nature's Super Foods Organic Atta</td>
+                                                <td><input class="form-control" disabled value="18"></td>
+                                                <td><input class="form-control" min=0 type="number" id="quantity" name="quantity" value="3"></td>
+                                                <td><input class="form-control" min=0 type="number" id="total_pieces" name="total_pieces" value="54"></td>
+                                                <td><input class="form-control" min=0 type="number" id="unit_price" name="unit_price"value="16"></td>
+                                                <td><input class="form-control" min=0 type="number" id="item_total" disabled name="item_total" value="864"></td>
+                                            </tr>
+                                            
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                    <!-- pricing detail cart-->
+                {% comment %} <div class="row row-sm price_detail_div">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="d-flex flex-sm-row flex-column justify-content-between">
+                                    <h4 class="card-title align-self-center">Pricing Details</h4>
+                                </div>
+                            </div>
+                            <div class="row card-body">
+                                <div class="col-md-3 row">
+                                    <div class="col-md-6 row">
+                                        <div class="col-md-12">
+                                            <b>Item Total :</b>
+                                        </div>
+                                        <div class="col-md-12 mt-3">
+                                            <b>Paid Amount :</b>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 row">
+                                        <div class="col-md-12">
+                                            400
+                                        </div>
+                                        <div class="col-md-12 mt-3">
+                                            400
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 row">
+                                    <div class="col-md-6 row">
+                                        <div class="col-md-12">
+                                            <b>Discount(%) :</b>
+                                        </div>
+                                        <div class="col-md-12 mt-3">
+                                            <b>Due Amount :</b>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 row">
+                                        <div class="col-md-12">
+                                            0   
+                                        </div>
+                                        <div class="col-md-12 mt-3">
+                                            -
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 row">
+                                    <div class="col-md-6 row">
+                                        <div class="col-md-12">
+                                            <b>ML Tax :</b>
+                                        </div>
+                                        <div class="col-md-12 mt-3">
+                                            <b>Shipping Charges :</b>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 row">
+                                        <div class="col-md-12">
+                                            0
+                                        </div>
+                                        <div class="col-md-12 mt-3">
+                                            0
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 row">
+                                    <div class="col-md-6 row">
+                                        <div class="col-md-12">
+                                            <b>Used Credits : </b>
+                                        </div>
+                                        <div class="col-md-12 mt-3">
+                                            <b>Grand Total :</b>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 row">
+                                        <div class="col-md-12">
+                                            0
+                                        </div>
+                                        <div class="col-md-12 mt-3">
+                                            400
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> {% endcomment %}
+                {% comment %} <div class="col-lg-12" style="padding-left: 0px !important;padding-right: 0px !important;">
+                        <div class="card">
+                            <div class="card-header" >
+                                <div class="d-flex flex-sm-row flex-column justify-content-between">
+                                    <h4 class="card-title align-self-center h6" >Invoice</h4>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                    <div class="container" style="border: 1px solid;">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="invoice-title text-center" style="margin-bottom: -16px;background-color: #f5f5f5 !important;" >
+                                            <h2>Invoice Order # 12345</h2>
+                                        </div>
+                                        <hr>
+                                        <div class="row row-sm">
+                                            <div class="col-lg-6 text-center">
+                                                <address>
+                                                <strong>Billed To:</strong><br>
+                                                    John Smith<br>
+                                                    1234 Main<br>
+                                                    Apt. 4B<br>
+                                                    Springfield, ST 54321
+                                                </address>
+                                            </div>
+                                            <div class="col-lg-6 text-center">
+                                                <address>
+                                                <strong>Shipped To:</strong><br>
+                                                    Jane Smith<br>
+                                                    1234 Main<br>
+                                                    Apt. 4B<br>
+                                                    Springfield, ST 54321
+                                                </address>
+                                            </div>
+                                        </div>
+                                        <div class="row row-sm">
+                                            <div class="col-lg-6 text-center">
+                                                <address>
+                                                    <strong>Payment Method:</strong><br>
+                                                    Visa ending **** 4242<br>
+                                                    jsmith@email.com
+                                                </address>
+                                            </div>
+                                            <div class="col-lg-6 text-center">
+                                                <address>
+                                                    <strong>Order Date:</strong><br>
+                                                    March 7, 2014<br><br>
+                                                </address>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+        
+                                <div class="row">
+                                    <div class="col-md-11" style="margin-left:53px">
+                                        <div class="panel panel-default" >
+                                            <div class="panel-heading">
+                                                <h3 class="panel-title"><strong>Order summary</strong></h3>
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="table-responsive">
+                                                    <table class="table table-condensed">
+                                                        <thead>
+                                                            <tr>
+                                                                <td><strong>Product Id</strong></td>
+                                                                <td class="text-center">Product Name</td>
+                                                                <td class="text-center"><strong>Price</strong></td>
+                                                                <td class="text-center"><strong>Quantity</strong></td>
+                                                                <td class="text-right"><strong>Totals</strong></td>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <!-- foreach ($order->lineItems as $line) or some such thing here -->
+                                                            <tr>
+                                                                <td>101</td>
+                                                                <td class="text-center">Detergent</td>
+                                                                <td class="text-center">$10.99</td>
+                                                                <td class="text-center">1</td>
+                                                                <td class="text-right">$10.99</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>102</td>
+                                                                <td class="text-center">Toothpaste</td>
+                                                                <td class="text-center">$20.00</td>
+                                                                <td class="text-center">3</td>
+                                                                <td class="text-right">$60.00</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>103</td>
+                                                                <td class="text-center">shampoo</td>
+                                                                <td class="text-center">$600.00</td>
+                                                                <td class="text-center">1</td>
+                                                                <td class="text-right">$600.00</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="thick-line"></td>
+                                                                <td class="thick-line"></td>
+                                                                <td class="thick-line"></td>
+                                                                <td class="thick-line text-center"><strong>Subtotal</strong></td>
+                                                                <td class="thick-line text-right">$670.99</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="no-line"></td>
+                                                                <td class="no-line"></td>
+                                                                <td class="no-line"></td>
+                                                                <td class="no-line text-center"><strong>Shipping</strong></td>
+                                                                <td class="no-line text-right">$15</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="no-line"></td>
+                                                                <td class="no-line"></td>
+                                                                <td class="no-line"></td>
+                                                                <td class="no-line text-center"><strong>Total</strong></td>
+                                                                <td class="no-line text-right">$685.99</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-center mt-3" style="margin-bottom:15px">
+                                        
+                                        <button class="btn btn-danger">Download</button>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> {% endcomment %}
+                    <!-- action buttons-->
+                 <div class="row row-sm">
+                    <div class="col-lg-12 text-end">
+                        <button type="submit" class="btn btn-success">Approve</button>
+                        <button class="btn btn-danger request-delete-btn">Decline</button>
+                        <a href="{% url 'order:order_list' %}"><button class="btn btn-dark">Back</button></a>
+                    </div>
+                </div>
+                </div>
+            </div>
+          <div id = "sale_order_tab" class="sale-content form-3">
+            <div class="row cardrow-sm">
+                <div class="col-lg-12 ">
+                    {% comment %} <button type="button" hx-get="{% url 'users:user_create' %}" hx-target="#sidebar_form" hx-swap="innerHTML" onclick="$('#sidebar_form').toggleClass('sidebar-open')" class="btn btn-primary" style="margin-right:35px; float: right; margin-bottom:5px;" >Add</button> {% endcomment %}
+                    {% comment %} <div class="card">
+                            <div class="d-flex flex-sm-row flex-column justify-content-between">
+                                <h4 class="job_work_title">Job Work List</h4>
+                                <button type="button" hx-get="{% url 'users:user_create' %}" hx-target="#sidebar_form" hx-swap="innerHTML" onclick="$('#sidebar_form').toggleClass('sidebar-open')" class="btn btn-primary" style="margin-right:35px;" >Add</button>
+                            </div>
+                        {% endcomment %}
+                        </div>
+                        <div class="row cardrow-sm">
+                            <div class="col-lg-12 ">
+                                <div class="card">
+                                        <div class="d-flex flex-sm-row flex-column justify-content-between">
+                                    <h4 class="job_work_title" style="margin-top:10px;">Job Work List</h4>
+                                    <a type="button" href="{% url 'order:add_job_work' %}" class="btn btn-primary" style="margin-right:35px; float: right; margin-bottom:5px; margin-top:10px" >Add</a>
+                                </div>
+                                    <div class="table-responsive col-lg-12">
+                                        <table class="table border-top-0 table-striped  table-bordered text-nowrap border-bottom" id="job_work_table">
+                                            <thead>
+                                                <tr>
+                                                    {% comment %} <th class="wd-15p border-bottom-0 text-center">Date</th> {% endcomment %}
+                                                    <th class="wd-20p border-bottom-0 text-center">Item Code</th>
+                                                    <th class="wd-20p border-bottom-0 text-center">Item Image</th>
+                                                    <th class="wd-20p border-bottom-0 text-center">Quantity</th>
+                                                    <th class="wd-20p border-bottom-0 text-center">Job Work</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    {% comment %} <td class="text-center">01/01/2022</td> {% endcomment %}
+                                                    <td class="text-center">CMCX-1011</td>
+                                                    <td class="text-center"><img src="{% static 'photos/jobwork/images.jpeg' %}" style="width:40% !important;"></td>
+                                                    <td class="text-center">4</td>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-3">
+                                                                <div class="row"  style="margin-left:5px; border-bottom:1px; border-color:black;">
+                                                                    Job 1:
+                                                                    <span> Sticker</span>
+                                                                </div><hr>
+                                                                <div class="row"  style="margin-left:5px;">
+                                                                    Job 2:
+                                                                    <span> Shrink Wrap</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-4"   style="margin-left:50px; margin-top:20px;">
+                                                                <div class="row" style=" border-bottom:1px; border-color:black;">
+                                                                    this is info
+                                                                </div><hr>
+                                                                <div class="row" style="margin-top:37px;">
+                                                                    this is info
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-1" >
+                                                                <div class="row" style="margin-top:22px;  border-bottom:1px; border-color:black;">
+                                                                    <i class="fa fa-edit"></i></td>
+                                                                </div><hr>
+
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+            <div class="modal fade" id="myModal" role="dialog">
+                <div class="modal-dialog  modal-lg">
+                
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Order Product Logs</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                    <table id="log_table" class="display nowrap" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Warehouse</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Olive Oil</td>
+                                <td>HINDUSTAN UNILEVER LTD</td>
+                                <td>25</td>
+                                <td>500</td>
+                                
+                            </tr>
+                            <tr>
+                                <td>Olive Oil</td>
+                                <td>HINDUSTAN UNILEVER LTD</td>
+                                <td>25</td>
+                                <td>450</td>
+                                
+                            </tr>
+                            <tr>
+                                <td>Olive Oil</td>
+                                <td>HINDUSTAN UNILEVER LTD</td>
+                                <td>25</td>
+                                <td>510</td>
+                                
+                            </tr>
+                            <tr>
+                                <td>Olive Oil</td>
+                                <td>HINDUSTAN UNILEVER LTD</td>
+                                <td>25</td>
+                                <td>450</td>
+                                
+                            </tr>
+                        </tbody>
+                    </table>
+                    </div>
+                    {% comment %} <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div> {% endcomment %}
+                </div>
+                
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block script %}
+<script src="https://cdn.datatables.net/datetime/1.5.1/js/dataTables.dateTime.min.js"></script>
+	<link href="{%  static 'assets/plugins/bootstrap/css/modal.css' %}" rel="stylesheet" id="style" />
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+
+ <script>
+    {% comment %} $('.order_tab').click(function(e) {
+  //Toggle tab link
+  $(this).addClass('nav-tab-active ').siblings().removeClass('nav-tab-active ');
+    $(this).removeClass('nav-tab').siblings().addClass('nav-tab');
+  //Toggle target tab
+    table_id = $(this).data('id')
+    $(`#${table_id}`).addClass('active').siblings().removeClass('active');
+
+    }); {% endcomment %}
+
+    $(document).ready(function() {
+        $('#job_work_table').DataTable( {
+            dom: 'Qlfrtip'
+        });
+    });
+</script>
+<script>
+    $( document ).ready(function() {
+        $(".form-3").addClass("hidden");
+        window.onload=function(){
+            document.getElementById("id_orderlist").click();
+          };
+    });
+    $("#title1").click(function(){
+        $(this).addClass("active-div");
+        $(this).addClass("main-content-label2");
+        $(this).removeClass("main-content-label");
+        $(".form-1").removeClass("hidden");
+        $(".form-3").addClass("hidden");
+
+
+        $("#title3").removeClass("active-div");
+        $("#title3").removeClass("main-content-label2");
+        $("#title3").addClass("main-content-label");
+    })
+    $("#title3").click(function(){
+        $(this).addClass("active-div");
+        $(this).addClass("main-content-label2");
+        $(this).removeClass("main-content-label");
+        $(".form-3").removeClass("hidden");
+        $(".form-1").addClass("hidden");
+
+        $("#title1").removeClass("active-div");
+        $("#title1").removeClass("main-content-label2");
+        $("#title1").addClass("main-content-label");
+
+       
+    })
+
+    $('.title').hover(function() {
+        $(this).css('cursor','pointer');
+    });
+
+
+
+
+
+
+	$(document).on('click', '.request-delete-btn', function (e) {
+		var id = $(this).data("id")
+		var name = $(this).data("title")
+		if (name == "None") {
+			name = ""
+		}
+		var url = $(this).data("url")
+		var delete_ele = $(this)
+
+
+		Swal.fire({
+			html: `Are you sure you want to cancel this order ?`,
+			icon: 'question',
+			showCloseButton: true,
+			showCancelButton: true,
+			confirmButtonColor: "#7442DB",
+		}).then((result) => {
+
+			/* Read more about isConfirmed, isDenied below */
+			if (result.isConfirmed) {
+				$.ajax({
+					type: "POST",
+					url: url,
+					data: {
+						"id": id,
+						"csrfmiddlewaretoken": '{{ csrf_token }}'
+					},
+					success: function (data) {
+						$('#table').DataTable().ajax.reload(null, false);
+						if (data["message"]) {
+							$.toast({
+								text: data.message,
+								position: 'bottom-right',
+								stack: false,
+								icon: 'success',
+							})
+						}
+					}
+				});
+			}
+		})
+	})
+</script>
+{% endblock script %}

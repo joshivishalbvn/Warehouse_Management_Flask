@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{object.full_name}}'s Details    
+{% endblock title %}
+
+{% block content %}
+
+<div id="vender_detail" class="sale-content active">
+    <div class="row row-sm">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex flex-sm-row flex-column justify-content-between">
+                        <h4 class="card-title align-self-center">Vendor Details</h4>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-sm-6">
+                            <div class="row">
+                                <div class="col-lg-6 text-dark">
+                                    <b><p>Full Name:</p></b>
+                                    <b><p>Email:</p></b>
+                                    <b><p>Phone No:</p></b>
+                                    <b><p>Company Name:</p></b>
+
+                                </div>
+                                
+                                <div class="col-lg-6">
+                                    <p>{{object.full_name|title}}</p>
+                                    <p>{{object.email}}</p>
+                                    <p>{{object.phone}}</p>
+                                    <p>{{object.company.name|title}}</p>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="row">
+                                <div class="col-lg-6 text-dark">
+                                    <b><p>Country:</p></b>
+                                    <b><p>State:</p></b>
+                                    <b><p>City:</p></b>
+                                    <strong>Zip Code:</strong>
+                                </div>
+                                <div class="col-lg-6">
+                                    <p>{{ object.country[:15] }}</p>
+                                    <p>{{ object.state[:15] }}</p>
+                                    <p>{{ object.city[:15] }}</p>
+                                    <p>{{object.zip_code}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+            <div class="row  row-sm">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="form-1">
+                                <div class="mt-3">
+                                    <span data-id="#table-1" class="btn btn-outline-primary tab-2 ml-sm-0 mt-3 nav-tab-active">Purchase Order</span>
+                                    <span data-id="#table-2" class="btn btn-outline-primary tab-2 ml-sm-0 mt-3 nav-tab">Documents</span>
+                                </div>
+                
+                                <section id="table-1" class="tab-content active">
+                                    <table border="1" class="table border-top-0 table-striped w-100 table-bordered text-nowrap border-bottom" id="purchase_history_table">
+                                        <thead>
+                                            <tr class="w-100">
+                                                <th>Sr No</th>
+                                                <th>Purchase Id</th>
+                                                <th>Date</th>
+                                                <th>Status</th>
+                                                <th>Total Amount ($)</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                    </tbody>
+                                </table>
+                            </section>
+                            
+                            <section id="tab-2" class="tab-content">
+                                <div class="row">
+                                    <div class="col-12 ">
+                                        <div style="display:flex; flex-direction: row-reverse;">
+                                            <button type="button" hx-get="#" hx-vals="js:{product_id: $('#id_product_list').val() }" 
+                                                    hx-target="#sidebar_form" hx-swap="innerHTML" onclick="$('#sidebar_form').toggleClass('sidebar-open');"
+                                                    class="btn btn-primary">Add</button>
+                                        </div>                                         
+                                        <table border="1" cellspacing="50" class="w-100 h-20 table border-top-0 table-striped  table-bordered text-nowrap border-bottom" id="payments">
+                                            <thead>
+                                                <tr>
+                                                    <th>Sr No.</th>
+                                                    <th>Date </th>
+                                                    <th>Bill Amount</th>
+                                                    <th>Paid Amount</th>
+                                                    <th>Total Due Amount</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </section>
+            
+                            <section id="table-2" class="tab-content">
+                                <div class="text-end my-2">
+                                    <button class="btn btn-primary" hx-get="#" hx-target="#sidebar_form" hx-vars="{'vendor_id': '{{ object.id }}'}" hx-swap="innerHTML" onclick="$('#sidebar_form').toggleClass('sidebar-open')">Add</button>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 ">
+                                        
+                                        <table cellspacing="50" class="w-100 h-20 table border-top-0 table-striped table-bordered text-nowrap border-bottom" id="document_table">
+                                            <thead>
+                                                <tr class="w-100">
+                                                    <th>SR No</th>
+                                                    <th>Document Name</th>
+                                                    <th>Document</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </section>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+                    
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block form %}
+{% endblock %}
+    
+
+{% block script %}
+
+<script src="{{ url_for('static', filename='assets/webapp/tabbing.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/js/htmx_1.9.4.min.js') }}"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+
+
+<script>
+	$(document).ready(function() {
+        var purchase_history_table = $("#purchase_history_table").DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "{{ url_for('vendor_bp.purchase_history_ajax') }}",
+                "data": function (d) {
+                    d.vendor_id = "{{ object.id|safe }}";
+                }
+            },
+            "columns": [
+                { data: 'id', name: 'id' },
+                { data: 'purchase_id', name: 'purchase_id' },
+                { data: 'created_at', name: 'created_at' },
+                { data: 'status', name: 'status' },
+                { data: 'total_price', name: 'total_price' },
+                { data: 'actions', name: 'actions' },
+            ]
+        });
+        
+        var payments_table = $("#payments").DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "{{ url_for('vendor_bp.purchase_history_ajax') }}",
+                "data": function (d) {
+                    d.vendor_id = "{{ object.id|safe }}";
+                }
+            },
+            "columns": [
+                { data: 'id', name: 'id' },
+                { data: 'created_at', name: 'created_at' },
+                { data: 'bill_amt', name: 'bill_amt' },
+                { data: 'paid_amt', name: 'paid_amt' },
+                { data: 'due_amt', name: 'due_amt' },
+                { data: 'actions', name: 'actions' },
+            ]
+        });
+        
+        var document_table = $("#document_table").DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "{{ url_for('vendor_bp.purchase_history_ajax') }}",
+                "data": function (d) {
+                    d.vendor_id = "{{ object.id|safe }}";
+                }
+            },
+            "columns": [
+                { data: 'id', name: 'id' },
+                { data: 'name', name: 'name' },
+                { data: 'document', name: 'document' },
+                { data: 'actions', name: 'actions' },
+            ]
+        });
+
+        $(document).on('click', '.document-delete-btn', function (e) {
+            var url = $(this).attr("data-url"); 
+            var table = $('#vendor_table').DataTable()
+
+            swal({
+                title: "Are you sure?",
+                text: "Once deleted, you will not be able to recover this item!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': $('meta[name="csrf-token"]').attr('content') 
+                        },
+                        success: function(response) {
+                            swal("Poof! Item has been deleted!", {
+                                icon: "success",
+                            }).then(() => {
+                                document_table.ajax.reload(); 
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            swal("Error", "An error occurred while deleting the item", "error");
+                        }
+                    });
+                }
+            });
+        });
+
+        $(document).on('click', '.update_document' , function (e) {
+            let url = $(this).data("url");
+            let vendor_id = $(this).data("vendor_id");
+
+            htmx.ajax('GET', url, {
+                target:'#sidebar_form',
+                swap:'innerHTML',
+                values: {"vendor_id": vendor_id},
+            }).then(() => {
+                $('#sidebar_form').toggleClass('sidebar-open');
+                document_table.ajax.reload(); 
+            });
+        });
+    });
+
+</script>
+
+{% endblock %}

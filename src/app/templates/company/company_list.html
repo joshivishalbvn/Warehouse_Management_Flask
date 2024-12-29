@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %} 
+	Companies
+{% endblock title %}
+
+{% block content %}
+<!-- Row -->
+<div class="row row-sm">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex flex-sm-row flex-column justify-content-between">
+                    <h4 class="card-title align-self-center d-flex">Companies<i class="fas fa-filter" onclick="filter_button()" style="display: block !important; cursor: pointer;margin-left: 10px;"></i></h4>
+					<div class="d-flex flex-sm-row flex-column justify-content-between">
+						<button type="button" hx-get="{{ url_for('company_bp.create_company') }}" hx-target="#sidebar_form"
+						hx-swap="innerHTML" onclick="$('#sidebar_form').toggleClass('sidebar-open')"
+						class="btn btn-primary" >Add</button>
+					</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+	{% for company in companies %}
+
+
+	<div class="col-sm-6 col-lg-6 col-xl-3 {{company.status}}">
+		<div class="card pricing-card ">
+
+			<span title="Update" data-url="{{ url_for('company_bp.update_company', id=company.id) }}"
+			class="update_this_company open_sidebar" style="color:var(--primary-bg-color); cursor: pointer; position: absolute; right: 0; margin-right: 10px;">
+				<i class="fa fa-edit"></i>
+				</span>
+
+			<div class="card-body text-center {{company.status}}" id="{{company.status}}">
+				<div class="card-category" style="height: 60px; overflow: hidden;">{{ company.name }}</div>
+				<div  style="color: {% if company.status == company.ACTIVE %}green; {% else %}  red; {% endif %} font-size:20px;">{{company.status}}</div>
+				<ul class="list-unstyled leading-loose">
+					<li><strong>Warehouses :</strong> {{company.get_warehouse_count}}</li>
+					<li><strong>Zones :</strong> {{company.get_zones_count}}</li>
+					<li></i><strong>Employees :</strong> {{ company.get_employees_count }}</li>
+					<li><strong>Products :</strong> {{ company.get_products_count }}</li>
+				</ul>
+				<div class="text-center mt-6 d-flex justify-content-center">
+					<div class="col-4"><a href="{{ url_for('company_bp.company_details', id=company.id) }}" class="btn btn-primary">Details</a></div>
+				</div> 
+			</div>
+		</div>
+	</div>
+
+
+	{% endfor %}
+</div>
+
+
+	<!-- End Row -->
+
+	{% endblock %}
+
+	{% block filters %}
+	<div class="event">
+		<div class="row  rounded py-2 mb-2 mx-n2">
+
+			<div class="col-12 col-sm-12 col-lg-12">
+				<label for="users-list-company">Company Status</label>
+				<fieldset class="form-group">
+					<select id="id_status" class="form-control">
+						<option value="All">All</option>
+						{% for company_status in company_statuses %}
+						<option value="{{company_status.0}}">{{company_status.1}}</option>
+						{% endfor %}
+					</select>
+				</fieldset>
+			</div>
+
+			<div class="col-12 col-sm-12 col-lg-12">
+			</div>
+			<div class="col-12 col-sm-12 col-lg-12 d-flex align-items-center justify-content-between mt-2">
+				<button type="reset" class="btn btn-primary btn-block glow mb-0 list-clear">Clear</button>
+			</div>
+		</div>
+	</div>
+	{% endblock filters %}
+
+	{% block form %}
+	<div class="addcompany  addcompany-animate">
+	</div>
+	{% endblock form %}
+
+
+	{% block script %}
+	<script src="{{ url_for('static', filename='assets/js/htmx_1.9.4.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='assets/js/sidebar_open.js') }}"></script>
+	<script src="{{ url_for('static', filename='assets/webapp/companylist.js') }}"></script>
+	<script src="{{ url_for('static', filename='assets/plugins/telephoneinput/inttelephoneinput.js') }}"></script>
+	<script src="{{ url_for('static', filename='assets/plugins/telephoneinput/telephoneinput.js') }}"></script> 
+	
+	{% endblock script %}

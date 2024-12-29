@@ -1,0 +1,39 @@
+{% extends "account/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block head_title %}{% trans "Signup" %}{% endblock %}
+
+{% block content %}
+
+<div class="page">
+
+  <!-- Main-signin-wrapper -->
+  <div class="my-auto page">
+      <div class="main-signin-wrapper">
+          <div class="main-card-signin forgot-password d-md-flex wd-100p">
+              <div class="wd-md-50p  page-signin-style p-md-5 p-4 text-white d-none d-md-block ">
+                  <div class="my-auto authentication-pages">
+                      <div>
+                          <img src="{% static 'assets/img/brand/.png' %}" class=" m-0 mb-4" alt="">
+                          <h5 class="mb-4">Responsive Modern Dashboard &amp; Admin Template</h5>
+                          <p class="mb-4">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s</p>
+                         
+                      </div>
+                  </div>
+              </div>
+              <div class="sign-up-body wd-md-50p">
+                  <div class="main-signin-header">
+                    <h2 class="fs-2 mt-2 text-dark">Sign Up Closed !</h2>
+                    <h4 class="mt-3 text-secondary fs-3">We are sorry, but the sign up is currently closed.</h4>
+                  </div>
+                 
+              </div>
+          </div>
+      </div>
+  </div>
+  <!-- Main-signin-wrapper -->
+</div>
+
+{% endblock %}

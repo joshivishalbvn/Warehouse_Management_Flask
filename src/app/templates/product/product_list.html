@@ -1,0 +1,299 @@
+{% extends 'base.html' %}
+
+{% block title %} 
+Products
+{% endblock title %}
+
+{% block css %}
+<style>
+    #stock-create-form .select2-container{
+        z-index: 10000;
+    }
+</style>
+
+<style>
+    .main-footer{
+        display:none;
+    }
+
+    .blink {
+        animation: blinker 1.5s linear infinite;
+        color: red;
+        font-family: sans-serif;
+    }
+    @keyframes blinker {
+        50% {
+            opacity: 80%;
+        }
+    }
+
+    .copy_done{
+     color: white !important;
+     background-color: black;
+     border-radius: 5px;
+     padding-left:2px;
+     padding-right:2px;
+    }
+    
+</style>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="/static/plugins/sweetalert2/sweetalert2.all.min.js"></script>
+{% endblock css %}
+    
+
+{% block content %}
+
+<div class="card match-height py-3">
+    <div class="card-header">
+        <div class="row text-center nav-tab-wrapper tab-list" style="cursor: pointer">
+            <div data-id="#tab-1-content-1" class="col-6 active-div tab-1" style="padding:20px ">Product List </div>
+            <div data-id="#tab-1-content-2" class="col-6 inactive-div tab-1" style="padding:20px">Manage Stock</div>
+        </div>
+    </div>    
+    <div id="tab-1-content-1" class="tab-1-content">
+        <div class="card-header">
+            <div class="d-flex flex-sm-row flex-column justify-content-between">
+                <h4 class="card-title">Products</h4>
+                <a href="#" class="btn btn-primary ml-sm-1">Export CSV</a>
+                <div>
+                    <a href="{{ url_for('product_bp.product_create_from_csv') }}" class="btn btn-primary ml-sm-1">Import Excel File</a>
+                    <button onclick="$('#lg_sidebar_form').toggleClass('sidebar-open')" hx-swap="innerHTML" hx-target="#lg_sidebar_form"
+                    hx-get="{{ url_for('product_bp.create_product') }}" class="btn btn-primary ml-sm-1">Add</button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table border-top-0 mb-5 table-striped table-bordered text-nowrap border-bottom w-100"
+                    id="product-datatable">
+                    <thead>
+                        <tr>
+                            <th>Sr No.</th> 
+                            <th>Product Image</th>
+                            <th>Product Info</th>
+                            <th>Company Name</th>
+                            <th>Stock Info </th>
+                            <th>Cost & Profit </th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-center">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="tab-1-content-2" class="hidden tab-1-content">
+        {% include 'stock/stock_create.html' %}
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block filters %}
+<div class="event">
+    
+    <div class="col-12 col-sm-12 col-lg-12">
+    <label for="filter_company">Company</label>
+    <fieldset class="form-group">
+        <select id="filter_company" class="select2-data-array form-control select2-list">
+        <option value=""selected>All</option>
+        {% for company in companies %}
+            <option value="{{company.id}}">{{company.name|title}}</option>     
+        {% endfor %}     
+        </select>
+    </fieldset>
+    </div>
+
+    <div class="row rounded py-2 mb-2 mx-n2">
+        <div class="col-12 col-sm-12 col-lg-12">
+            <label for="users-list-role">Product</label>
+            <fieldset class="form-group">
+            <select id="id_role" class="form-control">
+                <option value=""selected>All</option>
+            </select>
+            </fieldset> 
+        </div>
+        <div class="col-12 col-sm-12 col-lg-12 d-flex align-items-center justify-content-between mt-2">
+            <button type="reset" class="btn btn-primary btn-block users-list-clear glow mb-0" id="clear_search_filter">Clear</button>
+        </div>
+    </div>
+
+</div> 
+
+{% endblock filters %}
+
+
+{% block form %}
+{% endblock form %}
+    
+{% block large_form %}
+{% endblock large_form %}
+
+{% block script %}
+
+<script src="{{ url_for('static', filename='assets/js/htmx_1.9.4.min.js') }}"></script>
+
+<script src="{{ url_for('static', filename='assets/js/sidebar_open.js') }}"></script>
+
+<script src="{{ url_for('static', filename='assets/webapp/tabbing.js') }}"></script>
+
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+
+
+<script>
+    var element_table_id = "#product-datatable";
+    var csrf = "{{ csrf_token }}";
+</script>
+
+<!-- -----------------End Of Data Table Js------------------------- -->
+
+<script>
+	$(document).ready(function() {
+        var table = $('#product-datatable').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "{{ url_for('product_bp.product_data_table') }}",
+                "data": function (d) {
+                    d.role = $('#id_role').val();
+                    d.company = $('#id_company').val();
+                }
+            },
+            "columns": [
+                {data: 'id',name: 'id'},
+                {data: 'product_image',name: 'product_image'},
+                {data: 'product_info',name: 'product_info'},
+                {data: 'company',name: 'company'},
+                {data: 'stock_info', name: 'stock_info'},
+                {data: 'cost_profit_info', name: 'cost_profit_info'},
+                {data: 'actions', name: 'actions'},
+            ]
+        });
+
+        $('#id_role').on('change', function() {
+            table.ajax.reload(); 
+        });
+
+        $('#id_company').on('change', function() {
+            table.ajax.reload(); 
+        });
+
+        $(document).on('click', '.list-clear', function () {
+            $("#id_company").val(null).trigger('change');
+            $("#id_role").val(null).trigger('change');
+        })
+
+        $(document).on('click', '.delete-btn', function (e) {
+				var url = $(this).attr("data-url"); 
+				swal({
+					title: "Are you sure?",
+					text: "Once deleted, you will not be able to recover this item!",
+					icon: "warning",
+					buttons: true,
+					dangerMode: true,
+				})
+				.then((willDelete) => {
+					if (willDelete) {
+						$.ajax({
+							url: url,
+							method: 'POST',
+							headers: {
+								'X-CSRFToken': $('meta[name="csrf-token"]').attr('content') 
+							},
+							success: function(response) {
+								swal("Poof! Item has been deleted!", {
+									icon: "success",
+								}).then(() => {
+									table.ajax.reload(); 
+								});
+							},
+							error: function(xhr, status, error) {
+								swal("Error", "An error occurred while deleting the item", "error");
+							}
+						});
+					}
+				});
+			});
+    });
+
+</script>
+<script>
+    $(document).on('click', '.update_product' , function (e) {
+        let url = $(this).data("url");
+
+        htmx.ajax('GET', url, {
+            target:'#lg_sidebar_form',
+            swap:'innerHTML',
+        }).then(() => {
+            $('#lg_sidebar_form').toggleClass('sidebar-open');
+        });
+    });
+
+    $(document).on('click', '.delete-btn', function (e) {
+        var url = $(this).attr("data-url"); 
+        var table = $('#product-datatable').DataTable()
+
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this item!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willDelete) => {
+            if (willDelete) {
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': $('meta[name="csrf-token"]').attr('content') 
+                    },
+                    success: function(response) {
+                        swal("Poof! Item has been deleted!", {
+                            icon: "success",
+                        }).then(() => {
+                            table.ajax.reload(); 
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        swal("Error", "An error occurred while deleting the item", "error");
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+<script>
+    function hoverdiv(e, divid){
+        var left  = e.clientX  + "px";
+        var top  = e.clientY  + "px";
+        var div = document.getElementById(divid);
+        div.style.left = left;
+        div.style.top = top;
+        $("#"+divid).toggle();
+        return false;
+    }
+</script>
+
+<script>
+    function copyToClipboard(element) {
+        var $temp = $("<input>");
+        $("body").append($temp);
+        $temp.val($(element).text()).select();
+        document.execCommand("copy");
+        $temp.remove();
+        $(".product_code_copy").removeClass("copy_done")
+        $(element).addClass("copy_done")
+      }
+</script>
+
+{% endblock script %}

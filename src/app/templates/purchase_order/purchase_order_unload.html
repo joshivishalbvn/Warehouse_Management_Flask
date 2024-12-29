@@ -1,0 +1,350 @@
+{% extends "base.html" %}
+{% load static widget_tweaks crispy_forms_tags %}
+
+{% block content %}
+
+<section id="horizontal-form-layout">
+    <div class="row match-height main-form">
+        <form method="post" onsubmit="return manageInlineForm()" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            <div>
+                {% for formset in inlines %}
+                {{ formset.management_form }}
+                <table class="hidden">
+                    <tbody class="extra-fields-wrap">
+                    <tr id="row-__prefix__">
+                        <td class="hidden product-id">0</td>
+                        <td class="hidden">
+                            {% render_field formset.empty_form.product|add_class:"hidden" %}
+                        </td>
+                        <td>
+                            <span id="row-__prefix__-product_name"></span> 
+                            ( <a id="row-__prefix__-product_code" href="" title=""></a> )
+                        </td>
+                        <td>
+                            {% render_field formset.empty_form.batch_number %}
+                        </td>
+                        <td>
+                            {% render_field formset.empty_form.per_piece_price|add_class:"price_changed" %}
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-end">
+                                {% render_field formset.empty_form.case_size|add_class:"case_changed"|attr:"style:width:200px"|attr:"data-row:__prefix__"|attr:"data-type:select" %}
+                                <button type="button" class="btn btn-link text-dark add-case" data-row="__prefix__" data-bs-target="#ProductCaseForm" data-bs-toggle="modal"><i class="fa fa-plus"></i></button>
+                            </div>
+                        </td>
+                        <td>
+                            {% render_field formset.empty_form.case_quantity|add_class:"case_qty_changed"|attr:"data-row:__prefix__"|attr:"data-type:number" %}
+                        </td>
+                        <td>
+                            {% render_field formset.empty_form.total_pieces|attr:"disabled:true"|add_class:"pieces_changed" %}
+                        </td>
+                        <td>{% render_field formset.empty_form.amount|add_class:"update_amount"|attr:"disabled:true" %}</td>
+                        <td>
+                            <a href=""><i class="fa fa-edit"></i></a>
+                            <span class="text-danger button-delete" style="cursor: pointer" data-row="#row-__prefix__">
+                                {% render_field formset.empty_form.DELETE|add_class:"hidden" %}
+                                <label for="id_purchase_order_products-__prefix__-DELETE"><i class="fa fa-trash"></i></label>
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                {% endfor %}
+            </div>
+
+            <div class="row added_product_list">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div>
+                                    <b class="card-title">Unload Order</b>
+                                    <div class="row my-3">
+                                        <div class="col-md-1 col-12 my-auto">
+                                            <span>Purchase ID : </span>
+                                        </div>
+                                        <div class="col-md-3 col-12">
+                                            <input type="text" value="{{ form.instance.purchase_id }}" class="form-control" disabled />
+                                        </div>
+                                        <div class="col-md-1 col-12 my-auto text-end">
+                                            <span>{{ form.vendor.label }} : </span>
+                                        </div>
+                                        <div class="col-md-3 col-12">
+                                            {% render_field form.vendor|attr:"disabled:true" %}
+                                            {% if form.vendor.errors %}
+                                                {% for error in form.vendor.errors %}
+                                                <span class="text-danger">{{ error }}</span>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="company" id="id_company" value="{{ request.user.company.id }}" />
+                                <div class="my-3">
+                                    <b>Products</b>
+                                </div>
+                                <table id="purchase_order_table" class="table border-top-0 table-striped table-bordered border-bottom">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">Product</th>
+                                            <th class="text-center">Batch Number</th>
+                                            <th class="text-center">Price Per Piece (₹)</th>
+                                            <th class="text-center">Case Size</th>
+                                            <th class="text-center">Number of Cases</th>
+                                            <th class="text-center">Total Pieces</th>
+                                            <th class="text-center">Unloaded Pieces</th>
+                                            <th class="text-center">Undelivered Pieces</th>
+                                            <th class="text-center">Item Total (₹)</th>
+                                            <th class="text-center" style="width:90px">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for formset in inlines %}
+                                            {% for product_form in formset %}
+                                            <tr id="row-{{ forloop.counter0 }}">
+                                                <td class="hidden">{{ product_form.id }}</td>
+                                                <td class="hidden product-id">{{ product_form.product.id }}</td>
+                                                <td class="hidden">
+                                                    {% render_field product_form.product|add_class:"hidden" %}
+                                                </td>
+                                                <td>
+                                                    {{ product_form.instance.product.name }}
+                                                    (<a id="row-{{ forloop.counter0 }}-product_name_display" href="{% url 'products:product_details' product_form.instance.product.id %}" title="Product code">
+                                                        {{ product_form.instance.product.code }}
+                                                    </a>)
+                                                </td>
+                                                <td>
+                                                    {{ product_form.batch_number }}
+                                                    {% for error in product_form.batch_number.errors %}
+                                                    <span class="text-danger">{{ error }}</span>
+                                                    {% endfor %}
+                                                </td>
+                                                <td>
+                                                    {% render_field product_form.per_piece_price|add_class:"price_changed" %}
+                                                    {% for error in product_form.per_piece_price.errors %}
+                                                    <span class="text-danger">{{ error }}</span>
+                                                    {% endfor %}
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex justify-content-end">
+                                                        <select name="purchase_order_products-{{ forloop.counter0 }}-case_size" class="form-control case_changed"
+                                                                id="id_purchase_order_products-{{ forloop.counter0 }}-case_size" data-row="{{ forloop.counter0 }}" style="width:200px">
+                                                            {% for case in product_form.instance.product.product_case.all %}
+                                                                <option
+                                                                value = "{{ case.id }}" {% if case.id == product_form.case_size.value %} selected {% endif %}
+                                                                data-qty = "{{ case.quantity }}">
+                                                                    {{ case.quantity }} Qty, {{ case.weight }} Oz, {{ case.cubic_meter_volume }} CMV
+                                                                </option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        <button type="button" class="btn btn-link text-dark add-case" data-row="{{ forloop.counter0 }}" data-bs-target="#ProductCaseForm" data-bs-toggle="modal"><i class="fa fa-plus"></i></button>
+                                                    </div>
+                                                    {% for error in product_form.case_size.errors %}
+                                                    <span class="text-danger">{{ error }}</span>
+                                                    {% endfor %}
+                                                </td>
+                                                <td>
+                                                    {% render_field product_form.case_quantity|add_class:"case_qty_changed"|attr:"data-type:number" %}
+                                                    {% for error in product_form.case_quantity.errors %}
+                                                    <span class="text-danger">{{ error }}</span>
+                                                    {% endfor %}
+                                                </td>
+                                                <td>
+                                                    {% render_field product_form.total_pieces|attr:"disabled:true" %}
+                                                    {% for error in product_form.total_pieces.errors %}
+                                                    <span class="text-danger">{{ error }}</span>
+                                                    {% endfor %}
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control" name="unloaded_pieces" id="id_purchase_order_products-{{ forloop.counter0 }}-unloaded_pieces" value="{{ product_form.instance.get_unloaded_piece }}" disabled="true" />
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control" name="undelivered_pieces" id="id_purchase_order_products-{{ forloop.counter0 }}-undelivered_pieces" value="{{ product_form.instance.get_undelivered_piece }}" disabled="true" />
+                                                </td>
+                                                <td>
+                                                    {% render_field product_form.amount|add_class:"update_amount"|attr:"disabled:true" %}
+                                                    {% for error in product_form.amount.errors %}
+                                                    <span class="text-danger">{{ error }}</span>
+                                                    {% endfor %}
+                                                </td>
+                                                <td>
+                                                    <a href="#" title="Unload" data-row="{{ forloop.counter0 }}" data-bs-target="#unloadForm" data-bs-toggle="modal" data-product="{{ product_form.instance.product.name }} ({{ product_form.instance.product.code }})"
+                                                     hx-get="{% url 'purchase_order:create_purchase_order_stock' %}" hx-target="#product_stock_form" hx-swap="outerHTML" hx-vars="{'product_id': {{ product_form.instance.product.id }}, 'purchase_product_id': {{ product_form.instance.id }}, 'order_id': {{ form.instance.id }} }">
+                                                     <i class="fa fa-download text-primary" aria-hidden="true"></i>
+                                                    </a>
+                                                    <span class="text-danger button-delete" title="Remove" style="cursor: pointer" data-row="#row-{{ forloop.counter0 }}">
+                                                        {% render_field product_form.DELETE|add_class:"hidden" %}
+                                                        <label for="id_purchase_order_products-{{ forloop.counter0 }}-DELETE"><i class="fa fa-trash"></i></label>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            {% empty %}
+                                            <tr>
+                                                <td colspan="10">No product found</td>
+                                            </tr>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="8">
+                                                <div class="text-end mt-2">
+                                                    <b>Total Amount (₹): </b>
+                                                </div>
+                                            </td>
+                                            <td colspan="2">
+                                                {% render_field form.total_price|add_class:"form-control"|attr:"disabled:true" %}
+                                                {% for error in form.total_price.errors %}
+                                                    <p class="text-danger">{{error}}</p>
+                                                {% endfor %}
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12 col-xl-12 col-xs-12 col-sm-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6">
+                                    <label for="{{ form.invoice.auto_id }}">
+                                        {{ form.invoice.label }}{% if form.invoice.field.required %}<span class="asteriskField">*</span> {% endif %}
+                                    </label>
+                                    
+                                    <input type="file" name="invoice" class="form-control" placeholder="Purchase Order Invoice" id="id_invoice">
+                                    {% for error in form.invoice.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    {% endfor %}
+                                    <div class="row gallery mt-2">
+                                        {% if form.instance.invoice %}
+                                        <div class="image col-lg-2" id="image_id_{{form.instance.id}}">
+                                            <img class="btn-delete product_image_delete"
+                                            data-url="{% url 'purchase_order:delete_invoice' %}"
+                                            data-id="{{form.instance.id}}"
+                                            src="{% static 'photos/document/delete-icon.png' %}" />
+                                            <img src="{% static 'photos/jobwork/pdf.png' %}" width=100% height="100px">
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <label for="{{ form.remarks.auto_id }}">
+                                        {{ form.remarks.label }}{% if form.remarks.field.required %}<span class="asteriskField">*</span> {% endif %}
+                                    </label>
+                                    {% render_field form.remarks|attr:"rows:3" %}
+                                    {% if form.remarks.errors %}
+                                        {% for error in form.remarks.errors %}
+                                        <span class="text-danger">{{ error }}</span>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="is_complete_order" id="id_complete_order" value="false" />
+
+            <div class="text-end mb-5">
+                <button type="submit" name="complete_order" onclick="$('#id_complete_order').val('true')" class="btn btn-success complete_order">Complete Order</button>
+                <button type="submit" class="btn btn-primary">Update</button>
+                <a href="{% url 'purchase_order:purchase_order_list' %}"><button type="button" class="btn btn-secondary">Cancel</button></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% include 'purchase_order/add_product_case_modal.html' %}
+
+<div class="modal" id="unloadForm">
+    <div class="modal-lg modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content tx-size-sm">
+            <div class="modal-header">
+                <h5>Unload Product</h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
+            </div>    
+            <div class="modal-body pd-x-20" id="unload_form_body">
+                <div class="mb-3">
+                    <div class="row">
+                        <div class="col-12">
+                            <span class="font-weight-bold">Product : </span><span id="product_display"></span>
+                        </div>
+                    </div>
+                    <div class="row my-2">
+                        <div class="col-md-5">
+                            <label class="font-weight-bold">Case size : </label> <span id="id_case_size_text"></span>
+                        <input type="hidden" id="id_case_size" name="case_size" value="" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="font-weight-bold">No. of cases : </label> <span id="id_case_qty_text"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="font-weight-bold">Total stock : </label> <span id="id_affected_stock_text"></span>
+                        </div>
+                    </div>
+                </div>
+                {% include 'purchase_order/create_purchase_order_unload.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block script %}
+<script src="{% static 'assets/js/manage_images.js' %}"></script>
+<script src="{% static 'assets/product/product_dropdown.js' %}"></script>
+<script src="{% static 'assets/purchase_order/calculate_order_amount.js' %}"></script>
+<script src="{% static 'assets/purchase_order/update_order_manage_inline.js' %}"></script>
+<script src="{% static 'assets/purchase_order/create_product_case.js' %}"></script>
+<script src="{% static 'assets/js/htmx_1.9.4.min.js' %}"></script>
+
+<script>
+    manage_images("#id_invoice", "div.gallery");
+    var product_search_url = "{% url 'products:search_product' %}"
+    var product_detail_url = "{% url 'products:get_product_details_ajax' %}"
+    product_dropdown("#id_item_name");
+</script>
+
+<script>
+    var table_id="purchase_order_table";
+
+    function manageInlineForm(){
+        let row_list = $(`#${table_id} tbody`).children("tr:last");
+        
+        if (row_list.hasClass("no-product") == true){
+            $.toast({
+                text: 'Add at least one product in order !!!',
+                position: 'bottom-right',
+                stack: false,
+                icon: 'error',
+            });
+            return false;
+        }
+
+        let is_complete_order = $('#id_complete_order').val();
+        if(is_complete_order == "true" && document.getElementById("id_invoice").files.length == 0){
+            $.toast({
+                text: 'Upload invoice to complete the order !!!',
+                position: 'bottom-right',
+                stack: false,
+                icon: 'error',
+            });
+            return false;
+        }
+
+        $('.form-control').prop("disabled", false);
+        $(".extra-fields-wrap").empty();
+        return true;
+    }
+</script>
+
+{% endblock %}

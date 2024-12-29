@@ -1,0 +1,36 @@
+{% extends "account/base.html" %}
+
+{% load i18n %}
+{% load static %}
+{% block head_title %}{% trans "Sign Up Closed" %}{% endblock %}
+
+{% block content %}
+<div class="page">
+
+    <!-- main-signin-wrapper -->
+    <div class="my-auto page page-h">
+      <div class="main-signin-wrapper">
+        <div class="main-card-signin d-md-flex">
+        <div class="wd-md-50p login d-none d-md-block page-signin-style p-5 text-white" >
+          <div class="my-auto authentication-pages">
+            <div>
+              <img src="{% static 'assets/img/brand/.png' %}" class=" m-0 mb-4" alt="">
+              <h5 class="mb-4">Responsive Modern Dashboard &amp; Admin Template</h5>
+              <p class="mb-5">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
+             
+            </div>
+          </div>
+        </div>
+        <div class="sign-up-body wd-md-50p">
+            <div class="main-signin-header">
+                <div class="my-auto authentication-pages">
+                    <div>
+    <h2 class=" text-danger">Sign Up Closed</h2>
+    <h3 class="card-title text-primary" style="margin-top: 20px; font-size: 22px;">We are sorry, but the sign up is currently closed.</h3>
+    {% comment %} <p>We are sorry, but the sign up is currently closed.</p> {% endcomment %}
+    
+  </div>
+  </div>
+</div>
+
+{% endblock %}

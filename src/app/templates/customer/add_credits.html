@@ -1,0 +1,127 @@
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='cdns/jquery-ui.css') }}">
+
+<style>
+  #ui-datepicker-div{
+    z-index: 100000 !important;
+  }
+</style>
+<style>
+    .select2-container.select2-container--default.select2-container--open{
+    z-index: 100000 !important;
+  }
+</style>
+{% endblock css %}
+
+<form id="credits_form" hx-target="#credits_form" hx-post="#"
+    novalidate onsubmit="ManageShippingForm()">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-3 mt-3">
+            <label for="">Customer</label>
+            <input type="text" name="credit_customer" maxlength="10" class="form-control" value="{{ customer_name}}" disabled="true" id="customer_name" />
+            <input type="text" name="customer_id" maxlength="10" class="form-control" value="{{ customer_id }}" disabled="true" hidden id="id_customer" />
+        </div>
+
+        
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.amount.label }}{% if form.amount.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.amount %}
+            {% if form.amount.errors %}
+                {% for error in form.amount.errors %}
+                <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.payment_mode.label }}{% if form.payment_mode.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.payment_mode %}
+            {% for error in form.payment_mode.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.reference_id.label }}{% if form.reference_id.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.reference_id %}
+            {% if form.reference_id.errors %}
+                {% for error in form.reference_id.errors %}
+                <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.receive_date.label }}{% if form.receive_date.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.receive_date|attr:"autocomplete:off" %}
+            {% for error in form.receive_date.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.entry_date.label }}{% if form.entry_date.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.entry_date|attr:"autocomplete:off" %}
+            {% for error in form.entry_date.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="col-md-3 mt-3">
+            <label for="">{{ form.remark.label }}{% if form.remark.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+            {% render_field form.remark %}
+            {% for error in form.remark.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        
+    </div>
+    <div class="text-end mt-5">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" onclick="$('#creditModal').modal('hide');">Cancel</button>
+    </div>
+</form>
+
+
+{{form.media.js}}
+<script>
+    
+</script>
+{% addtoblock "script" %}
+<script src="{% static 'cdns/jquery-ui.js' %}"></script>
+
+<script>
+
+    document.addEventListener('htmx:afterRequest', function(evt) {
+        $("#id_receive_date, #id_entry_date").datepicker();
+    })
+
+    document.body.addEventListener('htmx:responseError', function (evt) {
+        $.toast({
+            text: "Customer not found !!!",
+            position: 'bottom-right',
+            stack: false,
+            icon: "error",
+        });
+    });
+
+    document.body.addEventListener("CreditResponse", function(evt){
+        $.toast({
+            text: evt.detail.message,
+            position: 'bottom-right',
+            stack: false,
+            icon: evt.detail.level,
+        });
+
+        if(evt.detail.level == "success"){
+            $("#creditModal").modal('hide');
+            $('#paymenthistory').DataTable().ajax.reload(null, false);  
+        }
+    });
+
+    function ManageShippingForm(){
+        $("#credits_form").find(".form-control").prop("disabled", false);
+    }
+</script>
+
+{% endaddtoblock %}

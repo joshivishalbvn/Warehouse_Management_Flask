@@ -1,0 +1,410 @@
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='cdns/jquery-ui.css') }}">
+
+<style>
+  #ui-datepicker-div{
+    z-index: 10000 !important;
+  }
+</style>
+{% endblock css %}
+
+<div class="panel panel-primary card mb-0">
+  <div class="panel-body tabs-menu-body p-0 border-0">
+    <ul class="Date-time" style="padding:2px;">
+      <div class="d-flex justify-content-between justify-content-center mt-3">
+        <div class="col-6 main-content-label mg-b-5 text-white mt-2">
+          Add Stock
+        </div>
+        <button class="btn btn-primary  main-content-label mg-b-5 mb-3"
+          onclick="$('#sidebar_form').toggleClass('sidebar-open')">
+          <i class="fe fe-x" data-bs-toggle="tooltip" title="" data-bs-original-title="fe fe-x" aria-label="fe fe-x"></i>
+        </button>
+      </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12 col-xl-12 col-xs-12 col-sm-12">
+    <div class="card">
+      <div class="card-body">
+        <form id="stock-create-form" encoding="multipart/form-data" novalidate class="mt-4">
+          {{ form.hidden_tag() }}
+          <div class="row">
+
+            <div class="col-md-6">
+              <label for="id_total_stock">Total Available Stock</label>
+              <input type="number" name="id_total_stock" value="{{total_stock}}" class="form-control" readonly />
+            </div>
+
+            <input type="hidden" id="id_company" name="company" value="{{ company_id }}" class="form-control" />
+
+            <input type="hidden" id="id_product" name="product" class="form-control" value="{{ product_id }}" />
+
+            <div class="col-md-6 col-6">
+                {{ form.warehouse_id.label(class="form-control-label") }}
+                {{ form.warehouse_id(class="form-control select2",) }}
+                {% if form.warehouse_id.errors %}
+                <ul class="errors">
+                  {% for error in form.warehouse_id.errors %}
+                  <small class="form-text text-danger">{{ error }}</small>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+              </div>
+
+              <div class="col-md-6 col-6">
+                {{ form.zone_id.label(class="form-control-label") }}
+                {{ form.zone_id(class="form-control select2",) }}
+                {% if form.zone_id.errors %}
+                <ul class="errors">
+                  {% for error in form.zone_id.errors %}
+                  <small class="form-text text-danger">{{ error }}</small>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+              </div>
+
+              <div class="col-md-6 col-6">
+                {{ form.manufacture_date.label(class="form-control-label") }}
+                {{ form.manufacture_date(class="form-control select2",) }}
+                {% if form.manufacture_date.errors %}
+                <ul class="errors">
+                  {% for error in form.manufacture_date.errors %}
+                  <small class="form-text text-danger">{{ error }}</small>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+              </div>
+
+              <div class="col-md-6 col-6">
+                {{ form.expiry_date.label(class="form-control-label") }}
+                {{ form.expiry_date(class="form-control select2",) }}
+                {% if form.expiry_date.errors %}
+                <ul class="errors">
+                  {% for error in form.expiry_date.errors %}
+                  <small class="form-text text-danger">{{ error }}</small>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+              </div>
+             
+              <div class="col-md-6 col-6">
+                {{ form.product_case_id.label(class="form-control-label") }}
+                {{ form.product_case_id(class="form-control select2",) }}
+                {% if form.product_case_id.errors %}
+                <ul class="errors">
+                  {% for error in form.product_case_id.errors %}
+                  <small class="form-text text-danger">{{ error }}</small>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+              </div>
+             
+              <div class="col-md-6 col-6">
+                {{ form.no_of_case.label(class="form-control-label") }}
+                {{ form.no_of_case(class="form-control select2",) }}
+                {% if form.no_of_case.errors %}
+                <ul class="errors">
+                  {% for error in form.no_of_case.errors %}
+                  <small class="form-text text-danger">{{ error }}</small>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+              </div>
+             
+              <div class="col-md-6 col-6">
+                {{ form.affected_stock.label(class="form-control-label") }}
+                {{ form.affected_stock(class="form-control select2",) }}
+                {% if form.affected_stock.errors %}
+                <ul class="errors">
+                  {% for error in form.affected_stock.errors %}
+                  <small class="form-text text-danger">{{ error }}</small>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+              </div>
+             
+              <div class="col-md-6 col-6">
+                {{ form.per_piece_price.label(class="form-control-label") }}
+                {{ form.per_piece_price(class="form-control select2",) }}
+                {% if form.per_piece_price.errors %}
+                <ul class="errors">
+                  {% for error in form.per_piece_price.errors %}
+                  <small class="form-text text-danger">{{ error }}</small>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+              </div>
+             
+              <div class="col-md-6 col-6">
+                {{ form.total_amount.label(class="form-control-label") }}
+                {{ form.total_amount(class="form-control select2",) }}
+                {% if form.total_amount.errors %}
+                <ul class="errors">
+                  {% for error in form.total_amount.errors %}
+                  <small class="form-text text-danger">{{ error }}</small>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+              </div>
+             
+
+              <div class="col-md-12 col-12">
+                {{ form.vendor_id.label(class="form-control-label") }}
+                {{ form.vendor_id(class="form-control select2",) }}
+                {% if form.vendor_id.errors %}
+                <ul class="errors">
+                  {% for error in form.vendor_id.errors %}
+                  <small class="form-text text-danger">{{ error }}</small>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+              </div>
+
+
+
+          </div>
+          <div class="row mt-4">
+            <div>
+              <button type="submit" id="submit-stock-form" class="btn btn-primary">Save</button>
+              <button type="button" class="btn btn-secondary" onclick="$('#sidebar_form').toggleClass('sidebar-open')">Cancel</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+{% block script %}
+<div class="modal" id="ProductCaseForm">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content tx-size-sm">
+      <div class="modal-header">
+        <h5>Add New Product Case</h5>
+        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body pd-x-20" id="add_product_case_modal">
+        
+      </div>
+      <div class="modal-footer">
+          <button type="submit" form="id_product_case_form" class="btn btn-primary pd-x-25 float-end">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='cdns/jquery-ui.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0/js/select2.min.js"></script>
+<script>
+  $(document).ready(function() {
+      $("#warehouse_id").select2({});
+      $("#zone_id").select2({});
+      $("#product_case_id").select2({});
+      $("#vendor_id").select2({});
+  });
+  $(document).on("input", "#no_of_case", function(){
+    var no_of_cases = $(this).val()
+    var case_size_id = $("#product_case_id").val()
+    var get_quantity_url = "{{ url_for('product_bp.get_quantity_ajax') }}";
+    $.ajax({
+      url: get_quantity_url, 
+      type: 'GET',
+      data: {
+        case_size_id: case_size_id 
+      },
+      success: function(response) {
+        qty = response.quantity
+        total_affected_stock = parseInt(no_of_cases) * parseInt(qty)
+        $("#affected_stock").val(total_affected_stock)
+        var price = $("#per_piece_price").val()
+        var total_price = parseFloat(total_affected_stock) * parseFloat(price)
+        console.log(total_price,"total_price")
+
+        $("#total_amount").val(total_price)
+        
+      },
+      error: function(xhr, status, error) {
+          console.error('AJAX request failed:', status, error);
+      }
+    });
+  });
+  
+  $(document).on("change", "#product_case_id", function(){
+    var case_size_id = $(this).val()
+    var no_of_cases = $("#no_of_case").val()
+    var get_quantity_url = "{{ url_for('product_bp.get_quantity_ajax') }}";
+    $.ajax({
+      url: get_quantity_url, 
+      type: 'GET',
+      data: {
+        case_size_id: case_size_id 
+      },
+      success: function(response) {
+        qty = response.quantity
+        total_affected_stock = parseInt(no_of_cases) * parseInt(qty)
+        $("#affected_stock").val(total_affected_stock)
+        var price = $("#per_piece_price").val()
+        var total_price = parseFloat(total_affected_stock) * parseFloat(price)
+        console.log(total_price,"total_price")
+
+        $("#total_amount").val(total_price)
+      },
+      error: function(xhr, status, error) {
+          console.error('AJAX request failed:', status, error);
+      }
+    });
+  });
+  
+  $(document).on("change", "#per_piece_price", function(){
+    var price = $(this).val()
+    console.log(stock,"stock")
+
+    var stock = $("#affected_stock").val()
+
+    var total_price = parseFloat(stock) * parseFloat(price)
+    console.log(total_price,"total_price")
+
+    $("#total_amount").val(total_price)
+  });
+  $(document).on("change", "#warehouse_id", function(){
+    var warehouse_id = $(this).val()
+    var get_zone_url = "{{ url_for('zone_bp.get_zone_ajax') }}";
+    $.ajax({
+      url: get_zone_url, 
+      type: 'GET',
+      data: {
+        warehouse_id: warehouse_id 
+      },
+      success: function(response) {
+        var selectZoneDropdown = $('#zone_id'); 
+        selectZoneDropdown.empty();
+        selectZoneDropdown.append('<option value="">Select Zone</option>'); 
+        
+        if (response.zones && Array.isArray(response.zones)) {
+            response.zones.forEach(zone => {
+                var newOption = $('<option></option>').val(zone.id).text(zone.name);
+                selectZoneDropdown.append(newOption);
+            });
+            
+            // Reinitialize select2 if it's being used
+            selectZoneDropdown.select2({
+                placeholder: 'Select Zone'
+            });
+          } else {
+              console.error('Invalid response format:', response);
+          }
+      },
+      error: function(xhr, status, error) {
+          console.error('AJAX request failed:', status, error);
+      }
+    });
+  });
+</script>
+
+
+
+<script>
+  $(document).ready(function() {
+      $('#submit-stock-form').on('click', function(e) {
+          var stock_table = $('#stocks_list').DataTable()
+          var $btn = $(this);
+          var form = $('#stock-create-form')[0];
+          var formData = new FormData(form);
+          console.log("formData",formData)
+          var company_id = $("#id_company").val()
+          var product_id = $("#id_product").val()
+          var total_amount = $("#total_amount").val()
+          var affected_stock = $("#affected_stock").val()
+          formData.append('company_id', company_id);
+          formData.append('product_id', product_id);
+          formData.append('total_amount', total_amount);
+          formData.append('affected_stock', affected_stock);
+          $btn.prop('disabled', true);
+          $.ajax({
+              url: "{{ url_for('stock_bp.create_stock') }}",
+              type: 'POST',
+              data: formData,
+              processData: false,
+              contentType: false,
+              success: function(response) {
+                  $('#sidebar_form').removeClass('sidebar-open');
+                  stock_table.ajax.reload(); 
+              },
+              error: function(xhr) {
+                console.error('Form submission failed:', xhr.status, xhr.statusText);
+                var response = xhr.responseJSON;
+                if (response && response.errors) {
+                    $('#stock-create-form .form-text.text-danger').remove();
+                    for (var field in response.errors) {
+                        var errors = response.errors[field];
+                        if (errors.length > 0) {
+                            var $field = $('#stock-create-form [name="' + field + '"]');
+                            $field.after('<small class="form-text text-danger">' + errors.join('<br>') + '</small>');
+                        }
+                    }
+                }
+                $btn.prop('disabled', false);
+            }
+          });
+      });
+  });
+</script>
+<script>
+  document.body.addEventListener("productCaseCreate", function(evt){
+    $("#id_product_case").append(evt.detail.option);
+    $('#ProductCaseForm').modal('hide');
+  });
+</script>
+
+<script>
+  $(document).on("input", "#id_no_of_case", function(){
+    let case_qty = parseInt($(this).val());
+    let case_size = parseInt($("#id_product_case option:selected").data("qty"));
+    let piece_price = parseInt($("#id_per_piece_price").val());
+
+    $("#id_affected_stock").val(case_qty * case_size);
+    $("#id_total_amount").val((case_qty * case_size) * piece_price);
+  });
+
+
+
+
+
+  $(document).on("change", "#id_product_case", function(){
+    let case_size = parseInt($("#id_product_case option:selected").data("qty"));
+    let case_qty = parseInt($("#id_stock").val());
+    let piece_price = parseInt($("#id_per_piece_price").val())
+
+    $("#id_affected_stock").val(case_size * case_qty);
+    $("#id_total_amount").val((case_qty * case_size) * piece_price);
+  });
+
+</script>
+
+<script>
+  document.body.addEventListener('stockHistoryCreated', function(evt) {
+    $(document).find("#sidebar_form").removeClass('sidebar-open');
+    $('#stocks_list').DataTable().ajax.reload(null, false);
+    $.toast({
+      text: evt.detail.message,
+      position: 'bottom-right',
+      stack: false,
+      icon: evt.detail.level,
+    });
+  });
+</script>
+
+<script>
+  document.addEventListener('htmx:afterRequest', function(evt) {
+    $("#id_product").val($("#id_product_list").val());
+    $("#id_manufacture_date").datepicker({
+      maxDate: new Date(),
+    });
+    $("#id_expiry_date").datepicker();
+  });
+</script> 
+{% endblock script %}

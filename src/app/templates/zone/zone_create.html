@@ -1,0 +1,140 @@
+
+<div class="panel panel-primary card mb-0">
+  <div class="panel-body tabs-menu-body p-0 border-0">
+    <ul class="Date-time" style="padding:2px;">
+      <div class="d-flex justify-content-between justify-content-center mt-3">
+        <div class="col-6 main-content-label mg-b-5 text-white mt-2">
+          Add Zone
+        </div>
+        <button class="btn btn-primary  main-content-label mg-b-5 mb-3"
+          onclick="$('#sidebar_form').toggleClass('sidebar-open')">
+          <i class="fe fe-x" data-bs-toggle="tooltip" title="" data-bs-original-title="fe fe-x"
+            aria-label="fe fe-x"></i>
+        </button>
+      </div>
+  </div>
+</div>
+<div class="row mt-3">
+  <div class="col-md-12 col-xl-12 col-xs-12 col-sm-12">
+    <div class="card">
+      <div class="card-body">
+        <form action="" method="post" novalidate id="zone_create_form">
+          {{ form.hidden_tag() }}
+          <div class="row">
+
+            {% for error in form.non_field_errors %}
+              <p style="color:red;" id="blink">{{error}}</p>
+            {% endfor %}
+
+            <div class="col-md-12 col-12">
+              {{ form.name.label(class="form-control-label") }}
+              {{ form.name(class="form-control", placeholder="Enter Name") }}
+              {% if form.name.errors %}
+              <ul class="errors">
+                {% for error in form.name.errors %}
+                <small class="form-text text-danger">{{ error }}</small>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </div>
+
+            <div class="col-md-12 col-12">
+              {{ form.status.label(class="form-control-label") }}
+              {{ form.status(class="form-control", placeholder="Select Status") }}
+              {% if form.status.errors %}
+              <ul class="errors">
+                {% for error in form.status.errors %}
+                <small class="form-text text-danger">{{ error }}</small>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </div>
+
+          <div class="my-3">
+            
+
+              <button id="btn_submit_zone" class="btn btn-primary mr-2"
+                hx-encoding="multipart/form-data">
+                Save
+              </button>
+
+              <button type="button" class="btn btn-secondary" onclick="$('#sidebar_form').toggleClass('sidebar-open')">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block script %}
+
+<script>
+  $('#id_status,#id_company').select2({
+    width: "100%",
+  });
+</script>
+
+
+<script src="{{ url_for('static', filename='assets/js/toast.js') }}"></script>
+
+<script>
+$(document).ready(function() {
+    var table = $('#zone-table').DataTable()
+    $('#btn_submit_zone').on('click', function(e) {
+        var warehouse_id = $("#id_warehouse_2").val()
+        console.log("warehouse_id",warehouse_id)
+        e.preventDefault();
+        var $btn = $(this);
+        var form = $('#zone_create_form')[0];
+        var formData = new FormData(form);
+        formData.append('warehouse_id', warehouse_id);
+        console.log("formData",formData)
+        $btn.prop('disabled', true);
+        $.ajax({
+            url: "{{ url_for('zone_bp.create_zone') }}",
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                $('#sidebar_form').removeClass('sidebar-open');
+                table.ajax.reload();
+                $.toast({
+                    text: "Zone Created Sucessfully !!!",
+                    position: 'bottom-right',
+                    stack: false,
+                    icon: 'success',
+                });
+            },
+            error: function(xhr) {
+                console.error('Form submission failed:', xhr.status, xhr.statusText);
+                var response = xhr.responseJSON;
+                if (response && response.errors) {
+                    $('#zone_create_form .form-text.text-danger').remove();
+                    for (var field in response.errors) {
+                        var errors = response.errors[field];
+                        if (errors.length > 0) {
+                            var $field = $('#zone_create_form [name="' + field + '"]');
+                            $field.after('<small class="form-text text-danger">' + errors.join('<br>') + '</small>');
+                        }
+                    }
+                }
+                $btn.prop('disabled', false);
+            }
+        });
+    });
+});
+
+document.body.addEventListener("zoneCreated", function(evt){
+  $(document).find("#sidebar_form").removeClass('sidebar-open');
+  $.toast({
+    text: evt.detail.message,
+    position: 'bottom-right',
+    stack: false,
+    icon: 'success',
+  });
+  location.reload();
+})
+</script>
+
+{% endblock script %}

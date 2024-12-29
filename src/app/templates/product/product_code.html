@@ -1,0 +1,8 @@
+<div>
+{% if request.user.role == "Customer" %}
+
+    <a href="{% url 'products:customer_product_details' product.pk %}">{{ product.code }} </a>
+{% else %}
+    <a href="{% url 'products:product_details' product.pk %}">{{ product.code }} </a>
+{% endif %}
+</div>

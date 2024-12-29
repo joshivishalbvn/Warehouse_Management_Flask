@@ -1,0 +1,5 @@
+<center>
+    <div>
+        <img src="{% if img_url %} {{ url_for('static', filename=img_url) }} {% else %} /static/images/product-image.png {% endif %}" alt="avatar" height="{{ height }}" width="{{ width }}">
+    </div>
+</center>

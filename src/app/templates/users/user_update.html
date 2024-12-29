@@ -1,0 +1,171 @@
+
+<div class="panel panel-primary card mb-0">
+  <div class="panel-body tabs-menu-body p-0 border-0">
+    <ul class="Date-time" style="padding:2px;">
+      <div class="d-flex justify-content-between justify-content-center mt-3">
+        <div class="col-6 main-content-label mg-b-5 text-white mt-2">
+          Update User
+        </div>
+        <button class="btn btn-primary  main-content-label mg-b-5 mb-3"
+          onclick="$('#sidebar_form').toggleClass('sidebar-open')">
+          <i class="fe fe-x" data-bs-toggle="tooltip" title="" data-bs-original-title="fe fe-x"
+            aria-label="fe fe-x"></i>
+        </button>
+      </div>
+  </div>
+</div>
+<div class="row mt-3">
+  <div class="col-md-12 col-xl-12 col-xs-12 col-sm-12">
+    <div class="card">
+      <div class="card-body">
+        
+        <form action="" method="post" enctype="multipart/form-data" id="user-create-form" novalidate>
+          {{ form.hidden_tag() }}
+          
+              <div class="row">
+
+                <div class="col-md-12 col-12">
+                  {{ form.first_name.label(class="form-control-label") }}
+                  {{ form.first_name(class="form-control", placeholder="Enter First Name") }}
+                  {% if form.first_name.errors %}
+                      <ul class="errors">
+                          {% for error in form.first_name.errors %}
+                              <small class="form-text text-danger">{{ error }}</small>
+                          {% endfor %}
+                      </ul>
+                  {% endif %}
+              </div>
+    
+              <div class="col-md-12 col-12">
+                  {{ form.last_name.label(class="form-control-label") }}
+                  {{ form.last_name(class="form-control", placeholder="Enter Last Name") }}
+                  {% if form.last_name.errors %}
+                      <ul class="errors">
+                          {% for error in form.last_name.errors %}
+                              <small class="form-text text-danger">{{ error }}</small>
+                          {% endfor %}
+                      </ul>
+                  {% endif %}
+              </div>
+    
+              <div class="col-md-12 col-12">
+                  {{ form.email.label(class="form-control-label") }}
+                  {{ form.email(class="form-control", placeholder="Enter Email") }}
+                  {% if form.email.errors %}
+                      <ul class="errors">
+                          {% for error in form.email.errors %}
+                              <small class="form-text text-danger">{{ error }}</small>
+                          {% endfor %}
+                      </ul>
+                  {% endif %}
+              </div>
+    
+              <div class="col-md-12 col-12">
+                  {{ form.mobile.label(class="form-control-label") }}
+                  {{ form.mobile(class="form-control", placeholder="Enter Mobile") }}
+                  {% if form.mobile.errors %}
+                      <ul class="errors">
+                          {% for error in form.mobile.errors %}
+                              <small class="form-text text-danger">{{ error }}</small>
+                          {% endfor %}
+                      </ul>
+                  {% endif %}
+              </div>
+    
+              <div class="col-md-12 col-12">
+                  {{ form.role.label(class="form-control-label") }}
+                  {{ form.role(class="form-control", placeholder="Select Role") }}
+                  {% if form.role.errors %}
+                      <ul class="errors">
+                          {% for error in form.role.errors %}
+                              <small class="form-text text-danger">{{ error }}</small>
+                          {% endfor %}
+                      </ul>
+                  {% endif %}
+              </div>
+    
+
+              <div class="my-3">
+                <button id="btn_submit_user" data-url="{{instance.update_url}}" class="btn btn-primary mr-2 user_create_form_submit">
+                  Save
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="$('#sidebar_form').toggleClass('sidebar-open')">Cancel</button>
+              </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="{{ url_for('static', filename='assets/js/toast.js') }}"></script>
+
+<script>
+  function open_file() {
+    document.getElementById('id_image').click();
+  }
+
+  document.getElementById('id_image').addEventListener('change', function() {
+    var preview = document.getElementById('image-preview');
+    var file = this.files[0];
+    var reader = new FileReader();
+
+    reader.onloadend = function() {
+      preview.src = reader.result;
+    };
+    if (file) {
+      reader.readAsDataURL(file);
+    } else {
+      preview.src = "";
+    }
+  });
+</script>
+<script>
+  $(document).ready(function() {
+      $('#btn_submit_user').on('click', function(e) {
+          var table = $('#user_table').DataTable()
+          var $btn = $(this);
+          var form = $('#user-create-form')[0];
+          var formData = new FormData(form);
+          var url = $btn.attr('data-url')
+          $btn.prop('disabled', true);
+          $.ajax({
+              url: url,
+              type: 'POST',
+              data: formData,
+              processData: false,
+              contentType: false,
+              success: function(response) {
+                  // Handle successful response
+                  console.log('Form submitted successfully:', response);
+
+                  // Process the response (e.g., close the form, reload data, show notifications)
+                  $('#sidebar_form').removeClass('sidebar-open');
+                  // Assuming you have a DataTable, you might want to reload it here:
+                  table.ajax.reload(); 
+                  $.toast({
+                    text: "User Updated Sucessfully !!!",
+                    position: 'bottom-right',
+                    stack: false,
+                    icon: 'success',
+                  });
+              },
+              error: function(xhr, status, error) {
+                  // Handle error response
+                  console.error('Form submission failed:', status, error);
+                  for (var field in response.errors) {
+                      var errors = response.errors[field];
+                      console/log("errors",errors)
+                      if (errors.length > 0) {
+                          // Append error messages to the respective form field
+                          var $field = $('#user-create-form [name="' + field + '"]');
+                          $field.after('<small class="form-text text-danger">' + errors.join('<br>') + '</small>');
+                      }
+                  }
+                  $btn.prop('disabled', false);
+                  // Display a toast or alert with an error message
+              }
+          });
+      });
+  });
+</script>

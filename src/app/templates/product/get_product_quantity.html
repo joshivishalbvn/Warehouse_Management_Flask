@@ -1,0 +1,13 @@
+{% load static %}
+
+{% if request.user.role != "Customer" %}
+
+<div class="number">
+	<input class="product_quantity form-control"  min="0" type="number" value="0" id="qty-{{ product.id }}">
+</div>
+{% else %}
+
+{% endif %}
+
+
+

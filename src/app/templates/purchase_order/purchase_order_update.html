@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+{% load static widget_tweaks crispy_forms_tags %}
+
+{% block content %}
+
+<section id="horizontal-form-layout">
+    <div class="row match-height main-form">
+        <form method="post" onsubmit="return manageInlineForm()" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            {% include 'purchase_order/purchase_product_inline.html' %}
+
+            <div class="row">
+                <div class="col-md-12 col-xl-12 col-xs-12 col-sm-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="main-content-label mg-b-5 my-2">
+                                <b class="card-title">Purchase</b>
+                            </div>
+                            <div class="row">
+                                {% if request.user.is_superuser or requser.user.role == "Super Admin" %}
+                                <div class="col-md-3">
+                                    <label for="">{{ form.company.label }}{% if form.company.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+                                    {{ form.company }}
+                                    {% if form.company.errors %}
+                                        {% for error in form.company.errors %}
+                                        <span class="text-danger">{{ error }}</span>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                {% else %}
+                                <input type="hidden" name="company" id="id_company" value="{{ request.user.company.id }}" />
+                                {% endif %}
+
+                                {% if request.user.is_superuser or requser.user.role == "Super Admin" %}
+                                <div class="col-md-3 col-12">
+                                {% else %}
+                                <div class="col-md-4 col-12">
+                                {% endif %}
+                                    <label for="">Purchase ID</label>
+                                    <input type="text" value="{{ form.instance.purchase_id }}" class="form-control" disabled />
+                                </div>
+
+                                {% if request.user.is_superuser or requser.user.role == "Super Admin" %}
+                                <div class="col-md-3 col-12">
+                                {% else %}
+                                <div class="col-md-4 col-12">
+                                {% endif %}
+                                    <label for="">{{ form.vendor.label }}{% if form.vendor.field.required %}<span class="asteriskField">*</span> {% endif %}</label>
+                                    {{ form.vendor }}
+                                    {% if form.vendor.errors %}
+                                        {% for error in form.vendor.errors %}
+                                        <span class="text-danger">{{ error }}</span>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+
+                                {% if request.user.is_superuser or requser.user.role == "Super Admin" %}
+                                <div class="col-md-3 col-12">
+                                {% else %}
+                                <div class="col-md-4 col-12">
+                                {% endif %}
+                                    <label for="id_item_name">Add Product<span class="asteriskField">*</span></label>
+                                    <select id="id_item_name" name="product" placeholder="select item">
+                                        {% for product in product_list %}
+                                        <option value="{{ product.id }}"
+                                                data-image="{{ product.get_product_image }}"
+                                                data-code="{{ product.code }}"
+                                                data-name="{{ product.name }}"
+                                                data-barcode="{{ product.product_barcode.all.0.number }}"
+                                                data-casepack="{% for case in product.product_case.all %}{{ case.id }}-{{ case.quantity }}-{{ case.quantity }} Qty, {{ case.weight }} Oz, {{ case.cubic_meter_volume }} CMV |{% endfor %}">
+                                            {{ product.code }} - {{ product.name }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="text-end mt-2">
+                                <button type="button" class="btn btn-primary" id="submit_product">Add</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row added_product_list">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <b>Products</b>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-body table-responsive">
+                                <table id="purchase_order_table" class="table text-center m-0" >
+                                    <thead>
+                                        <hr style="height:2px;">
+                                        <tr>
+                                            <th class="text-center">Product</th>
+                                            <th class="text-center">Price Per Piece (₹)</th>
+                                            <th class="text-center">Case Size</th>
+                                            <th class="text-center">Number of Cases</th>
+                                            <th class="text-center">Total Pieces</th>
+                                            <th class="text-center">Item Total (₹)</th>
+                                            <th class="text-center" style="width:90px">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% include 'purchase_order/purchase_product_inline_error.html' %}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="5">
+                                                <div class="text-end mt-2">
+                                                    <b>Total Amount (₹): </b>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {% render_field form.total_price|add_class:"form-control"|attr:"disabled:true" %}
+                                                {% for error in form.total_price.errors %}
+                                                    <p class="text-danger">{{error}}</p>
+                                                {% endfor %}
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12 col-xl-12 col-xs-12 col-sm-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6">
+                                    <label for="{{ form.invoice.auto_id }}">
+                                        {{ form.invoice.label }}{% if form.invoice.field.required %}<span class="asteriskField">*</span> {% endif %}
+                                    </label>
+                                    <input type="file" name="invoice" class="form-control" placeholder="Purchase Order Invoice" id="id_invoice">
+                                    {% for error in form.invoice.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    {% endfor %}
+                                    <div class="row gallery mt-2">
+                                        {% if form.instance.invoice %}
+                                        <div class="image col-lg-2" id="image_id_{{form.instance.id}}">
+                                            <img class="btn-delete product_image_delete" title="Delete"
+                                            data-url="{% url 'purchase_order:delete_invoice' %}"
+                                            data-id="{{form.instance.id}}"
+                                            src="{% static 'photos/document/delete-icon.png' %}" />
+                                            <img src="{% static 'photos/jobwork/pdf.png' %}" width=100% height="100px">
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <label for="{{ form.remarks.auto_id }}">
+                                        {{ form.remarks.label }}{% if form.remarks.field.required %}<span class="asteriskField">*</span> {% endif %}
+                                    </label>
+                                    {% render_field form.remarks|attr:"rows:3" %}
+                                    {% if form.remarks.errors %}
+                                        {% for error in form.remarks.errors %}
+                                        <span class="text-danger">{{ error }}</span>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-end mb-5">
+                <button type="submit" name="unload_order" class="btn btn-success">Unloading order</button>
+                <button type="submit" class="btn btn-primary">Update</button>
+                <a href="{% url 'purchase_order:purchase_order_list' %}"><button type="button" class="btn btn-secondary">Cancel</button></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% include 'purchase_order/add_product_case_modal.html' %}
+
+{% endblock content %}
+
+{% block script %}
+
+<script>
+    var productDetailUrl = "{% url 'products:product_details' 0 %}";
+</script>
+
+<script src="{% static 'assets/js/manage_images.js' %}"></script>
+<script src="{% static 'assets/product/product_dropdown.js' %}"></script>
+<script src="{% static 'assets/purchase_order/calculate_order_amount.js' %}"></script>
+<script src="{% static 'assets/purchase_order/update_order_manage_inline.js' %}"></script>
+<script src="{% static 'assets/purchase_order/create_product_case.js' %}"></script>
+
+<script>
+    manage_images("#id_invoice", "div.gallery");
+    var product_search_url = "{% url 'products:search_product' %}"
+    var product_detail_url = "{% url 'products:get_product_details_ajax' %}"
+    product_dropdown("#id_item_name");
+</script>
+
+<script>
+    var table_id="purchase_order_table";
+
+    $(document).ready(function() {
+        $("#id_vendor").select2({
+            placeholder: "Select Vendor",
+            allowClear: true,
+        });
+    });
+
+    function manageInlineForm(){
+        let row_list = $(`#${table_id} tbody`).children("tr:last");
+    
+        if (row_list.hasClass("no-product") == true){
+            $.toast({
+                text: 'Add at least one product in order !!!',
+                position: 'bottom-right',
+                stack: false,
+                icon: 'error',
+            });
+            return false;
+        }
+
+        $(".extra-fields-wrap").empty();
+        $('.form-control').prop("disabled", false);
+        return true;
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,247 @@
+<div class="panel panel-primary card mb-0">
+  <div class="panel-body tabs-menu-body p-0 border-0">
+    <ul class="Date-time" style="padding:2px;">
+      <div class="d-flex justify-content-between justify-content-center mt-3">
+        {% if object %}
+        <div class="col-6 main-content-label mg-b-5 text-white mt-2">
+          Update Shipping Address
+        </div>
+        {% else %}
+        <div class="col-6 main-content-label mg-b-5 text-white mt-2">
+          Add Shipping Address
+        </div>
+        {% endif %}
+        <button class="btn btn-primary  main-content-label mg-b-5 mb-3"
+          onclick="$('#sidebar_form').toggleClass('sidebar-open')">
+          <i class="fe fe-x" data-bs-toggle="tooltip" title="" data-bs-original-title="fe fe-x"
+            aria-label="fe fe-x"></i>
+        </button>
+      </div>
+  </div>
+</div>
+<div class="row mt-3">
+  <div class="col-md-12 col-xl-12 col-xs-12 col-sm-12">
+    <div class="card">
+      <div class="card-body">
+
+        <form id="shipping-address-create-form" novalidate enctype="multipart/form-data">
+
+          {{ form.hidden_tag() }}
+
+          <div class="row">
+
+            <div class="col-md-12 col-12">
+              {{ form.suite_apartment.label(class="form-control-label") }}
+              {{ form.suite_apartment(class="form-control",) }}
+              {% if form.suite_apartment.errors %}
+              <ul class="errors">
+                {% for error in form.suite_apartment.errors %}
+                <small class="form-text text-danger">{{ error }}</small>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </div>
+
+            <div class="col-md-12 col-12">
+              {{ form.address_line_1.label(class="form-control-label") }}
+              {{ form.address_line_1(class="form-control",) }}
+              {% if form.address_line_1.errors %}
+              <ul class="errors">
+                {% for error in form.address_line_1.errors %}
+                <small class="form-text text-danger">{{ error }}</small>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </div>
+
+            <div class="col-md-12 col-12">
+              {{ form.address_line_2.label(class="form-control-label") }}
+              {{ form.address_line_2(class="form-control",) }}
+              {% if form.address_line_2.errors %}
+              <ul class="errors">
+                {% for error in form.address_line_2.errors %}
+                <small class="form-text text-danger">{{ error }}</small>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </div>
+
+
+            <div class="col-md-12 col-12">
+              {{ form.city.label(class="form-control-label") }}
+              {{ form.city(class="form-control",) }}
+              {% if form.city.errors %}
+              <ul class="errors">
+                {% for error in form.city.errors %}
+                <small class="form-text text-danger">{{ error }}</small>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </div>
+
+            <div class="col-md-12 col-12">
+              {{ form.state.label(class="form-control-label") }}
+              {{ form.state(class="form-control",) }}
+              {% if form.state.errors %}
+              <ul class="errors">
+                {% for error in form.state.errors %}
+                <small class="form-text text-danger">{{ error }}</small>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </div>
+
+            <div class="col-md-12 col-12">
+              {{ form.country.label(class="form-control-label") }}
+              {{ form.country(class="form-control",) }}
+              {% if form.country.errors %}
+              <ul class="errors">
+                {% for error in form.country.errors %}
+                <small class="form-text text-danger">{{ error }}</small>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </div>
+
+            <div class="col-md-12 col-12">
+              {{ form.zip_code.label(class="form-control-label") }}
+              {{ form.zip_code(class="form-control",) }}
+              {% if form.zip_code.errors %}
+              <ul class="errors">
+                {% for error in form.zip_code.errors %}
+                <small class="form-text text-danger">{{ error }}</small>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </div>
+
+            <div class="col-md-12 col-12">
+              <div class="form-check">
+                {{ form.is_default(class="form-check-input") }}
+                {{ form.is_default.label(class="form-check-label ml-2") }} <!-- Add margin-left -->
+                {% if form.is_default.errors %}
+                <ul class="errors mt-2"> <!-- Add margin-top -->
+                  {% for error in form.is_default.errors %}
+                  <li><small class="form-text text-danger">{{ error }}</small></li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+              </div>
+            </div>
+
+
+
+            <div class="mt-4">
+
+              {% if instance %}
+              <button type="submit" class="btn btn-primary"
+                data-url="{{ url_for('customer_bp.update_shipping_address' ,id=instance.id) }}"
+                id="update_shipping_address">Save</button>
+              {% else %}
+              <button type="submit" class="btn btn-primary" data-url="{{ url_for('customer_bp.add_shipping_add') }}"
+                id="submit_shipping_address">Save</button>
+              {% endif %}
+              <button type="button" class="btn btn-secondary"
+                onclick="$('#sidebar_form').toggleClass('sidebar-open')">Cancel</button>
+
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block script %}
+<script src="{{ url_for('static', filename='assets/js/toast.js') }}"></script>
+
+<script>
+  $(document).ready(function () {
+    var table = $('#shipping_add').DataTable()
+    var customer_id = $("#id_customer_2").val()
+
+    $('#submit_shipping_address').on('click', function (e) {
+      var $btn = $(this);
+      var form = $('#shipping-address-create-form')[0];
+      var formData = new FormData(form);
+      var url = $(this).attr("data-url");
+      formData.append('customer_id', customer_id);
+      $btn.prop('disabled', true);
+      $.ajax({
+        url: url,
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+          $('#sidebar_form').removeClass('sidebar-open');
+          table.ajax.reload();
+          $.toast({
+            text: "Billing Address Created Sucessfully !!!",
+            position: 'bottom-right',
+            stack: false,
+            icon: 'success',
+          });
+        },
+        error: function (xhr) {
+          console.error('Form submission failed:', xhr.status, xhr.statusText);
+          var response = xhr.responseJSON;
+          if (response && response.errors) {
+            $('#shipping-address-create-form .form-text.text-danger').remove();
+            for (var field in response.errors) {
+              var errors = response.errors[field];
+              if (errors.length > 0) {
+                var $field = $('#shipping-address-create-form [name="' + field + '"]');
+                $field.after('<small class="form-text text-danger">' + errors.join('<br>') + '</small>');
+              }
+            }
+          }
+          $btn.prop('disabled', false);
+        }
+      });
+    });
+
+    $('#update_shipping_address').on('click', function (e) {
+      var url = $(this).attr("data-url")
+      var $btn = $(this);
+      var form = $('#shipping-address-create-form')[0];
+      var formData = new FormData(form);
+      formData.append('customer_id', customer_id);
+      $btn.prop('disabled', true);
+      $.ajax({
+        url: url,
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+          $('#sidebar_form').removeClass('sidebar-open');
+          table.ajax.reload();
+          $.toast({
+            text: "Document Updated Sucessfully !!!",
+            position: 'bottom-right',
+            stack: false,
+            icon: 'success',
+          });
+        },
+        error: function (xhr) {
+          console.error('Form submission failed:', xhr.status, xhr.statusText);
+          var response = xhr.responseJSON;
+          if (response && response.errors) {
+            $('#shipping-address-create-form .form-text.text-danger').remove();
+            for (var field in response.errors) {
+              var errors = response.errors[field];
+              if (errors.length > 0) {
+                var $field = $('#shipping-address-create-form [name="' + field + '"]');
+                $field.after('<small class="form-text text-danger">' + errors.join('<br>') + '</small>');
+              }
+            }
+          }
+          $btn.prop('disabled', false);
+        }
+      });
+    });
+
+  });
+</script>
+
+{% endblock script %}

@@ -1,0 +1,990 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/daterangepicker.css' %}" />
+{% endblock css %}
+
+{% block content %}
+
+
+{% if 'reports/client' in request.path %}
+<div class="row row-sm">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex flex-sm-row">
+                    <div class="col-4">
+                        <h4 class="card-title d-flex" style="float: left; margin-right:10px;">Client Report</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="mx-4 mb-4">
+                    
+                </div>                
+            </div>
+        </div>
+    </div>
+</div> 
+
+
+{% elif 'reports/top-performing-items' in request.path %}
+<div class="row row-sm">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h4 class="card-title d-flex" style="float: left; margin-right:10px;">Top Performing Items</h4>
+                </div>
+                <div class="row text-center">
+                    <div class="col-6 main-content-label2 active-div title" data-id="max_quantity_sale_table" style="cursor:pointer; padding:20px;">
+                        Maximum Number of Units Sold
+                    </div>
+                    <div class="col-6 main-content-label2 inactive-div title" data-id="max_value_sale_table" style="cursor:pointer; padding:20px;">
+                        Maximum Value of Per Item Sold 
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+
+                <div class="row">
+                    <div class="col-10">
+                    </div>
+                    <div class="col-2">
+                        Date Range Filter: 
+                        <input class="daterange_picker form-control" type="text" name="daterange" value="01/01/2023 - 11/06/2023" />  
+                    </div>
+                </div>
+                    <div class="row tabbing-table show-table table-responsive" id="max_quantity_sale_table" >
+                                
+                        <table id="top_performing_items" class="table border-top-0 table-striped  table-bordered text-nowrap border-bottom" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">S. No.</th>
+                                    <th class="text-center">Product Code</th>
+                                    <th class="text-center">Product Name</th>
+                                    <th class="text-center">Unit Sold</th>
+
+                                    <th class="text-center">Case Size (m³)</th>
+                                    <th class="text-center">Available Quantity</th>
+                                    <th class="text-center">Average Stock Seating Days</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in product_list %}
+                                    <tr>
+                                        <td class="text-center" >{{forloop.counter}}</td>
+                                        <td class="text-center p-2" >{{product.code}}</td>
+                                        {% comment %} <td class="text-center" >{{product.name|truncatechars:20 }}</td> {% endcomment %}
+                                        <td class="text-center" >{{product.name}}</td>
+                                        <td class="text-center" >{% random_int 1000 20000 %}</td>
+                                        <td class="text-center" >{% random_int 5 20 %}</td>
+                                        <td class="text-center" >{% random_int 50 20000 %}</td>
+                                        <td class="text-center" >{% random_int 3 15 %}</td>
+
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row tabbing-table table-responsive second_table" id="max_value_sale_table" >
+                                
+                            <table id="top_performing_items" class="table border-top-0 table-striped  table-bordered text-nowrap border-bottom" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">S. No.</th>
+                                        <th class="text-center">Product Code</th>
+                                        <th class="text-center">Product Name</th>
+                                        <th class="text-center">Value Sold ($)</th>
+                                        <th class="text-center">Case Size (m³)</th>
+                                        <th class="text-center">Available Quantity</th>
+                                        <th class="text-center">Average Stock Seating Days</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    {% for product in product_list %}
+                                        <tr>
+                                            <td class="text-center" >{{forloop.counter}}</td>
+                                            <td class="text-center p-2" >{{product.code}}</td>
+                                            {% comment %} <td class="text-center" >{{product.name|truncatechars:20 }}</td> {% endcomment %}
+                                            <td class="text-center" >{{product.name}}</td>
+                                            <td class="text-center" >{% random_int 1000 20000 %}</td>
+                                            <td class="text-center" >{% random_int 5 20 %}</td>
+                                            <td class="text-center" >{% random_int 50 20000 %}</td>
+                                            <td class="text-center" >{% random_int 3 15 %}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                    </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% elif 'reports/sales' in request.path and not 'reports/sales-report-client' in request.path %}
+<div class="row row-sm">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex flex-sm-row">
+                    <div class="col-6">
+                        <h4 class="card-title d-flex" style="float: left; margin-right:10px;">Sales Report</h4>   
+                    </div>
+                    <div class="col-6 text-end">
+                        <div class="nav-tab-wrapper text-end">
+                            <button class="btn btn-outline-primary btn-sm tab-2 nav-tab-active px-2" onclick="GetRevenueStatic(7)">1W</button>
+                            <button class="btn btn-outline-primary btn-sm tab-2 nav-tab px-2" onclick="GetRevenueStatic(30)">1M</button>
+                            <button class="btn btn-outline-primary btn-sm tab-2 nav-tab px-2" onclick="GetRevenueStatic(90)">3M</button>
+                            <button class="btn btn-outline-primary btn-sm tab-2 nav-tab px-2" onclick="GetRevenueStatic(180)">6M</button>
+                            <button class="btn btn-outline-primary btn-sm tab-2 nav-tab px-2" onclick="GetRevenueStatic(270)">9M</button>
+                            <button class="btn btn-outline-primary btn-sm tab-2 nav-tab px-2" onclick="GetRevenueStatic(365);">1Y</button>
+                            <button class="btn btn-outline-primary btn-sm tab-2 nav-tab px-2" onclick="$('#date_filter').removeClass('d-none')">custom</button>
+                        </div>
+                        <div class="my-1 d-none" id="date_filter">
+                            <div class="d-flex justify-content-end">
+                                <b class="my-auto">Date Filter : </b>
+                                <input class="daterange_picker form-control w-25" type="text" name="daterange" value="01/01/2023 - 11/06/2023" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="mx-4 mb-4">
+                    <table id="sales_report" class="table border-top-0 table-striped table-bordered text-nowrap border-bottom" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Sr. No.</th>
+                                <th class="text-center">Order ID</th>
+                                <th class="text-center">Customer</th>
+                                <th class="text-center">Total Price($)</th>
+                                <th class="text-center">Payments Status</th>
+                                <th class="text-center">Profit ($)</th>
+                                <th class="text-center">Profit Margin (%)</th>
+                                <th class="text-center">Order Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% elif 'reports/sales-report-client' in request.path %}
+<div class="row row-sm">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex flex-sm-row">
+                    <div class="col-4">
+                        <h4 class="card-title d-flex" style="float: left; margin-right:10px;">Client Sales Report</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="mx-4 mb-4">
+                    <table id="client_sales_table" class="table border-top-0 table-striped  table-bordered text-nowrap border-bottom" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th class="text-center">S. No.</th>
+                                <th class="text-center">Client</th>
+                                <th class="text-center">Total Amount $</th>    
+                                <th class="text-center">Stock Quantity Sold</th>    
+                                <th class="text-center">Number Of Invoices</th>    
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                        </tbody>
+                    </table>
+                </section>
+                <section id="tab-22" class="tab-content">
+                    <table class="table border-top-0 table-striped  table-bordered text-nowrap border-bottom" style="width:100%" id="confirmed_table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">ORDER NO.</th>
+                                <th class="text-center">Order Date</th>
+                                <th class="text-center">Vendor</th>
+                                <th class="text-center">Customer</th>
+                                <th class="text-center">Created By</th>
+                                <th class="text-center">Total Total $</th>                            
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center">ORD_6064876</td>
+                                <td class="text-center" >16 Jan 2022</td>
+                                <td class="text-center" >MJ Sales</td>
+                                <td class="text-center" >Techno Plast Ltd</td>
+                                <td class="text-center" >Roy Harry</td>
+                                <td class="text-center" >30000</td>
+                                {% comment %} <td class="text-center" >35000</td> {% endcomment %}
+                                                   <td class="text-center" ><span>
+                                            <a href="" data-id="{obj.id}" title="Logs" data-toggle="modal" data-target="#myModal">
+                                                <i class="fa fa-history text-info"></i>
+                                            </a>
+                                            <a href="" data-id="{obj.id}" title="Pdf">
+                                                <i class="fa fa-print text-danger" ></i>
+                                            </a>
+                                            <a href="#" data-id="{obj.id}" title="Detail">
+                                                <i class="fa fa-eye font-medium-3 mr-3"></i>
+                                            </a>
+                                            <a href="" title="Edit">
+                                                <i class="fa fa-edit font-medium-3 mr-3"></i>
+                                            </a>    
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">ORD_6064777</td>
+                                <td class="text-center" >25 Jan 2022</td>
+                                <td class="text-center" >wholsale ltd </td>
+                                <td class="text-center" >Inv Tech Ltd</td>
+                                <td class="text-center" >Carran Sham </td>
+                                <td class="text-center" >15000</td>
+                                <td class="text-center" ><span>
+                                            <a href="" data-id="{obj.id}" title="Logs" data-toggle="modal" data-target="#myModal">
+                                                <i class="fa fa-history text-info"></i>
+                                            </a>
+                                            <a href="" data-id="{obj.id}" title="Pdf">
+                                                <i class="fa fa-print text-danger" ></i>
+                                            </a>
+                                            <a href="#" data-id="{obj.id}" title="Detail">
+                                                <i class="fa fa-eye font-medium-3 mr-3"></i>
+                                            </a>
+                                            <a href="" title="Edit">
+                                                <i class="fa fa-edit font-medium-3 mr-3"></i>
+                                            </a>    
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">ORD_6064778</td>
+                                <td class="text-center" >21 Sep 2022</td>
+                                <td class="text-center" >Hannry ltd</td>
+                                <td class="text-center" >JkP Solution Ltd</td>
+                                <td class="text-center" >Stark Toni</td>
+                                <td class="text-center" >55000</td>
+                                
+                               <td class="text-center" ><span>
+                                            <a href="" data-id="{obj.id}" title="Logs" data-toggle="modal" data-target="#myModal">
+                                                <i class="fa fa-history text-info"></i>
+                                            </a>
+                                            <a href="" data-id="{obj.id}" title="Pdf">
+                                                <i class="fa fa-print text-danger" ></i>
+                                            </a>
+                                            <a href="#" data-id="{obj.id}" title="Detail">
+                                                <i class="fa fa-eye font-medium-3 mr-3"></i>
+                                            </a>
+                                            <a href="" title="Edit">
+                                                <i class="fa fa-edit font-medium-3 mr-3"></i>
+                                            </a>    
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">ORD_6064791</td>
+                                <td class="text-center" >16 Sep 2022</td>
+                                <td class="text-center" >Harry Sales</td>
+                                <td class="text-center" >Bolt Int Solution Ltd</td>
+                                <td class="text-center" >Smith Buttlet</td>
+                                <td class="text-center" >25000</td>
+                                
+                               <td class="text-center" ><span>
+                                            <a href="" data-id="{obj.id}" title="Logs" data-toggle="modal" data-target="#myModal">
+                                                <i class="fa fa-history text-info"></i>
+                                            </a>
+                                            <a href="" data-id="{obj.id}" title="Pdf">
+                                                <i class="fa fa-print text-danger" ></i>
+                                            </a>
+                                            <a href="#" data-id="{obj.id}" title="Detail">
+                                                <i class="fa fa-eye font-medium-3 mr-3"></i>
+                                            </a>
+                                            <a href="" title="Edit">
+                                                <i class="fa fa-edit font-medium-3 mr-3"></i>
+                                            </a>    
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">ORD_6064779</td>
+                                <td class="text-center" >22 Sep 2022</td>
+                                <td class="text-center" >Wholsale Sales</td>
+                                <td class="text-center" >Hurry Solution Ltd</td>
+                                <td class="text-center" >Joe Hatty</td>
+                                <td class="text-center" >25000</td>
+                                
+                               <td class="text-center" ><span>
+                                            <a href="" data-id="{obj.id}" title="Logs" data-toggle="modal" data-target="#myModal">
+                                                <i class="fa fa-history text-info"></i>
+                                            </a>
+                                            <a href="" data-id="{obj.id}" title="Pdf">
+                                                <i class="fa fa-print text-danger" ></i>
+                                            </a>
+                                            <a href="#" data-id="{obj.id}" title="Detail">
+                                                <i class="fa fa-eye font-medium-3 mr-3"></i>
+                                            </a>
+                                            <a href="" title="Edit">
+                                                <i class="fa fa-edit font-medium-3 mr-3"></i>
+                                            </a>    
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">ORD_6064780</td>
+                                <td class="text-center" >20 Sep 2022</td>
+                                <td class="text-center" >Techno Tech Sales</td>                           
+                                <td class="text-center" > Yok Solution Ltd</td>
+                                <td class="text-center" >Jr. Buttlet</td>
+                                <td class="text-center" >29000</td>
+                                
+                               <td class="text-center" ><span>
+                                            <a href="" data-id="{obj.id}" title="Logs" data-toggle="modal" data-target="#myModal">
+                                                <i class="fa fa-history text-info"></i>
+                                            </a>
+                                            <a href="" data-id="{obj.id}" title="Pdf">
+                                                <i class="fa fa-print text-danger" ></i>
+                                            </a>
+                                            <a href="#" data-id="{obj.id}" title="Detail">
+                                                <i class="fa fa-eye font-medium-3 mr-3"></i>
+                                            </a>
+                                            <a href="" title="Edit">
+                                                <i class="fa fa-edit font-medium-3 mr-3"></i>
+                                            </a>    
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">ORD_6064781</td>
+                                <td class="text-center" >15 Sep 2022</td>
+                                <td class="text-center" >Jack Sales</td>
+                                <td class="text-center" >Hurry Solution Ltd</td>
+                                <td class="text-center" >Jorje Buttlet</td>
+                                <td class="text-center" >25000</td>
+                                
+                               <td class="text-center" ><span>
+                                            <a href="" data-id="{obj.id}" title="Logs" data-toggle="modal" data-target="#myModal">
+                                                <i class="fa fa-history text-info"></i>
+                                            </a>
+                                            <a href="" data-id="{obj.id}" title="Pdf">
+                                                <i class="fa fa-print text-danger" ></i>
+                                            </a>
+                                            <a href="#" data-id="{obj.id}" title="Detail">
+                                                <i class="fa fa-eye font-medium-3 mr-3"></i>
+                                            </a>
+                                            <a href="" title="Edit">
+                                                <i class="fa fa-edit font-medium-3 mr-3"></i>
+                                            </a>    
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">ORD_6064782</td>
+                                <td class="text-center" >17 Sep 2022</td>
+                                <td class="text-center" >HItech Tech Sales</td>                            
+                                <td class="text-center" > Int Solution Ltd</td>
+                                <td class="text-center" >Ray Smith</td>
+                                <td class="text-center" >52000</td>
+                                
+                               <td class="text-center" ><span>
+                                            <a href="" data-id="{obj.id}" title="Logs" data-toggle="modal" data-target="#myModal">
+                                                <i class="fa fa-history text-info"></i>
+                                            </a>
+                                            <a href="" data-id="{obj.id}" title="Pdf">
+                                                <i class="fa fa-print text-danger" ></i>
+                                            </a>
+                                            <a href="#" data-id="{obj.id}" title="Detail">
+                                                <i class="fa fa-eye font-medium-3 mr-3"></i>
+                                            </a>
+                                            <a href="" title="Edit">
+                                                <i class="fa fa-edit font-medium-3 mr-3"></i>
+                                            </a>    
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">ORD_6064784</td>
+                                <td class="text-center" >22 Sep 2022</td>
+                                <td class="text-center" >Hannry Sales ltd</td>
+                                <td class="text-center" >Inter Wifi Solution Ltd</td>
+                                <td class="text-center" >Jack Buttlet</td>
+                                <td class="text-center" >65000</td>
+                                
+                               <td class="text-center" ><span>
+                                            <a href="" data-id="{obj.id}" title="Logs" data-toggle="modal" data-target="#myModal">
+                                                <i class="fa fa-history text-info"></i>
+                                            </a>
+                                            <a href="" data-id="{obj.id}" title="Pdf">
+                                                <i class="fa fa-print text-danger" ></i>
+                                            </a>
+                                            <a href="#" data-id="{obj.id}" title="Detail">
+                                                <i class="fa fa-eye font-medium-3 mr-3"></i>
+                                            </a>
+                                            <a href="" title="Edit">
+                                                <i class="fa fa-edit font-medium-3 mr-3"></i>
+                                            </a>    
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            <tr> 
+                                <td class="text-center">ORD_6064783</td>
+                                <td class="text-center" >18 Sep 2022</td>
+                                <td class="text-center" >Jack Sales</td>
+                                <td class="text-center" >K K Inc Tech Ltd</td>
+                                <td class="text-center" >Ema Smith</td>                               
+                                <td class="text-center" >40000</td>
+                                
+                               <td class="text-center" ><span>
+                                            <a href="" data-id="{obj.id}" title="Logs" data-toggle="modal" data-target="#myModal">
+                                                <i class="fa fa-history text-info"></i>
+                                            </a>
+                                            <a href="" data-id="{obj.id}" title="Pdf">
+                                                <i class="fa fa-print text-danger" ></i>
+                                            </a>
+                                            <a href="#" data-id="{obj.id}" title="Detail">
+                                                <i class="fa fa-eye font-medium-3 mr-3"></i>
+                                            </a>
+                                            <a href="" title="Edit">
+                                                <i class="fa fa-edit font-medium-3 mr-3"></i>
+                                            </a>    
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">ORD_6064787</td>
+                                <td class="text-center" >30 Sep 2022</td>
+                                <td class="text-center" >Jack Sales</td>
+                                <td class="text-center" >Hey Hello Inc ltd</td>
+                                <td class="text-center" >Rossy Mady</td>
+                                <td class="text-center" >25000</td>
+                                
+                               <td class="text-center" ><span>
+                                            <a href="" data-id="{obj.id}" title="Logs" data-toggle="modal" data-target="#myModal">
+                                                <i class="fa fa-history text-info"></i>
+                                            </a>
+                                            <a href="" data-id="{obj.id}" title="Pdf">
+                                                <i class="fa fa-print text-danger" ></i>
+                                            </a>
+                                            <a href="#" data-id="{obj.id}" title="Detail">
+                                                <i class="fa fa-eye font-medium-3 mr-3"></i>
+                                            </a>
+                                            <a href="" title="Edit">
+                                                <i class="fa fa-edit font-medium-3 mr-3"></i>
+                                            </a>    
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">ORD_6064786</td>
+                                <td class="text-center" >27 Sep 2022</td>
+                                <td class="text-center" >Go Harry Pool Sales</td>
+                                <td class="text-center" >American Technology Ltd</td>
+                                <td class="text-center" >Marry helly</td>
+                                <td class="text-center" >38000</td>
+                                
+                               <td class="text-center" ><span>
+                                            <a href="" data-id="{obj.id}" title="Logs" data-toggle="modal" data-target="#myModal">
+                                                <i class="fa fa-history text-info"></i>
+                                            </a>
+                                            <a href="" data-id="{obj.id}" title="Pdf">
+                                                <i class="fa fa-print text-danger" ></i>
+                                            </a>
+                                            <a href="#" data-id="{obj.id}" title="Detail">
+                                                <i class="fa fa-eye font-medium-3 mr-3"></i>
+                                            </a>
+                                            <a href="" title="Edit">
+                                                <i class="fa fa-edit font-medium-3 mr-3"></i>
+                                            </a>    
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">ORD_6064785</td>
+                                <td class="text-center" >23 Sep 2022</td>
+                                <td class="text-center" >Hannry Sales ltd</td>                            
+                                <td class="text-center" >S.S Tech Ltd</td>
+                                <td class="text-center" >Oley Joy</td>                                
+                                <td class="text-center" >35000</td>
+                                
+                               <td class="text-center" ><span>
+                                            <a href="" data-id="{obj.id}" title="Logs" data-toggle="modal" data-target="#myModal">
+                                                <i class="fa fa-history text-info"></i>
+                                            </a>
+                                            <a href="" data-id="{obj.id}" title="Pdf">
+                                                <i class="fa fa-print text-danger" ></i>
+                                            </a>
+                                            <a href="#" data-id="{obj.id}" title="Detail">
+                                                <i class="fa fa-eye font-medium-3 mr-3"></i>
+                                            </a>
+                                            <a href="" title="Edit">
+                                                <i class="fa fa-edit font-medium-3 mr-3"></i>
+                                            </a>    
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">ORD_6064788</td>
+                                <td class="text-center" >21 Sep 2022</td>
+                                <td class="text-center" >Harry Pool Sales</td>
+                                <td class="text-center" > HP Inc. Ltd</td>
+                                <td class="text-center" >Scout Joy</td>
+                                <td class="text-center" >35000</td>
+                                
+                               <td class="text-center" ><span>
+                                            <a href="" data-id="{obj.id}" title="Logs" data-toggle="modal" data-target="#myModal">
+                                                <i class="fa fa-history text-info"></i>
+                                            </a>
+                                            <a href="" data-id="{obj.id}" title="Pdf">
+                                                <i class="fa fa-print text-danger" ></i>
+                                            </a>
+                                            <a href="#" data-id="{obj.id}" title="Detail">
+                                                <i class="fa fa-eye font-medium-3 mr-3"></i>
+                                            </a>
+                                            <a href="" title="Edit">
+                                                <i class="fa fa-edit font-medium-3 mr-3"></i>
+                                            </a>    
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">ORD_6064789</td>
+                                <td class="text-center" >20 Sep 2022</td>
+                                <td class="text-center" >JP Solution Ltd</td>
+                                <td class="text-center" >Bolt Int  Ltd</td>
+                                <td class="text-center" >Ronaldo Fedrick</td>
+                                <td class="text-center" >45000</td>
+                                
+                               <td class="text-center" ><span>
+                                            <a href="" data-id="{obj.id}" title="Logs" data-toggle="modal" data-target="#myModal">
+                                                <i class="fa fa-history text-info"></i>
+                                            </a>
+                                            <a href="" data-id="{obj.id}" title="Pdf">
+                                                <i class="fa fa-print text-danger" ></i>
+                                            </a>
+                                            <a href="#" data-id="{obj.id}" title="Detail">
+                                                <i class="fa fa-eye font-medium-3 mr-3"></i>
+                                            </a>
+                                            <a href="" title="Edit">
+                                                <i class="fa fa-edit font-medium-3 mr-3"></i>
+                                            </a>    
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">ORD_6064790</td>
+                                <td class="text-center" >20 Oct 2022</td>
+                                <td class="text-center" >Harry Pool Sales</td>
+                                <td class="text-center" >JP Solution Ltd</td>
+                                <td class="text-center" >Tom Buttlet</td>
+                                <td class="text-center" >25000</td>
+                                
+                               <td class="text-center" ><span>
+                                            <a href="" data-id="{obj.id}" title="Logs" data-toggle="modal" data-target="#myModal">
+                                                <i class="fa fa-history text-info"></i>
+                                            </a>
+                                            <a href="" data-id="{obj.id}" title="Pdf">
+                                                <i class="fa fa-print text-danger" ></i>
+                                            </a>
+                                            <a href="#" data-id="{obj.id}" title="Detail">
+                                                <i class="fa fa-eye font-medium-3 mr-3"></i>
+                                            </a>
+                                            <a href="" title="Edit">
+                                                <i class="fa fa-edit font-medium-3 mr-3"></i>
+                                            </a>    
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% elif 'reports/country-sku-sale-report' in request.path %}
+<div class="row row-sm">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex flex-sm-row">
+                    <div class="col-6">
+                    <h4 class="card-title d-flex" style="float: left; margin-right:10px;">SKU Sales Analysis Report 
+                    </h4>
+                </div>
+                {% comment %} <div class="col-6">
+                    Date Range Filter: 
+                      <input class="daterange_picker form-control" type="text" name="daterange" value="01/01/2023 - 11/06/2023" />  
+                </div> {% endcomment %}
+
+
+                </div>
+            </div>
+            <div class="card-body">
+
+                <div class="mx-4 mb-4">
+                    <table id="top_performing_items" class="table border-top-0 table-striped  table-bordered text-nowrap border-bottom" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th class="text-center">S. No.</th>
+                                <th class="text-center">Country</th>
+                                <th class="text-center">SKU Code</th>
+                                <th class="text-center">Product Name</th>
+                                <th class="text-center">Sales</th>
+                                <th class="text-center">Value</th>
+                                <th class="text-center">Case</th>
+                                <th class="text-center">Total Stock Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for product in product_list %}
+                            <tr>
+                                <td class="text-center" >{{ forloop.counter}}</td>
+                                <td class="text-center p-2" >{%  random_country %}</td>
+                                <td class="text-center p-2" >{{product.code}}</td>
+                                <td class="text-center" >{{product.name}}</td>
+                                <td class="text-center" >{% random_int 999 9999 %}</td>
+                                <td class="text-center" >{% random_int 9999 99999 %}</td>
+                                <td class="text-center" >{% random_int 5 25 %}</td>
+                                <td class="text-center" >{% random_int 50 5000 %}</td>
+                            </tr>   
+                        {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif 'reports/purchase-report' in request.path %}
+<div class="row row-sm">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex flex-sm-row">
+                    <div class="col-6">
+                        <h4 class="card-title d-flex" style="float: left; margin-right:10px;">Purchase Report</h4>
+                    </div>
+                    <div class="col-6 text-end">
+                        <div class="nav-tab-wrapper text-end">
+                            <button class="btn btn-outline-primary btn-sm tab-2 nav-tab-active px-2" onclick="GetRevenueStatic(7)">1W</button>
+                            <button class="btn btn-outline-primary btn-sm tab-2 nav-tab px-2" onclick="GetRevenueStatic(30)">1M</button>
+                            <button class="btn btn-outline-primary btn-sm tab-2 nav-tab px-2" onclick="GetRevenueStatic(90)">3M</button>
+                            <button class="btn btn-outline-primary btn-sm tab-2 nav-tab px-2" onclick="GetRevenueStatic(180)">6M</button>
+                            <button class="btn btn-outline-primary btn-sm tab-2 nav-tab px-2" onclick="GetRevenueStatic(270)">9M</button>
+                            <button class="btn btn-outline-primary btn-sm tab-2 nav-tab px-2" onclick="GetRevenueStatic(365);">1Y</button>
+                            <button class="btn btn-outline-primary btn-sm tab-2 nav-tab px-2" onclick="$('#date_filter').removeClass('d-none')">custom</button>
+                        </div>
+                        <div class="my-1 d-none" id="date_filter">
+                            <div class="d-flex justify-content-end">
+                                <b class="my-auto">Date Filter : </b>
+                                <input class="daterange_picker form-control w-25" type="text" name="daterange" value="01/01/2023 - 11/06/2023" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="mx-4 mb-4">
+                    <table id="purchase_order_report_table" class="table border-top-0 table-striped  table-bordered text-nowrap border-bottom" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th class="text-center">S. No.</th>
+                                <th class="text-center">Product</th>
+                                <th class="text-center">Case Size</th>
+                                <th class="text-center">Order Date</th>
+                                <th class="text-center">Total Stock</th>
+                                <th class="text-center">Cost Price ($)</th>
+                                <th class="text-center">Profit (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<div class="row row-sm">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex flex-sm-row">
+                    <div class="col-12">
+                        <h4 class="card-title d-flex" style="float: left; margin-right:10px;">Item Wise Profitability % Report</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="mx-4 mb-4">
+                    <table id="top_performing_items" class="table border-top-0 table-striped  table-bordered text-nowrap border-bottom" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th class="text-center">S. No.</th>
+                                <th class="text-center">Product Code</th>
+                                <th class="text-center">Product Name</th>
+                                <th class="text-center">Case Size</th>
+                                <th class="text-center">Cost Price ($)</th>
+                                <th class="text-center">Saling Price ($)</th>
+                                <th class="text-center">Profit (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in product_list %}
+                                <tr>
+                                    <td class="text-center" >{{ forloop.counter}}</td>
+                                    <td class="text-center p-2" >{{product.code}}</td>
+                                    <td class="text-center p-2" >{{product.name}}</td>
+                                    <td class="text-center" >Weight:{{ forloop.counter|add:"35"}} / Volume:{{ forloop.counter|add:"124"}} </td>
+                                    <td class="text-center" >{{ forloop.counter|add:"245"}}</td>
+                                    <td class="text-center" >{{ forloop.counter|add:"384"}}</td>
+                                    <td class="text-center" >{% if forloop.counter <= 10%}{{ 49|subtract:forloop.counter }} % {% else %} 10 % {% endif %}
+                                    </td>
+                                </tr>   
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+
+{% endblock %}
+
+
+{% comment %} {% block filters %}
+<div class="event">
+    <div class="row rounded py-2 mb-2 mx-n2">
+    
+        <div class="col-12 col-sm-12 col-lg-12">
+            <div>
+                Columns
+            </div>
+            <fieldset>
+                <legend>Choose columns to show:</legend>
+
+                <div class="hide-column">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="column-0" data-column="0" checked/>
+                        <label class="form-check-label" for="column-0">Sr. No.</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="column-1" data-column="1" checked/>
+                        <label class="form-check-label" for="column-1">Warehouse</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="column-2" data-column="2" checked/>
+                        <label class="form-check-label" for="column-2">Product Code</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="column-3" data-column="3" checked/>
+                        <label class="form-check-label" for="column-3">Product Name</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="column-4" data-column="4" checked/>
+                        <label class="form-check-label" for="column-4">Stock Sitting</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="column-5" data-column="5" checked />
+                        <label class="form-check-label" for="column-5">Total Stock Quantity</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="column-6" data-column="6" checked/>
+                        <label class="form-check-label" for="column-6">Lock Quantity</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="column-7" data-column="7" checked/>
+                        <label class="form-check-label" for="column-7">Saleable Quantity</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="column-8" data-column="8" checked/>
+                        <label class="form-check-label" for="column-8">Previous Cost Price</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="column-9" data-column="9" checked/>
+                        <label class="form-check-label" for="column-9">Current Cost Price</label>
+                    </div>
+                </div>
+              </fieldset>
+        </div>
+
+    </div>
+</div>
+
+{% endblock filters %} {% endcomment %}
+
+
+{% block script %}
+
+<!-- date range picker cdn-->
+
+<script src="{% static 'assets/webapp/tabbing.js' %}"></script>
+<script src="{% static 'assets/js/daterangepicker.min.js' %}"></script>
+{% comment %} <script src="{%  static 'assets/js/sidebar_open.js' %}"></script> {% endcomment %}
+<script src="{% static 'assets/webapp/initailize_datatables.js' %}"></script>
+
+<script>
+    {% if 'reports/client' in request.path %}
+        var table = "#client_report_table";
+        var url = "{% url 'report:client_report_ajax' %}";
+        var columns = [
+            // data: json key from prepare_results, name: model field name
+            { data: 'id', name: 'id' },
+            { data: 'name', name: 'name' },
+            { data: 'type', name: 'type' },
+            { data: 'email', name: 'email' },
+            { data: 'total_orders', name: 'total_orders' },
+            { data: 'total_orders_amount', name: 'total_orders_amount' },
+            { data: 'profit', name: 'profit' },
+            { data: 'margin', name: 'margin' },
+            { data: 'last_order_date', name: 'last_order_date' },
+            { data: 'payment_around_time', name: 'payment_around_time' },
+        ]
+    {% elif 'reports/sales-report-client' in request.path %}
+        var table = "#client_sales_table";
+        var url = "{% url 'report:client_sales_report_ajax' %}";
+        var columns = [
+            // data: json key from prepare_results, name: model field name
+            { data: 'id', name: 'id' },
+            { data: 'customer', name: 'customer' },
+            { data: 'total_amount', name: 'total_amount' },
+            { data: 'sold_stock', name: 'sold_stock' },
+            { data: 'no_of_invoices', name: 'no_of_invoices' },
+        ]
+    {% elif 'reports/sales' in request.path and not 'reports/sales-report-client' in request.path %}
+        var table = "#sales_report";
+        var url = "{% url 'report:sales_report_ajax' %}";
+        var columns = [
+            // data: json key from prepare_results, name: model field name
+            { data: 'id', name: 'id' },
+            { data: 'order_id', name: 'order_id' },
+            { data: 'customer', name: 'customer' },
+            { data: 'total_price', name: 'total_price' },
+            { data: 'payment_status', name: 'payment_status' },
+            { data: 'profit', name: 'profit' },
+            { data: 'margin', name: 'margin' },
+            { data: 'status', name: 'status' },
+        ]
+    {% elif 'reports/purchase-report' in request.path %}
+        var table = "#purchase_order_report_table";
+        var url = "{% url 'report:purchase_order_report_ajax' %}";
+        var columns = [
+            // data: json key from prepare_results, name: model field name
+            { data: 'id', name: 'id' },
+            { data: 'product', name: 'order_id' },
+            { data: 'case_size', name: 'total_price' },
+            { data: 'order_date', name: 'order_date' },
+            { data: 'stock', name: 'customer' },
+            { data: 'cost_price', name: 'payment_status' },
+            { data: 'profit', name: 'profit' },
+        ]
+    {% endif %}
+    
+</script>
+<script src="{%  static 'assets/js/reports.js' %}"></script>
+<script>
+    $('.daterange_picker').daterangepicker();
+</script>
+
+
+<script>
+    var table;
+    var hidden_columns = [];
+    let data = localStorage.getItem("hidden_columns");
+    
+    if (data){
+        hidden_columns = JSON.parse(data);
+    }
+
+    $(document).ready(function(){
+        table = $('#top_performing_items').DataTable( {
+            scrollX: true,
+            dom: 'Bfrtip',
+            buttons: [
+                { extend: 'excel', text: 'Download',className: 'btn btn-danger', },
+            ]
+        });
+        $('#Item_wise_profitability_table, #client-top_performing_items').DataTable( {
+            scrollX: true,
+            dom: 'Bfrtip',
+            buttons: [
+                { extend: 'excel', text: 'Download',className: 'btn btn-danger', },
+            ]
+        });
+        hidden_columns.forEach((col) => {
+            table.columns(col).visible(false);
+            document.getElementById("column-"+col).checked = false;
+        })
+    })
+
+    document.querySelectorAll('input.form-check-input').forEach((el) => {
+        el.addEventListener('click', function (e) {
+            let columnIdx = e.target.getAttribute('data-column');
+            let column = table.column(columnIdx);
+            column.visible(!column.visible());
+
+            if(e.target.checked){
+                if(hidden_columns.indexOf(columnIdx) != -1){
+                    // Remove column from array
+                    const index = hidden_columns.indexOf(columnIdx);
+                    hidden_columns.splice(index, 1);
+                }
+            }
+            else{
+                if(hidden_columns.indexOf(columnIdx) == -1){
+                    hidden_columns.push(columnIdx);
+                }
+            }
+            localStorage.setItem("hidden_columns", JSON.stringify(hidden_columns));
+        });
+    });
+
+    function GetRevenueStatic(days){
+        $('#date_filter').addClass('d-none')
+    }
+    
+</script>
+
+{% endblock script %}
+    

@@ -1,0 +1,64 @@
+{% load static %}
+
+<div class="row">
+    <div class="col-3 my-auto">
+        <img src="{% if img_url.image %} {{img_url.image.url}} {% else %} {% static 'images/product-image.png' %} {% endif %}"  alt="avatar" height="{{height}}" class="border-rounded">
+    </div>
+
+    {% if in_quotation %}
+    <div class="col-3">
+        <div class="row my-3">
+            <div class="text-start">
+                <b>Product Name : </b>{{ obj.product.name }}
+            </div>
+            <div class="text-start">
+                <b>Customer Price : </b>$ {{ obj.customer_price }} (per piece)
+            </div>
+            <div class="text-start">
+                <b>Case Size : </b>{{ obj.case_pack }}
+            </div>
+            <div class="text-start">
+                <b>Case Quantity : </b>{{ obj.quantity }}
+            </div>
+            <div class="text-start">
+                <b>Total Pieces : </b>{{ total_pieces }}
+            </div>
+        </div>
+    </div>
+  
+    {% else %}
+    <div class="col-3">
+        <div class="row my-3">
+            <div class="text-start">
+                <b>Product Name : </b>{{ obj.product.name }}
+            </div>
+            <div class="text-start">
+                <b>Customer Price : </b>$ {{ obj.customer_price }} (per piece)
+            </div>
+            <div class="text-start">
+                <b>Case Size : </b>{{ obj.case_pack }}
+            </div>
+            <div class="text-start">
+                <b>Case Quantity : </b>{{ obj.quantity }}
+            </div>
+            <div class="text-start">
+                <b>Total Quantity : </b>{{ obj.total_pieces }}
+            </div>
+            <div class="text-start mt-2">
+                <b>Job Work Details :</b>
+            </div>
+            <div class="text-start">
+                <b>Total Approved Quantity : </b><span class="text-primary">{{ obj.get_approve_job_work_quantity }}</span>
+            </div>
+            <div class="text-start">
+                <b>Total Packed Quantity : </b><span class="text-success">{{ obj.get_packed_job_work_quantity }}</span>
+            </div>
+            {% if obj.order.status == obj.order.LOADING %}
+            <div class="text-start">
+                <b>Total Loaded Quantity : </b><span class="text-info">{{ obj.total_loaded_quantity }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>

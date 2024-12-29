@@ -1,0 +1,28 @@
+#how to migrate
+# flask db init
+# flask db migrate -m "migration message"
+# flask db upgrade
+
+
+#to remove all migrations
+# rm -rf migrations
+# flask db upgrade
+
+
+#to run celery
+./start_celery.sh
+
+
+
+#rename table without losing data use this command
+"""
+alembic revision -m "Rename old_users to users"
+
+def upgrade():
+    op.rename_table('old_users', 'users')
+
+def downgrade():
+    op.rename_table('users', 'old_users')
+
+alembic upgrade head
+"""

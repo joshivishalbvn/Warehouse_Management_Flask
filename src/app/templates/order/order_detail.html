@@ -1,0 +1,920 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags static %}
+
+
+{% block css %}
+    <style>
+        td {
+            vertical-align: middle
+        }
+    </style>
+{% endblock css %}
+    
+
+{% block content %}
+<div class="card match-height py-4">
+    <div class="card-header">
+        <div class="row p-10 text-center nav-tab-wrapper tab-list" style="cursor: pointer">
+            <div data-id="#tab-1-content-1" class="col-6 active-div tab-1" style="padding:20px ">Order Details</div>
+            <div data-id="#tab-1-content-2" class="col-6 inactive-div tab-1" style="padding:20px">Job Work</div>
+        </div>
+    </div>
+    <div id="tab-1-content-1" class="tab-1-content">
+        <div class="row row-sm">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="row card-body">
+                        <div class="col-md-3 row">
+                            <div class="col-md-6 row">
+                                <div class="col-md-12">
+                                    <b>Order ID:</b>
+                                </div>
+                                <div class="col-md-12 mt-3">
+                                    <b>Total Products :</b>
+                                </div>
+                            </div>
+                            <div class="col-md-6 row">
+                                <div class="col-md-12">
+                                    {{order.order_id}}
+                                </div>
+                                <div class="col-md-12 mt-3">
+                                    {{ total_products }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 row">
+                            <div class="col-md-6 row">
+                                <div class="col-md-12">
+                                    <b> Order Date : </b>
+                                </div>
+                                <div class="col-md-12 mt-3">
+                                    <b>Payment Method :</b>
+                                </div>
+                            </div>
+                            <div class="col-md-6 row">
+                                <div class="col-md-12">
+                                    {{ order.created_at.date }}
+                                </div>
+                                <div class="col-md-12 mt-3">
+                                    {{order.payment_method}}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 row">
+                            <div class="col-md-6 row">
+                                <div class="col-md-12">
+                                    <b>Customer :</b>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <b>Reference No.: </b>
+                                </div>
+                            </div>
+                            <div class="col-md-6 row">
+                                <div class="col-md-12">
+                                    {{order.customer.user.first_name|capfirst}} {{order.customer.user.last_name|capfirst}}
+                                </div>
+                                <div class="col-md-12 mt-2"> - </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 row">
+                            <div class="col-md-6 row">
+                                {% if request.user.is_superuser or requser.user.role == "Super Admin" %}
+                                <div class="col-md-12">
+                                    <b>Company :</b>
+                                </div>
+                                {% endif %}
+                                <div class="col-md-12">
+                                    <b>Status :</b>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    {% if request.user.is_superuser or requser.user.role == "Super Admin" %}
+                                    <div class="col-md-12">
+                                        {{order.company}}
+                                    </div>
+                                    {% endif %}
+                                    <div class="col-md-12 my-auto">
+                                        {{order.status|upper}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row row-sm">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex flex-sm-row flex-column justify-content-between">
+                            <h4 class="card-title align-self-center">Products</h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table border-top-0  table-striped table-bordered border-bottom"
+                                id="order_products_table">
+                                <thead>
+                                    <tr>
+                                        <th>Sr No.</th>
+                                        <th>Product</th>
+                                        <th>Case Quantity</th>
+                                        <th style="width: 250px;">Case Pack</th>
+                                        <th>Total Quantity</th>
+                                        
+                                        {% if order.status == order.ACCEPTED or order.status == order.LOADING %}
+                                        <th>Missing Quantity</th>
+                                        {% endif %}
+
+                                        {% if order.status == order.LOADING %}
+                                        <th>Loaded Quantity</th>
+                                        {% endif %}
+                                            
+                                        <th>Unit Price ($)</th>
+                                        <th>Item Total ($)</th>
+                                        <th>Discount (%)</th>
+                                        <th>Net Price ($) {{is_quotation}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if  request.user.role == "Warehouse Manager" %} 
+                                        {% for item in order_product_object %}
+                                            <tr>
+                                                <td>{{forloop.counter}}</td>
+                                                <td>{{ item.product.name }} (<a href="{% url 'products:product_details' item.product.id %}">{{ item.product.code }}</a>)</td>
+                                                <td><input class="form-control change_case_qty" data-id="{{item.id}}" min=0  type="number" id="quantity-{{item.id}}"
+                                                        name="quantity" value="{{ item.quantity }}" disabled></td>
+                                                <!-- <td><input class="form-control" min=0 type="number" id="total-pieces-{{item.id}}"
+                                                        name="total_pieces" value="{{ item.case_pack.cubic_meter_volume }}">
+                                                </td> -->
+                                                <td>
+                                                    <div class="dropdown">
+                                                        <select name="cases" aria-haspopup="true" class="form-control change_qty" data-id="{{item.id}}" id="case-{{item.id}}"  data-cart-id={{item.id}} disabled>
+                                                            <div class="dropdown-menu tx-13">
+                                                            {% for case in item.product.get_product_cases %}
+                                                                <option value="{{case.id}}" data-qty="{{ case.quantity }}" {% if item.case_pack.id == case.id %} selected {% endif %}>{{ case }}</option>
+                                                            {% endfor %}
+                                                            </div>
+                                                        </select>
+                                                    </div>
+                                                </td>
+
+                                                <td><input class="form-control" min=0 type="number" id="total-quantity-{{ item.id }}"
+                                                    name="total_quantity" value="{{ item.total_pieces }}" disabled="true"></td>
+                                                
+                                                {% if order.status == order.ACCEPTED or order.status == order.LOADING %}
+                                                <td>
+                                                    <input class="form-control {% if item.missing_quantity > 0 %} text-danger {% endif %}" min=0 type="number" id="missing-quantity-{{item.id}}"
+                                                    name="missing_quantity" value="{{ item.missing_quantity }}" disabled="true">
+                                                </td>
+                                                {% endif %}
+
+                                                {% if order.status == order.LOADING %}
+                                                    <td>
+                                                        <input class="form-control {% if item.total_loaded_quantity > 0 %} text-success {% endif %}" min=0 type="number" id="loaded-quantity-{{item.id}}"
+                                                        name="loaded_quantity" value="{{ item.total_loaded_quantity }}" disabled="true">
+                                                    </td>
+                                                {% endif %}
+
+                                                <td><input class="form-control" min=0 type="number" id="unit-price-{{item.id}}"
+                                                        name="unit_price" value="{{ item.customer_price }}" disabled></td>
+
+                                                <td><input class="form-control" min=0 type="number" id="item-total-{{item.id}}"
+                                                        name="item_total" value="{{ item.item_total }}" disabled></td>
+
+                                                <td><input class="form-control" min=0 type="number" id="discount-{{item.id}}"
+                                                        name="discount" value="{{ item.discount }}" disabled></td>
+
+                                                <td><input class="form-control" id="net-price-{{item.id}}" disabled value="{{ item.net_price }}"></td>
+
+                                            </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        {% if not show_qutation %}
+                                            {% for item in order_product_object %}
+                                                <tr>
+                                                    <td>{{forloop.counter}}</td>
+                                                    <td>{{ item.product.name }} (<a href="{% url 'products:product_details' item.product.id %}">{{ item.product.code }}</a>)</td>
+                                                    <td><input class="form-control change_case_qty" data-id="{{item.id}}" min=0  type="number" id="quantity-{{item.id}}"
+                                                            name="quantity" value="{{ item.quantity }}" onchange="adjustOrderTotal({{item.id}})"></td>
+                                                    <!-- <td><input class="form-control" min=0 type="number" id="total-pieces-{{item.id}}"
+                                                            name="total_pieces" value="{{ item.case_pack.cubic_meter_volume }}">
+                                                    </td> -->
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <select name="cases" aria-haspopup="true" class="form-control change_qty" data-id="{{item.id}}" id="case-{{item.id}}"  data-cart-id={{item.id}} onchange="adjustOrderTotal({{item.id}})">
+                                                                <div class="dropdown-menu tx-13">
+                                                                {% for case in item.product.get_product_cases %}
+                                                                    <option value="{{case.id}}" data-qty="{{ case.quantity }}" {% if item.case_pack.id == case.id %} selected {% endif %}>{{ case }}</option>
+                                                                {% endfor %}
+                                                                </div>
+                                                            </select>
+                                                        </div>
+                                                    </td>
+
+                                                    <td><input class="form-control" min=0 type="number" id="total-quantity-{{ item.id }}"
+                                                        name="total_quantity" value="{{ item.total_pieces }}" disabled="true"></td>
+                                                    
+                                                    {% if order.status == order.ACCEPTED or order.status == order.LOADING %}
+                                                    <td>
+                                                        <input class="form-control {% if item.missing_quantity > 0 %} text-danger {% endif %}" min=0 type="number" id="missing-quantity-{{item.id}}"
+                                                        name="missing_quantity" value="{{ item.missing_quantity }}" disabled="true">
+                                                    </td>
+                                                    {% endif %}
+
+                                                    {% if order.status == order.LOADING %}
+                                                    <td>
+                                                        <input class="form-control {% if item.total_loaded_quantity > 0 %} text-success {% endif %}" min=0 type="number" id="loaded-quantity-{{item.id}}"
+                                                        name="loaded_quantity" value="{{ item.total_loaded_quantity }}" disabled="true">
+                                                    </td>
+                                                    {% endif %}
+
+                                                    <td><input class="form-control" min=0 type="number" id="unit-price-{{item.id}}"
+                                                            name="unit_price" value="{{ item.customer_price }}" onchange="adjustOrderTotal({{item.id}})"></td>
+
+                                                    <td><input class="form-control" min=0 type="number" id="item-total-{{item.id}}"
+                                                            name="item_total" value="{{ item.item_total }}" disabled></td>
+
+                                                    <td><input class="form-control" min=0 type="number" id="discount-{{item.id}}"
+                                                            name="discount" value="{{ item.discount }}" onchange="adjustOrderTotal({{item.id}})"></td>
+                                                    <td><input class="form-control" id="net-price-{{item.id}}" disabled value="{{ item.net_price }}"></td>
+
+                                                </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                            {% for item in quotation_product_obj %}
+                                                <tr>
+                                                    <td>{{forloop.counter}}</td>
+                                                    <td>{{ item.product.name }} (<a href="{% url 'products:product_details' item.product.id %}">{{ item.product.code }}</a>)</td>
+                                                    <td><input class="form-control" min=0  type="number" id="quantity-{{item.id}}"
+                                                            name="quantity" value="{{ item.quantity }}" onchange="adjustQuotationTotal({{item.id}})"></td>
+                                                    <!-- <td><input class="form-control" min=0 type="number" id="total-pieces-{{item.id}}"
+                                                            name="total_pieces" value="{{ item.case_pack.cubic_meter_volume }}">
+                                                    </td> -->
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <select name="cases" aria-haspopup="true" class="form-control" id="case-{{item.id}}"  data-cart-id={{item.id}} onchange="adjustQuotationTotal({{item.id}})">
+                                                                <div class="dropdown-menu tx-13">
+                                                                {% for case in item.product.get_product_cases %}
+                                                                <option value="{{case.id}}" data-qty="{{ case.quantity }}" {% if item.case_pack.id == case.id %} selected {% endif %}>{{ case }}</option>
+                                                                {%  endfor %}
+                                                            </div>
+                                                            </select>
+                                                        </div>
+                                                    </td>
+
+                                                    <td><input class="form-control" min=0 type="number" id="total-quantity-{{ item.id }}"
+                                                        name="total_quantity" value="{{ item.total_pieces }}" disabled="true"></td>
+                                                    
+
+                                                    {% if order.status == order.ACCEPTED or order.status == order.LOADING %}
+                                                    <td><input class="form-control {% if item.missing_quantity > 0 %} text-danger {% endif %}" min=0 type="number" id="missing-quantity-{{item.id}}"
+                                                            name="missing_quantity" value="{{ item.missing_quantity }}"  disabled="true"></td>
+                                                    {% endif %}
+
+                                                    <td><input class="form-control" min=0 type="number" id="unit-price-{{item.id}}"
+                                                            name="unit_price" value="{{ item.customer_price }}" onchange="adjustQuotationTotal({{item.id}})"></td>
+
+                                                    <td><input class="form-control" min=0 type="number" id="item-total-{{item.id}}"
+                                                            name="item_total" value="{{ item.item_total }}" disabled></td>
+
+                                                    <td><input class="form-control" min=0 type="number" id="discount-{{item.id}}"
+                                                            name="discount" value="{{ item.discount }}" onchange="adjustQuotationTotal({{item.id}})"></td>
+                                                    <td><input class="form-control" id="net-price-{{item.id}}" disabled value="{{ item.net_price }}"></td>
+
+                                                </tr>
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row row-sm price_detail_div">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex flex-sm-row flex-column justify-content-between">
+                            <h4 class="card-title align-self-center">Pricing Details</h4>
+                        </div>
+                    </div>
+                    {% if  request.user.role == "Warehouse Manager" %} 
+                    <div class="row card-body">
+                        <div class="col-md-12 row">
+                            <div class="col-md-4 form-group d-flex">
+                                <label class="mt-2">Item Total ($) :</label>
+                                <div class="col-6">
+                                <input class="form-control" min=0 type="number" id="order_item-total" name="order_item_total" value="{{ item_total }}" disabled>
+                                </div>
+                            </div>
+                           
+                            <div class="col-md-4 form-group d-flex">
+                                <label class="mt-2">Shipping Charges ($) :</label>
+                                <div class="col-6">
+                                <input class="form-control" min=0 type="number" id="shipping-charges-{{order.id}}" name="shipping_charge" value="{{ shipping_charge }}" disabled>
+                                </div>
+                            </div>
+
+                           
+                            <div class="col-md-4 form-group d-flex">
+                                <label class="mt-2">Packing Charges ($) :</label>
+                                <div class="col-6">
+                                <input class="form-control" min=0 type="number" id="packing-charges-{{order.id}}" name="packing_charge" value="{{ packing_charge }}"disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 row mt-2">
+                            <div class="col-md-4 form-group d-flex">
+                            <label class="mt-2">Discount (%) :</label>
+                            <div class="col-6">
+                                <input class="form-control" min=0 type="number" id="order-discount-{{order.id}}" name="over-all-discount" value="{{ discount }}" disabled>
+                            </div>
+                            </div>
+
+                            <div class="col-md-4 form-group d-flex">
+                                <label class="mt-2">Grand Total ($) :</label>
+                                <div class="col-6">
+                                <input class="form-control" min=0 type="number" id="order_grand_total" name="order_item_total" value="{{grand_total}}" disabled>
+                                </div>
+                            </div>
+
+                           
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="row card-body">
+                        <div class="col-md-12 row">
+                            <div class="col-md-4 form-group d-flex">
+                                <label class="mt-2">Item Total ($) :</label>
+                                <div class="col-6">
+                                <input class="form-control" min=0 type="number" id="order_item-total" name="order_item_total" value="{{ item_total }}" disabled>
+                                </div>
+                            </div>
+                           
+                            <div class="col-md-4 form-group d-flex">
+                                <label class="mt-2">Shipping Charges ($) :</label>
+                                <div class="col-6">
+                                <input class="form-control" min=0 type="number" id="shipping-charges-{{order.id}}" name="shipping_charge" value="{{ shipping_charge }}" onchange="adjustOrderFinal({{order.id}})">
+                                </div>
+                            </div>
+
+                           
+                            <div class="col-md-4 form-group d-flex">
+                                <label class="mt-2">Packing Charges ($) :</label>
+                                <div class="col-6">
+                                <input class="form-control" min=0 type="number" id="packing-charges-{{order.id}}" name="packing_charge" value="{{ packing_charge }}" onchange="adjustOrderFinal({{order.id}})">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 row mt-2">
+                            <div class="col-md-4 form-group d-flex">
+                            <label class="mt-2">Discount (%) :</label>
+                            <div class="col-6">
+                                <input class="form-control" min=0 type="number" id="order-discount-{{order.id}}" name="over-all-discount" value="{{ discount }}" onchange="adjustOrderFinal({{order.id}})">
+                            </div>
+                            </div>
+
+                            <div class="col-md-4 form-group d-flex">
+                                <label class="mt-2">Grand Total ($) :</label>
+                                <div class="col-6">
+                                <input class="form-control" min=0 type="number" id="order_grand_total" name="order_item_total" value="{{grand_total}}" disabled>
+                                </div>
+                            </div>
+                           
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="tab-1-content-2" class="hidden tab-1-content">
+        <div class="row row-sm">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="card-body table-responsive">
+                            <table class="table border-top-0 table-striped table-bordered text-nowrap border-bottom w-100"
+                                id="manage_job_work_table">
+                                <thead>
+                                    <tr>
+                                        <th>Sr. No.</th>
+                                        <th>Product</th>
+                                        <th>Job Work</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between px-3">
+        <div>
+            <button class="btn btn-dark" onclick="javascript:history.go(-1);"><span class="bi bi-arrow-return-left"></span> Back</button>
+        </div>
+        {% if order.status == order.SUBMITTED %}
+        <div>
+            {% if show_qutation and status == "Pending" and is_quotation_sent == False %}
+                <button class="btn btn-primary" id="send_quatation" onclick="SendQuotation({{quotation_order_id}})">Send Quotation</button>
+            {% else %}
+                <button class="btn btn-primary" hidden id="send_quatation">Send Quotation</button>
+            {% endif %}
+            {% if not show_qutation %}
+            <button class="btn btn-primary" id="approve_id" onclick="ApproveOrder({{order.id}})">Approve</button>
+            {% endif %}
+            <button type="button" class="btn btn-danger" id="cancel_order" data-order-id="{{order.id}}">Cancel Order</button>
+        </div>
+        {% elif order.status == order.ACCEPTED %}
+        <div>
+            <button class="btn btn-success" data-order_id="{{ order.id|safe }}" id="id_load_order">Load Order</button>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="modal" id="JobWorkApproveModal">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Approve Job Work</h4>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body" id="jobwork_approve_body">
+                {% include 'order/job_work_approve.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="JobworkHistoryModal">
+	<div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+		<div class="modal-content tx-size-sm">
+			<div class="modal-header">
+				<h4 class="modal-title">Job Work History</h4>
+				<button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
+			</div>
+			<div class="modal-body" id="jobwork_modal_body">
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal" id="JobworkDetailModal">
+	<div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+		<div class="modal-content tx-size-sm">
+			<div class="modal-header">
+				<h4 class="modal-title">Job Work Details</h4>
+				<button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
+			</div>
+			<div class="modal-body" id="detail_jobwork_modal_body">
+			</div>
+            <div class="modal-footer text-end">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block large_form %}
+    {% include 'order/add_job_work.html' %}
+{% endblock large_form %}
+
+{% block form %}
+    {% include 'order/update_job_work.html' %}
+{% endblock form %}
+
+
+{% block script %}
+<script src="{% static 'assets/webapp/tabbing.js' %}"></script>
+
+<script>
+    $(document).on('click', '#cancel_order', function (e) {
+        var order_id = $(this).attr("data-order-id")
+
+        Swal.fire({
+            html: `Are you sure you want to cancel order : <b>{{order.order_id}}</b> ?`,
+            icon: 'question',
+            showCloseButton: true,
+            showCancelButton: true,
+            confirmButtonColor: "#7442DB",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: "get",
+                    url: '{% url "order:cancel_order" %}',
+                    data: {
+                        "id": order_id,
+                    },
+                    success: function (data) {
+                        $.toast({
+                            text: "Order Cancelled Sucessfully...",
+                            position: 'bottom-right',
+                            stack: false,
+                            icon: 'success',
+                        })
+                        window.location.href = '{% url "order:order_list" %}'
+                    }
+                });
+            }
+        })
+    })
+</script>
+<script>
+
+function ajax_call_setup() {
+    csrf_token = $("input[name=csrfmiddlewaretoken]").val();
+    $.ajaxSetup({
+        headers: { "X-CSRFToken": csrf_token }
+    });
+
+}
+
+function adjustOrderTotal(order_id) {
+    var order_product_id = order_id;
+    console.log({ order_product_id })
+    var qty = parseInt($("#quantity-"+order_id).val())
+    var case_size_id = $("#case-"+order_id).val()
+    console.log({ case_size_id })
+    var unit_price = $("#unit-price-"+order_id).val()
+    console.log({ unit_price })
+    var discount = $("#discount-"+order_id).val()
+    console.log({ discount })
+    ajax_call_setup()
+    $.ajax({
+        url: '{% url "order:update_order_product_ajax" %}',
+        type: "POST",
+        dataType: "json",
+        data: {
+            'id': order_product_id,
+            'qty': qty,
+            'case_size_id': case_size_id,
+            'discount': discount,
+            'unit_price': unit_price,
+        },
+        success: function (data) {
+            $("#send_quatation").removeAttr("hidden");
+            $("#send_quatation").attr("onclick", "SendQuotation("+data.quotation_order_id+")");
+
+            $("#approve_id").hide();
+            $("#order_grand_total").val(data.grand_total)
+            $("#net-price-"+order_id).val(data.net_price)
+            $("#item-total-"+order_id).val(data.item_total)
+            $("#total-quantity-"+order_id).val(data.total_pieces)
+            $("#missing-quantity-"+order_id).val(data.missing_qty)
+            $("#quantity-"+order_id).val(data.case_qty)
+            $("#order_item-total").val(data.order_item_total)
+
+            if(data.missing_qty > 0){
+                $("#missing-quantity-"+order_id).addClass("text-danger");
+            }
+            else{
+                $("#missing-quantity-"+order_id).removeClass("text-danger");
+            }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.log(thrownError);
+        }
+    });
+}
+
+function adjustQuotationTotal(order_id) {
+    var quotation_product_id = order_id;
+    console.log({ quotation_product_id })
+    var qty = $("#quantity-"+order_id).val()
+    console.log({ qty })
+    var case_size_id = $("#case-"+order_id).val()
+    console.log({ case_size_id })
+    var unit_price = $("#unit-price-"+order_id).val()
+    console.log({ unit_price })
+    var discount = $("#discount-"+order_id).val()
+    console.log({ discount })
+    ajax_call_setup()
+    $.ajax({
+        url: '{% url "order:update_quotation_order_product_ajax" %}',
+        type: "POST",
+        dataType: "json",
+        data: {
+            'id': quotation_product_id,
+            'qty': qty,
+            'case_size_id': case_size_id,
+            'discount': discount,
+            'unit_price': unit_price,
+        },
+        success: function (data) {
+        	console.log({ data })
+            
+            {% if is_quotation_sent == False %}
+            $("#send_quatation").removeAttr("hidden");
+            {% endif %}
+            $("#order_grand_total").val(data.grand_total)
+            $("#net-price-"+order_id).val(data.net_price)
+            $("#item-total-"+order_id).val(data.item_total)
+            $("#total-quantity-"+order_id).val(data.total_pieces)
+            $("#order_item-total").val(data.order_item_total)
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.log(thrownError);
+        }
+    });
+}
+
+function adjustOrderFinal(order_id) {
+    var order_product_id = order_id;
+    var shipping_charges = $("#shipping-charges-"+order_id).val()
+    var packing_charges = $("#packing-charges-"+order_id).val()
+    var overall_discount = $("#order-discount-"+order_id).val()
+    var discount = $("#discount-"+order_id).val()
+    ajax_call_setup()
+    $.ajax({
+        url: '{% url "order:update_order_ajax" %}',
+        type: "POST",
+        dataType: "json",
+        data: {
+            'id': order_product_id,
+            'shipping_charges': shipping_charges,
+            'packing_charges': packing_charges,
+            'overall_discount': overall_discount,
+        },
+        success: function (data) {
+            $("#order_grand_total").val(data.grand_total)
+           
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.log(thrownError);
+        }
+    });
+}
+
+function ApproveOrder(order_id) {
+   
+    var url = '{% url "order:update_order_status_ajax" %}'
+    var redirect_url = '{% url "order:order_list" %}';
+
+    Swal.fire({
+        html: `Are you sure you want to accept this order ?`,
+        icon: 'question',
+        showCloseButton: true,
+        showCancelButton: true,
+        confirmButtonColor: "#7442DB",
+    }).then((result) => {
+
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    'order_id': order_id,
+                    "csrfmiddlewaretoken": '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data["message"]) {
+                        $.toast({
+                            text: data.message,
+                            position: 'bottom-right',
+                            stack: false,
+                            icon: 'success',
+                        })
+                        if(data.level == "success"){
+                            setTimeout(function() {
+                                window.location.href = redirect_url;
+                            }, 3000);
+                        }
+                    }
+                }
+            });
+        }
+    })
+}
+
+function SendQuotation(order_id) {
+    
+    var quotation_order_id = order_id;
+    var url = '{% url "order:update_quotation_order_status_ajax" %}'
+    var redirect_url = '{% url "order:order_list" %}';
+
+    Swal.fire({
+        html: `Are you sure you want to send quotation for this order ?`,
+        icon: 'question',
+        showCloseButton: true,
+        showCancelButton: true,
+        confirmButtonColor: "#7442DB",
+    }).then((result) => {
+
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    'quotation_order_id': quotation_order_id,
+                    "csrfmiddlewaretoken": '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data["message"]) {
+                        $.toast({
+                            text: data.message,
+                            position: 'bottom-right',
+                            stack: false,
+                            icon: 'success',
+                        })
+                        if(data.level == "success"){
+                            setTimeout(function() {
+                                window.location.href = redirect_url;
+                            }, 3000);
+                        }
+                    }
+                }
+            });
+        }
+    })
+}
+
+</script>
+<script src="{% static 'assets/webapp/initailize_datatables.js' %}"></script>
+<script>
+    var table_id = '#manage_job_work_table';
+    var to_center = "_all";
+    var scrollX = false;
+    var invisible_columns = [];
+    var order_false = [-1, -2];
+    var url = '{% url "order:order_product_jobwork_list_ajax" %}';
+    var role = false;
+    var filter_id = $("#filter_customer{% if request.user.is_superuser or requser.user.role == "Super Admin"  %}, #filter_company{% endif %}");
+    var columns = [
+        { data: 'id', name: 'id' },
+        { data: 'product', name: 'product' },
+        { data: 'job_work', name: 'job_work' },
+    ]
+
+    function set_filters() {
+        var data = {}
+        data["company"] = $("#id_company").val();
+        data["status"] = $("#id_status").val();
+        data["order_id"] = "{{ order.id|safe }}";
+        return data;
+    }
+
+    initailize_datatables()
+</script>
+
+<script src="{% static 'assets/js/htmx_1.9.4.min.js' %}"></script>
+
+<script>
+    var jobwork_url = "";
+    $(document).on('click', '.add_jobwork' , function (e) {
+        let url = $(this).data("url");
+        let product_id = $(this).data("product_id");
+
+        htmx.ajax('GET', url, {
+            target:'#lg_sidebar_form',
+            swap:'innerHTML',
+            values: {"product_id": product_id},
+        }).then(() => {
+            $('#lg_sidebar_form').toggleClass('sidebar-open');
+        });
+        jobwork_url = url;
+    });
+
+    $(document).on('click', '.update_jobwork' , function (e) {
+        let url = $(this).data("url");
+
+        htmx.ajax('GET', url, {
+            target:'#sidebar_form',
+            swap:'innerHTML',
+        }).then(() => {
+            $('#sidebar_form').toggleClass('sidebar-open');
+        });
+        jobwork_url = url;
+    });
+
+    $(document).on('click', '.approve_jobwork' , function (e) {
+        let url = $(this).data("url");
+
+        htmx.ajax('GET', url, {
+            target:'#jobwork_approve_body',
+            swap:'innerHTML',
+        });
+    });
+
+    $(document).on('click', '.jobwork_history' , function (e) {
+        let url = $(this).data("url");
+
+        htmx.ajax('GET', url, {
+            target:'#jobwork_modal_body',
+            swap:'innerHTML',
+        });
+    });
+
+    $(document).on('click', '.detail_jobwork' , function (e) {
+        let url = $(this).data("url");
+
+        htmx.ajax('GET', url, {
+            target:'#detail_jobwork_modal_body',
+            swap:'innerHTML',
+        });
+    });
+
+    $(document).on("input", ".pack_qty", function(){
+        var val = $(this).val();
+        var max_val = parseInt($(this).attr("max"));
+        if(val < 0){
+            $(this).val(0);
+        }
+        if(val > max_val){
+            $(this).val(max_val);
+        }
+    });
+
+    $(document).on("click", ".packed_jobwork", function(){
+        var url = $(this).data("url");
+        var job_work_id = $(this).data("job_work_id");
+        var quantity = $(`#id_pack_quantity_${job_work_id}`).val()
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: {
+                "job_work_id": job_work_id,
+                "quantity": quantity,
+                "csrfmiddlewaretoken": "{{ csrf_token }}",
+            },
+            success: function (data) {
+                if(data.level == "success"){
+                    $("#manage_job_work_table").DataTable().ajax.reload(null, true);
+                }
+                $.toast({
+                    text: data.message,
+                    position: 'bottom-right',
+                    stack: false,
+                    icon: data.level,
+                });
+            }
+        })
+    })
+
+</script>
+
+<script>
+    $(document).on('click', '#id_load_order', function (e) {
+		var order_id = $(this).data("order_id");
+		var url = '{% url "order:change_order_status" %}';
+
+		Swal.fire({
+			html: `Are you sure you want to load this order ?`,
+			icon: 'question',
+			showCloseButton: true,
+			showCancelButton: true,
+			confirmButtonColor: "#7442DB",
+		}).then((result) => {
+
+			/* Read more about isConfirmed, isDenied below */
+			if (result.isConfirmed) {
+				$.ajax({
+					type: "POST",
+					url: url,
+					data: {
+						"id": order_id,
+						"csrfmiddlewaretoken": '{{ csrf_token }}'
+					},
+					success: function (data) {
+						if (data["message"]) {
+							$.toast({
+								text: data.message,
+								position: 'bottom-right',
+								stack: false,
+								icon: 'success',
+							})
+                            if(data.level == "success"){
+                                setTimeout(function() {
+                                    window.location.reload();
+                                }, 3000);
+                            }
+						}
+					}
+				});
+			}
+		})
+	})
+</script>
+
+{% endblock script %}

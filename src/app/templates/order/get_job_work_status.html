@@ -1,0 +1,7 @@
+{% if job_work.status == job_work.PACKED %}
+<button class="btn btn-success btn-sm disabled">{{ job_work.PACKED|capfirst }}</button>
+{% elif job_work.status == job_work.APPROVED %}
+<button class="btn btn-primary btn-sm disabled">{{ job_work.APPROVED|capfirst }}</button>
+{% else %}
+<button class="btn btn-warning btn-sm disabled">{{ job_work.REQUESTED|capfirst }}</button>
+{% endif %}

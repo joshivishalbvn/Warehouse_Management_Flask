@@ -1,0 +1,75 @@
+    <div class="main-header side-header sticky nav nav-item">
+        <div class="container-fluid main-container">
+            <div class="main-header-left">
+                <div class="app-sidebar__toggle mobile-toggle" data-bs-toggle="sidebar">
+                    <a class="open-toggle" href="javascript:void(0);"><i class="header-icons" data-eva="menu-outline"></i></a>
+                    <a class="close-toggle" href="javascript:void(0);"><i class="header-icons" data-eva="close-outline"></i></a>
+                </div>
+                <div class="responsive-logo">
+                    <a href="{{ url_for('dashboard') }}" class="header-logo">
+                        <h4 class="logo-1">current user name</h4>
+                    </a>
+                </div>
+            </div>
+
+            {% block header %}
+            {% endblock %}
+
+            <button class="navbar-toggler nav-link icon navresponsive-toggler vertical-icon ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent-4" aria-controls="navbarSupportedContent-4" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fe fe-more-vertical header-icons navbar-toggler-icon"></i>
+            </button>
+
+            <div class="mb-0 navbar navbar-expand-lg navbar-nav-right responsive-navbar navbar-dark p-0 mg-lg-s-auto">
+                <div class="collapse navbar-collapse" id="navbarSupportedContent-4">
+                    <div class="main-header-right justify-content-end">
+                        <div class="nav nav-item navbar-nav-right mg-lg-s-auto">
+                            <div>
+                                <h4 class="text-white mt-2 text-center" style="margin-right: 5px;">current user first name current user last name</h4>
+                            </div>
+
+                            <div class="main-header-message mx-2">
+                                <a class="nav-link" href="#">
+                                    <i class="fa fa-shopping-cart fa-2x bg-transparent"></i>
+                                    <span class="cart-items-count">0</span>
+                                </a>
+                            </div>
+
+                            <div class="dropdown main-profile-menu nav nav-item nav-link">
+                                <a class="profile-user d-flex" href="#">
+                                    {% if current_user %}
+                                    <img src="{% if current_user.image %}{{ current_user.image.url}}{% else %}{{ url_for('static', filename='assets/img/default user.png') }}{% endif %}" alt="user-img" class="rounded-circle mCS_img_loaded">
+                                    {% endif %}
+                                    <span></span>
+                                </a>
+                                <div class="dropdown-menu">
+                                    <div class="main-header-profile header-img">
+                                        <div class="main-img-user">
+                                            {% if current_user %}
+
+                                            <img alt="" src="{% if current_user.image %}{{ current_user.image.url}}{% else %}{{ url_for('static', filename='assets/img/default user.png') }}{% endif %}">
+                                            {% endif %}
+                                        </div>
+                                        <h6>current user first name</h6>
+                                        <span>current user role</span>
+                                    </div>
+                                    {% if current_user %}
+                                    {% if current_user.is_authenticated %}
+                                    <a class="dropdown-item" href="{{ url_for('users.user_profile', user_id=current_user.id) }}"><i class="far fa-user"></i> Profile</a>
+                                    <a class="dropdown-item" href="{{ url_for('users.logout') }}"><i class="fas fa-sign-out-alt"></i> Sign Out</a>
+                                    {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="dropdown main-header-message right-toggle">
+                                <a class="nav-link pe-0" data-bs-toggle="sidebar-right" data-bs-target="#sidebar_filter">
+                                    <i class="ion ion-md-menu tx-20 bg-transparent"></i>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

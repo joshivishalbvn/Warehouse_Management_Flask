@@ -1,0 +1,134 @@
+<div class="row row-sm">
+	<div class="col-lg-12">
+		<div class="card">
+			<div class="card-header">
+				<div class="d-flex flex-sm-row flex-column justify-content-between">
+					<h4 class="card-title align-self-center">Stock</h4>
+				</div>
+			</div>
+			<div class="card-body">
+				<div class="table-responsive">
+					<table class="table border-top-0 table-striped table-bordered text-nowrap border-bottom" id="stocks_list" style="width:100% !important">
+						<thead class="text-center">
+							<tr>
+								<th class="text-center">Sr No.</th>
+								<th class="text-center">Product Code</th>
+								<th class="text-center">Product</th>
+								<th class="text-center">Available Stock</th>
+								<th class="text-center">Locked Stock</th>
+								<th class="text-center">Actions</th>
+							</tr>
+						</thead>
+						<tbody class="text-center">
+
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal" id="myModal">
+	<div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+		<!-- Modal content-->
+		<div class="modal-content tx-size-sm">
+			<div class="modal-header">
+				<h4 class="modal-title">Stock History <code></code></h4>
+				<button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
+			</div>
+			<div class="modal-body">
+				<table id="log_table" class="table border-top-0 table-striped table-bordered text-nowrap border-bottom">
+					<thead class="text-center">
+						<tr>
+							<th class="text-center">Updated Date</th>
+							<th class="text-center">Vendor</th>
+							<th class="text-center">Zone</th>
+							<th class="text-center">Modifed By</th>
+							<th class="text-center">Affected Stock</th>
+							<th class="text-center">Total Available Stock</th>
+							<th class="text-center">Price (₹)</th>
+							<th class="text-center">IN / OUT</th>
+						</tr>
+					</thead>
+				</table>			
+			</div>
+		</div>
+	</div>
+</div>
+
+{% block script %}
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script>
+	$(document).ready(function() {
+        var stock_table = $('#stocks_list').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "{{ url_for('stock_bp.stock_data_table') }}",
+                "data": function (d) {
+                    d.product_id = $('#id_product_list').val();
+                    d.company_id= $('#id_company_list').val();
+                }
+            },
+            "columns": [
+				{ data: 'id', name: 'id'},
+				{ data: 'product_code', name: 'product_code' },
+				{ data: 'product', name: 'product' },
+				{ data: 'available_stock', name: 'total_stock' },
+				{ data: 'locked_quantity', name: 'locked_quantity' },
+				{ data: 'actions', name: 'actions' },
+            ]
+        });
+
+		$('#id_product_list').on('change', function() {
+            stock_table.ajax.reload(); 
+        });
+		$('#id_company_list').on('change', function() {
+            stock_table.ajax.reload(); 
+        });
+	});
+</script>
+
+<script>
+	$(document).on('click', '.log_history_model', function () {
+		var product_id = $(this).data('product_id');
+		var url = "#";
+
+		$("#log_table").dataTable().fnDestroy();
+		$('#log_table').DataTable({
+			columnDefs: [
+				{
+					orderable: true,
+					targets: -1
+				},
+				{
+					targets: "_all",
+                	className: "text-center",
+				},
+			],
+			processing: true,
+			serverSide: true,
+			order: [0 , "desc"],
+			ajax: {
+				url: url,
+				type: 'get',
+				data: {
+					'product_id' : product_id,
+				}
+			},
+			columns: [
+				{ data: 'created_at', name: 'created_at' },
+				{ data: 'vendor', name: 'vendor' },
+				{ data: 'zone', name: 'zone' },
+				{ data: 'modified_by', name: 'modified_by' },
+				{ data: 'affected_stock', name: 'affected_stock' },
+				{ data: 'stock', name: 'stock' },
+				{ data: 'price', name: 'price' },
+				{ data: 'type', name: 'type' },
+			],
+		});
+	});
+</script>
+
+{% endblock script %}

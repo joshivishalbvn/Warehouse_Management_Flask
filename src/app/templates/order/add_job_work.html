@@ -1,0 +1,238 @@
+{% load static %}
+{% load widget_tweaks sekizai_tags %}
+
+<div class="panel panel-primary card mb-0">
+  <div class="panel-body tabs-menu-body p-0 border-0">
+    <ul class="Date-time" style="padding:2px;">
+      <div class="d-flex justify-content-between justify-content-center mt-3">
+        <div class="col-6 main-content-label mg-b-5 text-white mt-2">
+          Add job work
+        </div>
+        <button class="btn btn-primary  main-content-label mg-b-5 mb-3"
+          onclick="$('#lg_sidebar_form').toggleClass('sidebar-open')">
+          <i class="fe fe-x" data-bs-toggle="tooltip" title="" data-bs-original-title="fe fe-x" aria-label="fe fe-x"></i>
+        </button>
+      </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12 col-xl-12 col-xs-12 col-sm-12">
+      <div class="card">
+        <div class="card-body my-2">
+          <div>Job Description : </div>
+          <form class="" method="post" hx-post="{% url 'order:add_job_work' %}" hx-include="#job_work_form" hx-target="#lg_sidebar_form" hx-swap="innerHTML" hx-encoding="multipart/form-data" id="job_work_form" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <input type="hidden" name="ordered_product" id="ordered_product_id" value="{{ product_id }}" />
+            <input type="hidden" name="job_work_qty" id="job_work_qty_id" value="{{ job_work_qty }}" />
+      
+            <div class="row my-1">
+              <div class="col-12">
+
+                {% for formset in inlines %}
+                {{ formset.management_form }}
+                
+                <div class="extra-fields-wrap">
+                  <hr>
+                {% for form in formset %}
+                  <div class="extra-fields-main" id="row-{{ forloop.counter0 }}-">
+                    {{ form.id }}
+                    <input type="hidden" id="id_ordered_product_job_work-{{ forloop.counter0 }}-created_by" name="ordered_product_job_work-{{ forloop.counter0 }}-created_by" value="{{ request.user.id }}" />
+                    <div class="row mb-2">
+                      <div class="col-4">
+                        <label for="{{ form.quantity.auto_id }}">
+                          {% if request.user.role != request.user.CUSTOMER %}
+                          Select Quantity{% if form.quantity.field.required %}<span class="asteriskField">*</span>{% endif %}
+                          {% else %}
+                          {{ form.quantity.label }}{% if form.quantity.field.required %}<span class="asteriskField">*</span>{% endif %}
+                          {% endif %}
+                        </label>
+                        <input type="number" name="ordered_product_job_work-0-quantity" value="{% if form.instance %}{{ form.instance.quantity }}{% else %}0{% endif %}" min="0" data-max="{{ job_work_qty }}" class="form-control select_qty" data-row_id="-0-" id="id_ordered_product_job_work-0-quantity">
+                        {% for error in form.quantity.errors %}
+                        <span class='text-danger'>{{ error }}</span>
+                        {% endfor %}
+                      </div>
+                      <div class="col-4">
+                        <label for="{{ form.type.auto_id }}">{{ form.type.label }}{% if form.type.field.required %}<span class="asteriskField">*</span>{% endif %}</label>
+                        {% render_field form.type|add_class:"form-control" %}
+                        {% for error in form.type.errors %}
+                        <span class='text-danger'>{{ error }}</span>
+                        {% endfor %}
+                      </div>
+                      <div class="col-4">
+                        <label for="{{ form.voice_note.auto_id }}">{{ form.voice_note.label }}{% if form.voice_note.field.required %}<span class="asteriskField">*</span>{% endif %}</label>
+                        {% render_field form.voice_note|add_class:"hidden" %}
+                        <audio id="id_audio-{{ forloop.counter0 }}-"></audio>
+                        <div>
+                          <button class="btn btn-danger btn-recorder" onclick="startRecording('-{{ forloop.counter0 }}-')" type="button" id="start-{{ forloop.counter0 }}-" title="Record">
+                            <i class="fa fa-microphone"></i>
+                          </button>
+                          <button class="btn btn-default" type="button" onclick="stopRecording('-{{ forloop.counter0 }}-')" id="stop-{{ forloop.counter0 }}-" title="Stop" disabled="true">
+                            <i class="fa fa-stop"></i>
+                          </button>
+                          <button class="btn btn-default" type="button" onclick="playRecording('-{{ forloop.counter0 }}-')" id="play-{{ forloop.counter0 }}-" title="Play" disabled="true">
+                            <i class="fa fa-play"></i>
+                          </button>
+                          <div class="output" id="output-{{ forloop.counter0 }}-"></div>
+                        </div>
+                        {% for error in form.voice_note.errors %}
+                        <span class='text-danger'>{{ error }}</span>
+                        {% endfor %}
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-6">
+                        <label for="{{ form.file.auto_id }}">{{ form.file.label }}{% if form.file.field.required %}<span class="asteriskField">*</span>{% endif %}</label>
+                        {% render_field form.file|attr:"accept:image/png, image/gif, image/jpeg"|add_class:"form-control" %}
+                        {% for error in form.file.errors %}
+                        <span class='text-danger'>{{ error }}</span>
+                        {% endfor %}
+                      </div>
+                      <div class="col-5">
+                        <label for="{{ form.comment.auto_id }}">{{ form.comment.label }}{% if form.comment.field.required %}<span class="asteriskField">*</span>{% endif %}</label>
+                        {% render_field form.comment|add_class:"form-control"|attr:"rows:3" %}
+                          {% for error in form.comment.errors %}
+                          <span class='text-danger'>{{ error }}</span>
+                        {% endfor %}
+                      </div>
+                      <div class="col-1 delete-button-wrap {% if forloop.counter0 == 0 %}d-none{% endif %} mb-auto">
+                        <div>
+                          <label for="id_ordered_product_job_work-{{ forloop.counter0 }}-DELETE" class="label-delete-group">
+                            <input type="checkbox" class="hidden" name="ordered_product_job_work-{{ forloop.counter0 }}-DELETE" id="id_ordered_product_job_work-{{ forloop.counter0 }}-DELETE">
+                            <p class="fa fa-trash delete_button" value="row-{{ forloop.counter0 }}-" style="color:red" title="Delete"></p>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+                {% endfor %}
+                </div>
+                <div class="extra-fields-added"></div>
+              </div>
+            </div>
+
+            <div class="text-end">
+                <button class="btn btn-default mx-1" type="button" id="add-case-inline" onclick="AddForm()">
+                <i class="fa fa-plus" id=""></i> Add more</button>
+            </div>
+
+            <div class="my-3">
+              <button type="submit" class="btn btn-primary">Save</button>
+              <button type="button" class="btn btn-secondary" onclick="$('#lg_sidebar_form').toggleClass('sidebar-open')">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+  </div>
+</div>
+
+
+{% addtoblock "script" %}
+<script type="text/javascript" src="{% static 'assets/webapp/recorder.js' %}"> </script>
+
+<script>
+  function AddForm() {
+	  var total_forms = parseInt($("#id_ordered_product_job_work-TOTAL_FORMS").val());
+
+    var total_job_work_qty = parseInt($("#job_work_qty_id").val());
+
+    var total_qty = 0;
+    for(let i=0; i<total_forms; i++){
+      if(!$(`#row-${i}-`).hasClass("d-none")){
+        total_qty = total_qty + parseInt($("#id_ordered_product_job_work-"+i+"-quantity").val());
+      }
+    }
+    var pending_job_work_qty = total_job_work_qty - total_qty;
+
+    if(pending_job_work_qty == 0){
+      return;
+    }
+
+    let clone_group = $(".extra-fields-wrap").first().clone();
+    let html_text = clone_group.html();
+
+    let _html_text = html_text.replaceAll(`-0-`, "-" + total_forms + "-");
+    let final_template = $.parseHTML(_html_text);
+    $(final_template).find(".output, .text-danger").text("");
+
+    $(".extra-fields-added").append(final_template);
+
+    $(".extra-fields-added").find(".extra-fields-main").removeClass("extra-fields-main").addClass("my-2 extra-fields-main-" + total_forms);
+    $(".extra-fields-main-" + total_forms).find(".form-control").val(null);
+    $(".extra-fields-main-" + total_forms).find(".delete-button-wrap").removeClass("d-none");
+    //$(".extra-fields-main-" + total_forms).find(".select_qty").val(pending_job_work_qty);
+    $(".extra-fields-main-" + total_forms).find(".select_qty").val(0);
+
+    const attr = document.createAttribute("data-max");
+    attr.value = pending_job_work_qty;
+    document.getElementById(`id_ordered_product_job_work-${total_forms}-quantity`).setAttributeNode(attr);
+
+    $("#id_ordered_product_job_work-TOTAL_FORMS").val(++total_forms);
+  }
+
+  $(document).on("click", ".delete_button", function(){
+    let id = $(this).attr("value");
+    $(`#${id}`).addClass("d-none");
+  });
+
+  $(document).on("input", ".select_qty", function(){
+    let value = parseInt($(this).val());
+    let row_id = parseInt($(this).data("row_id").replaceAll("-", ""));
+    let max = document.getElementById(`id_ordered_product_job_work-${row_id}-quantity`).getAttribute("data-max")
+
+    if(value > max){
+      $(this).val(max);
+    }
+    else{
+      row_id++;
+      var total_forms = parseInt($("#id_ordered_product_job_work-TOTAL_FORMS").val());
+      
+      if(total_forms > 1 && total_forms >= row_id+1){
+        
+        console.log('max - value: ', max - value)
+        const attr = document.createAttribute("data-max");
+        attr.value = max - value;
+        document.getElementById(`id_ordered_product_job_work-${row_id}-quantity`).setAttributeNode(attr);
+        document.getElementById(`id_ordered_product_job_work-${row_id}-quantity`).value = max - value;
+      }
+    }
+  });
+
+</script>
+
+<script>
+  document.body.addEventListener('jobworkResponse', function(evt) {
+    if (evt.detail.action == "approve"){
+        $('#JobWorkApproveModal').modal('hide');
+        $('#job_work_table').DataTable().ajax.reload(null, false);
+        $('#manage_job_work_table').DataTable().ajax.reload(null, false);
+    }
+    else{
+      if(evt.detail.action == "create"){
+        $(document).find("#lg_sidebar_form").removeClass('sidebar-open');
+      }
+      else{
+        $(document).find("#sidebar_form").removeClass('sidebar-open');
+      }
+    
+      {% if request.user.role == request.user.CUSTOMER %}
+      $('#order_table').DataTable().ajax.reload(null, false);
+      {% else %}
+      $('#job_work_table').DataTable().ajax.reload(null, false);
+      $('#manage_job_work_table').DataTable().ajax.reload(null, false);
+      {% endif %}
+    }
+    
+    $.toast({
+      text: evt.detail.message,
+      position: 'bottom-right',
+      stack: false,
+      icon: evt.detail.level,
+    });
+  });
+
+</script>
+
+{% endaddtoblock %}

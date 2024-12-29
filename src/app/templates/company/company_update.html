@@ -1,0 +1,174 @@
+<!-- row -->
+<div class="panel panel-primary card mb-0">
+  <div class="panel-body tabs-menu-body p-0 border-0">
+    <ul class="Date-time" style="padding:2px;">
+      <div class="d-flex justify-content-between justify-content-center mt-3">
+        <div class="col-6 main-content-label mg-b-5 text-white mt-2">
+          Update
+        </div>
+        <button class="btn btn-primary  main-content-label mg-b-5 mb-3"
+          onclick="$('#sidebar_form').toggleClass('sidebar-open')">
+          <i class="fe fe-x" data-bs-toggle="tooltip" title="" data-bs-original-title="fe fe-x"
+            aria-label="fe fe-x"></i>
+        </button>
+      </div>
+  </div>
+</div>
+<div class="row" style="margin-top:0px !important; padding-top:0px !important;">
+  <div class="col-md-12 col-xl-12 col-xs-12 col-sm-12" style="margin-top:0px !important; padding-top:0px !important;">
+    <div class="card" style="margin-top:0px !important; padding-top:0px !important;">
+      <div class="card-body" style="margin-top:0px !important; padding-top:0px !important;">
+
+        <input type="file" name="image" accept="image/*"  class="form-control clearablefileinput form-control-file" placeholder="User Image" id="id_company_logo_upload" style="display:none;" value="">
+        
+        <form action="" method="post" enctype="multipart/form-data" id="company-update-form" novalidate>
+          {{ form.hidden_tag() }}
+            <div class="row mt-2">
+
+                  
+              <div class="col-md-12 col-12">
+                  {{ form.name.label(class="form-control-label") }}
+                  {{ form.name(class="form-control", placeholder="Enter Name") }}
+                  {% if form.name.errors %}
+                      <ul class="errors">
+                          {% for error in form.name.errors %}
+                              <small class="form-text text-danger">{{ error }}</small>
+                          {% endfor %}
+                      </ul>
+                  {% endif %}
+              </div>
+
+              <div class="col-md-12 col-12">
+                  {{ form.email.label(class="form-control-label") }}
+                  {{ form.email(class="form-control", placeholder="Enter Email") }}
+                  {% if form.email.errors %}
+                      <ul class="errors">
+                          {% for error in form.email.errors %}
+                              <small class="form-text text-danger">{{ error }}</small>
+                          {% endfor %}
+                      </ul>
+                  {% endif %}
+              </div>
+
+              <div class="col-md-12 col-12">
+                  {{ form.phone.label(class="form-control-label") }}
+                  {{ form.phone(class="form-control", placeholder="Enter Phone Number") }}
+                  {% if form.phone.errors %}
+                      <ul class="errors">
+                          {% for error in form.phone.errors %}
+                              <small class="form-text text-danger">{{ error }}</small>
+                          {% endfor %}
+                      </ul>
+                  {% endif %}
+              </div>
+
+              <div class="col-md-12 col-12">
+                  {{ form.logo.label(class="form-control-label") }}
+                  {{ form.logo(class="form-control", placeholder="Select Logo") }}
+                  {% if form.logo.errors %}
+                      <ul class="errors">
+                          {% for error in form.logo.errors %}
+                              <small class="form-text text-danger">{{ error }}</small>
+                          {% endfor %}
+                      </ul>
+                  {% endif %}
+              </div>
+
+            <div class="col-md-12 col-12">
+                {{ form.status.label(class="form-control-label") }}
+                {{ form.status(class="form-control", placeholder="Select Status") }}
+                {% if form.status.errors %}
+                    <ul class="errors">
+                        {% for error in form.status.errors %}
+                            <small class="form-text text-danger">{{ error }}</small>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div class="col-12 text-end mt-2">
+              <button id="btn_submit_company" data-url="{{company.update_url}}" class="btn btn-primary mr-2 user_create_form_submit" hx-encoding="multipart/form-data">Save</button>
+              <button type="button" class="btn btn-secondary" onclick="$('#sidebar_form').toggleClass('sidebar-open')"><i class="ft-x mr-1"></i>Cancel</button></a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- row closed -->
+<!---->
+
+
+{% block script %}
+<script src="{{ url_for('static', filename='assets/js/toast.js') }}"></script>
+
+<script>
+
+$(document).ready(function() {
+  $('#btn_submit_company').on('click', function(e) {
+      e.preventDefault(); // Prevent default form submission
+      var $btn = $(this);
+      var form = $('#company-update-form')[0];
+      var formData = new FormData(form);
+      var url = $btn.attr('data-url')
+      $btn.prop('disabled', true);
+      $.ajax({
+          url: url,
+          type: 'POST',
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function(response) {
+              console.log('Form submitted successfully:', response);
+              $('#sidebar_form').removeClass('sidebar-open');
+              $.toast({
+                    text: "Company Updated Sucessfully !!!",
+                    position: 'bottom-right',
+                    stack: false,
+                    icon: 'success',
+                });
+                setTimeout(function() {
+                    location.reload();
+                }, 3000);
+          },
+          error: function(xhr) {
+              console.error('Form submission failed:', xhr.status, xhr.statusText);
+              var response = xhr.responseJSON;
+              if (response && response.errors) {
+                  $('#company-update-form .form-text.text-danger').remove();
+                  for (var field in response.errors) {
+                      var errors = response.errors[field];
+                      if (errors.length > 0) {
+                          var $field = $('#company-update-form [name="' + field + '"]');
+                          $field.after('<small class="form-text text-danger">' + errors.join('<br>') + '</small>');
+                      }
+                  }
+              }
+              $btn.prop('disabled', false);
+          }
+      });
+  });
+});
+</script>
+<script>
+  function open_file() {
+    document.getElementById('id_logo').click();
+  }
+
+  document.getElementById('id_logo').addEventListener('change', function() {
+    var preview = document.getElementById('image-preview');
+    var file = this.files[0];
+    var reader = new FileReader();
+
+    reader.onloadend = function() {
+      preview.src = reader.result;
+    };
+    if (file) {
+      reader.readAsDataURL(file);
+    } else {
+      preview.src = "";
+    }
+  });
+</script>
+
+{% endblock script %}

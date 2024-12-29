@@ -1,0 +1,6 @@
+<div class="text-wrap">
+    <input type="checkbox" name="id[]" id="row-{{product.id}}-code" value="{{product.id}}" class="form-checkbox checks" {% if is_checked %}checked{% endif %} />
+    <label for="row-{{product.id}}-code">
+        <div class="mx-3"> <span>{{product.code}}</span></div>
+    </label>
+</div>

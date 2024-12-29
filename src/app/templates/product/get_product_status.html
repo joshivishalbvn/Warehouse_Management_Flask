@@ -1,0 +1,12 @@
+{% if product.status == 'Active' %}
+
+<center><span class="bg-light-success">Active</span></center>
+
+{% elif product.status == 'Inactive' %}
+
+<center><span class="bg-light-danger">{{product.status}}</span></center>
+
+{% endif %}
+
+
+

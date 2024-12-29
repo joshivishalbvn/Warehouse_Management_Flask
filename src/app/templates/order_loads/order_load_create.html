@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags widget_tweaks %}
+{% load static %}
+{% block content %}
+
+<section id="horizontal-form-layout">
+    <div class="row match-height main-form">
+        <form method="post" id="order-form" novalidate>
+            
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-lg-12 col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <b>Loading Order</b>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-body row g-3 p-3">
+                                 
+                                <div class="col-md-3">
+                                    <label for="id_customer">Customer</label>
+                                    <fieldset class="form-group">
+                                        <select id="id_customer" class="select2-data-array form-control select2-list" onchange="GetCustomerLoeadedProduct()">
+                                            <option value="">All</option>
+                                            {% for customer in customer_list %}
+                                            <option value="{{customer.id}}">{{customer.user.first_name}} {{customer.user.last_name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </fieldset>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+            <div class="col-lg-12 col-12 d-flex match-height">
+
+                <div class="col-lg-6 col-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <b>Products</b>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-body table-responsive">
+                            <table id="pending_loading_table" class="table border-top-0 table-striped  w-100 table-bordered text-nowrap border-bottom">
+                                <thead>
+                                <tr>
+                                    <th>Product Details</th>
+                                    <th style="width: 18%;">Qty</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                </tbody>
+                            </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <b>Loaded Products</b>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-body table-responsive">
+                                <table id="loaded_products" class="table border-top-0 w-100 table-striped text-center table-bordered text-nowrap border-bottom">
+                                    <thead>
+                                    {% comment %} <tr>
+                                        <th>Product Code</th>
+                                        <th>Product Name</th>
+                                        <th style="width: 130px">Case Size</th>
+                                        <th>Total Qty</th>
+                                        <th>Delivered Qty</th>
+                                        <th>In-transit Qty</th>
+                                        <th>Pending Qty</th>
+                                        <th style="width:10%">Loaded Qty</th>
+                                        <th>Remaining Qty</th>
+                                        <th style="width:100px">Action</th>
+                                    </tr> {% endcomment %}
+                                    <tr>
+                                        <th>Product Details</th>
+                                        <th style="width: 18%;">Qty</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="no-products">
+                                            <td colspan="10">No product added.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            </div>
+           
+            <div class="row mb-5">
+                <div class="col-md-12 col-12 text-end">
+                    <input type="hidden" name="product_id_list" id="product_id_list" value="{{loading_product_id_list}}"/>
+                    <button type="button" name="submit" value="new" id="submit_loading" class="btn btn-primary mr-2" onclick="CompleteLoading()" {% if not is_pending_loading %} disabled {% endif %}>Save</button>
+                    <a href="{% url 'order_loads:order_load_list' %}"><button class="btn btn-secondary" type="button">Cancel</button></a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</section>
+{% csrf_token %}
+{% endblock %}
+
+
+{% block script %}
+<script>
+    var pending_load_url = '{% url "order_loads:order_load_list_ajax" %}'
+    var loaded_product_url = '{% url "order_loads:loaded_product_list_ajax" %}'
+    var pending_loading_table = "#pending_loading_table"
+    var loaded_products = "#loaded_products"
+    var add_item_to_loading_url = '{% url "order_loads:add_item_to_loading" %}'
+    var update_loading_items_url = '{% url "order_loads:update_loading_items" %}'
+    var update_loading_ajax_url = '{% url "order_loads:update_loading_ajax" %}'
+    var loading_complete_redirect_url = '{% url "order_loads:order_load_list" %}'
+</script>
+
+<script src="{%  static 'assets/js/loading.js' %}"></script>
+<script>
+    $(document).ready(function() {
+        $("#id_customer").select2({
+              placeholder: "",
+              allowClear: true,
+        });
+    });
+
+    $(document).on("click", ".add-product", function(){
+        let count = $("#loaded-products tbody").children().length;
+        if(count == 1){
+            if($("#loaded-products tbody").children("tr:first").hasClass("no-products")){
+                $("#loaded-products tbody").empty();
+            }
+        }
+        let row_id = $(this).data("row");
+        let row = $("#row-"+row_id).clone(true);
+
+        $(row).children("td:last").empty().html("<span class='remove-product' data-row='"+row_id+"'><i class='fa fa-trash text-danger'></i></span>");
+        $("#loaded-products tbody").append(row);
+    })
+
+    $(document).on("click", ".remove-product", function(){
+        let row_id = $(this).data("row");
+
+        $("#loaded-products tbody").find("#row-"+row_id).remove();
+        let count = $("#loaded-products tbody").children().length;
+        if(count == 0){
+            $("#loaded-products tbody").append("<tr class='no-products'><td colspan='10'>No product added.</td></tr>");
+        }
+    })
+
+    function ajax_call_setup() {
+    csrf_token = $("input[name=csrfmiddlewaretoken]").val();
+    $.ajaxSetup({
+        headers: { "X-CSRFToken": csrf_token }
+    });
+
+}
+
+    function GetCustomerLoeadedProduct(){
+        customer_id = $("#id_customer").val()
+        ajax_call_setup()
+        $.ajax({
+            url: '{% url "order_loads:get_customer_loaded_products" %}',
+            type: "POST",
+            dataType: "json",
+            data: {
+                'customer_id': customer_id,
+            },
+            success: function (data) {
+                $("#product_id_list").val(data.product_id_list)
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                console.log(thrownError);
+
+            }
+        });
+
+    }
+
+</script>
+{% endblock script %}
+    

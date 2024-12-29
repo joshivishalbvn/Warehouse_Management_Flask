@@ -1,0 +1,117 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Order #{{ order_id }}</title>
+
+        <style>
+            .btn {
+                display: inline-block;
+                font-weight: 400;
+                text-align: center;
+                white-space: nowrap;
+                vertical-align: middle;
+                user-select: none;
+                border: 1px solid transparent;
+                padding: 0.251rem 0.51rem;
+                font-size: 0.875rem;
+                border-radius: 3px;
+                line-height: 1.5;
+                transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            }
+
+            .my-2 {
+                margin-top: 0.5rem !important;
+            }
+
+            .mx-2 {
+                margin-right: 0.5rem !important;
+            }
+            
+            .btn:hover {
+                text-decoration: none !important;
+            }
+            
+            .btn:focus {
+                text-decoration: none;
+                outline: none !important;
+                outline: 0;
+                box-shadow: none;
+            }
+            
+            .btn-primary {
+                color: #fff !important;
+                background-color: #3858f9;
+                border-color: #3858f9;
+            }
+            
+            .btn-primary:hover {
+                color: #fff;
+                background-color: #3d4bb7;
+                border-color: #3d4bb7;
+            }
+            
+            .btn-primary:focus,
+            .btn-primary.focus {
+                box-shadow: 0 0 0 0.2rem rgba(82, 125, 255, 0.5);
+                background-color: #3858f9;
+                border-color: #3858f9;
+            }
+
+            .d-flex {
+                display: flex !important;
+            }
+
+            .justify-content-between {
+                justify-content: space-between !important;
+            }
+
+            .text-muted {
+                color: #838294 !important;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between">
+                        
+                        {% if company_logo %}
+                        <img src="{{ company_logo }}" alt="company logo" style="width:60px; height:60px">
+                        {% endif %}
+
+                        <div class="my-2 mx-2">
+                            <h4>{{ company_name }}</h4>
+                        </div>
+
+                    </div>
+                </div>
+                <div>
+                    <p><span class="text-muted">Date :</span> {% now "j M, Y"%}</p>
+                    <p><span class="text-muted">Order ID : </span>#<b>{{ order_id }}</b></p>
+                    <p><span class="text-muted">Order Date :</span> {{ order_date|date:"j M, Y" }}</p>
+                </div>
+            </div>
+
+            <div>
+                Dear {{ customer_name }}, <br><br>
+                <p>
+                    We are greatly informed you that, For <b>ORDER#{{ order_id }}</b>, new job work has been arrived.
+                </p>
+                <p>
+                    To review the job work detail click below button.
+                </p>
+                <p>
+                    <a href="{{ job_work_url }}"><button class="btn btn-primary">View jobwork</button></a>
+                </p>
+            </div>
+            <p>
+            For further questions and comments, please feel free to contact us on <a href="mailto:{{ company_email }}">{{ company_email }}</a> or <a href="call:{{ company_phone }}">{{ company_phone }}</a>.
+            </p>
+            <p>
+                Sincerely,<br>
+                {{ company_name }}
+            </p>
+        </div>
+    </body>
+</html>

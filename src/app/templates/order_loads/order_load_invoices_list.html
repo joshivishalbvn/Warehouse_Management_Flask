@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="row row-sm">
+	<div class="col-lg-12">
+		<div class="card">
+			<div class="card-header">
+				<div class="d-flex flex-sm-row flex-column justify-content-between">
+					<h4 class="card-title">Invoices</h4>
+				</div>
+			</div>
+			<div class="card-body">
+				<div class="table-responsive">
+					<table id="load_order_invoice_table" class="table border-top-0 table-striped  table-bordered text-nowrap w-100 border-bottom">
+						<thead>
+							<tr>
+								<th class="border-bottom-0 text-center">Invoice ID</th>
+								<th class="border-bottom-0 text-center">Customer</th>
+								<th class="border-bottom-0 text-center">Loading Id</th>
+								<th class="border-bottom-0 text-center">Total Amount($)</th>
+								<th class="border-bottom-0 text-center">Due Amount ($)</th>
+								<th class="border-bottom-0 text-center">Action</th>
+							</tr>
+						</thead>
+						<tbody>
+                            
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- End Row -->
+
+{% endblock content %}
+
+
+{% block filters %}
+	<div class="event">
+		<div class="row  rounded py-2 mb-2 mx-n2">
+			
+			{% if request.user.is_superuser %}
+				<div class="col-12 col-sm-12 col-lg-12">
+					<label for="users-list-company">Company</label>
+					<fieldset class="form-group">
+						<select id="id_order_company" class="form-control">
+							<option value="">All</option>
+							{% for company in company_list %}
+							<option value="{{company.id}}">{{company.name}}</option>
+							{% endfor %}
+						</select>
+					</fieldset>
+				</div>
+			{% endif %}
+
+			<div class="col-12 col-sm-12 col-lg-12">
+				<label for="users-list-role">Customer</label>
+				<fieldset class="form-group">
+					<select id="id_order_customer" class="form-control">
+						<option value="">All</option>	
+						{% for customer in customer_list %}
+							<option value="{{customer.id}}">{{customer.user.first_name}} {{customer.user.last_name}} </option>
+						{% endfor %}
+					</select>
+				</fieldset>
+			</div>
+				
+
+			<div class="col-12 col-sm-12 col-lg-12">
+			</div>
+			<div class="col-12 col-sm-12 col-lg-12 d-flex align-items-center justify-content-between mt-2">
+				<button type="reset" class="btn btn-primary btn-block glow mb-0 loading-list-clear">Clear</button>
+			</div>
+		</div>
+	</div>
+	{% endblock filters %}
+
+{% block form %}
+<div class="adduserform  adduser-animate">
+	{% include 'customer/use_credits.html' %}
+</div>
+{% endblock form %}
+
+{% block script %}
+<script src="{% static 'assets/js/htmx_1.9.4.min.js' %}"></script>
+<script>
+	var load_order_invoice_url = '{% url "order_loads:loading_invoice_list_ajax" %}';
+	var load_order_invoice_table = "#load_order_invoice_table"
+
+	
+</script>
+
+<script src="{% static 'assets/js/loading_invoice_list.js' %}"></script>
+<script src="{% static 'assets/js/sidebar_open.js' %}"></script>
+{% endblock script %}

@@ -1,0 +1,79 @@
+
+{% if loaded %}
+
+<div class="media">
+    <div class="card-aside-img">
+        <img src="{{obj.order_product.product.image_product.last.image.url }}" alt="img" class="h-60 w-60">
+    </div>
+    <div class="media-body">
+        <div class="card-item-desc mt-0">
+            <h6 class="font-weight-semibold mt-0 text-uppercase">{{obj.order_product.product.name}} ({{obj.order_product.product.code}})</h6>
+            <h6 class="font-weight-semibold mt-0 text-uppercase">{{order_product_obj.order.order_id}}</h6>
+            {% comment %} <h6 class="font-weight-semibold mt-0 text-uppercase"><a href=" {% url 'order:order_detail' order_product_obj.order.id %}">{{order_product_obj.order.order_id}}</a></h6> {% endcomment %}
+            
+            
+            <dl class="card-item-desc-1">
+              <dt>Size: </dt>
+              <dd> Qty {{obj.order_product.case_pack.quantity}} , Weight {{obj.order_product.case_pack.weight}}(Oz) , CMV {{obj.order_product.case_pack.cubic_meter_volume}} </dd>
+            </dl>
+            <dl class="card-item-desc-1">
+            <dt>Quantity: </dt>
+              <dd>
+                <span><b>Total  : </b></span><span data-qty="{{remaining_qty}}" id="id-total-qty-{{obj.id}}">{{ total }}</span>,
+
+                <span><b>Job Work : </b></span><span>{{ completed_jobworks }}/{{ total_job_works }}</span>,
+                <span><b>Ready For Loading  : </b></span><span>{{ available_for_loading_qty }}</span>,
+                
+                {% if loading_obj %}
+
+                <span><b>Loaded  : </b></span><span id="id_loaded-qty-{{obj.id}}">{{loading_obj.quantity}} </span>,
+                                
+                {% else %}
+
+                <span><b>Loaded  : </b></span><span data-qty="{{obj.quantity}}" id="id_loaded-qty-{{obj.id}}">{{obj.quantity}} </span>,
+                
+                {% endif %}
+                
+                <span><b>Remaining  : </b></span><span id="id-remaining-qty-{{obj.id}}">{{remaining_qty}}</span>
+              </dd>
+            </dl>
+        </div>
+    </div>
+</div>
+    
+{% else %}
+
+<div class="media">
+    <div class="card-aside-img">
+        <img src="{{obj.product.image_product.last.image.url }}" alt="img" class="h-60 w-60">
+    </div>
+    <div class="media-body">
+        <div class="card-item-desc mt-0">
+            <h6 class="font-weight-semibold mt-0 text-uppercase">{{obj.product.name}} ({{obj.product.code}})</h6>
+            {% comment %} <h6 class="font-weight-semibold mt-0 text-uppercase"><a href=" {% url 'order:order_detail' obj.order.id %}">{{obj.order.order_id}}</a></h6> {% endcomment %}
+            <h6 class="font-weight-semibold mt-0 text-uppercase">{{obj.order.order_id}}</h6>
+            
+            <dl class="card-item-desc-1">
+              <dt>Size: </dt>
+              <dd> Qty {{obj.case_pack.quantity}} , Weight {{obj.case_pack.weight}}(Oz) , CMV {{obj.case_pack.cubic_meter_volume}} </dd>
+            </dl>
+            <dl class="card-item-desc-1">
+            <dt>Quantity: </dt>
+              <dd>
+                <span><b>Total  : </b></span><span data-qty="{{remaining_qty}}" data-total-qty="{{total_qty}}" id="totla-qty-{{obj.id}}">{{obj.total_pieces}}  </span>,
+                <span><b>Job Work : </b></span><span>{{ completed_jobwors }}/{{ total_job_works }}</span>,
+                <span><b>Ready For Loading  : </b></span><span>{{available_for_loading_qty}}</span>,
+                <span><b>Loaded  : </b></span><span id="loaded-qty-{{obj.id}}">{{loaded_qty}} </span>,
+                <span><b>Remaining : </b></span><span id="remaining-qty-{{obj.id}}">{{remaining_qty}}</span>
+              </dd>
+            </dl>
+            <dl class="card-item-desc-1">
+              <dt>Available Quantity: </dt>
+              <dd class="text-success"> {{ available_qty }} </dd>
+            </dl>
+        </div>
+    </div>
+</div>
+    
+{% endif %}
+    

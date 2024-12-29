@@ -1,0 +1,511 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags widget_tweaks static %}
+
+{% block content %}
+
+<section id="horizontal-form-layout">
+    <div class="row match-height main-form mb-5">
+        <form method="post" id="order-form" onsubmit="return manageInlineForm()" novalidate>
+            {% csrf_token %}
+            
+            {% include 'order/order_product_inline.html' %}
+
+            <div class="row">
+                <div class="col-lg-12 col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <b class="card-title">Create Order</b>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="row">
+                                    {% if request.user.is_superuser or requser.user.role == "Super Admin" %}
+                                    <div class="col-md-4">
+                                        <label for="{{form.company.auto_id}}">{{form.company.label}}{% if form.company.field.required %}<span class="asteriskField">*</span>{% endif %}</label>
+                                        {{ form.company }}
+                                        {% if form.company.errors %}
+                                            {% for error in form.company.errors %}
+                                            <p class="text-danger">{{error}}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                    {% else %}
+                                    <input type="hidden" name="company" id="id_company" value="{{ request.user.company.id }}" />
+                                    {% endif %}
+
+                                    {% if request.user.is_superuser or requser.user.role == "Super Admin" %}
+                                    <div class="col-md-4 col-12">
+                                    {% else %}
+                                    <div class="col-md-6 col-12">
+                                    {% endif %}
+                                        <label for="{{form.customer.auto_id}}">{{form.customer.label}}{% if form.customer.field.required %}<span class="asteriskField">*</span>{% endif %}</label>
+                                        {{ form.customer }}
+                                        {% if form.customer.errors %}
+                                            {% for error in form.customer.errors %}
+                                            <p class="text-danger">{{error}}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+
+                                    {% if request.user.is_superuser or requser.user.role == "Super Admin"%}
+                                    <div class="col-md-4 col-12">
+                                    {% else %}
+                                    <div class="col-md-6 col-12">
+                                    {% endif %}
+                                        <label for="id_item_name">Add Product<span class="asteriskField">*</span></label>
+                                        <select id="id_item_name" name="product" placeholder="select item">
+                                            {% comment %} {% for product in product_list %}
+                                            <option value="{{ product.id }}"
+                                                    data-image="{{ product.get_product_image }}"
+                                                    data-code="{{ product.code }}"
+                                                    data-name="{{ product.name }}"
+                                                    data-barcode="{{ product.product_barcode.all.0.number }}"
+                                                    data-name="{{ product.name }}"
+                                                    data-casepack="{% for case in product.product_case.all %}{{ case.id }}-{{ case.quantity }}-{{ case.quantity }} Qty, {{ case.weight }} Oz, {{ case.cubic_meter_volume }} CMV |{% endfor %}">
+                                                {{ product.code }} - {{ product.name }}
+                                            </option>
+                                            {% endfor %} {% endcomment %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="text-end mt-2">
+                                    <button type="button" class="btn btn-primary" id="submit_product">Add</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                
+            <div class="row added_product_list">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <b>Products</b>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-body table-responsive">
+                                <table id="order_table" class="table text-center m-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Price Per Piece ($)</th>
+                                            <th>Case Size</th>
+                                            <th>Number of Cases</th>
+                                            <th>Total Pieces</th>
+                                            <th>Item Total ($)</th>
+                                            <th>Net Price ($)</th>
+                                            <th style="width:100px">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% include 'order/order_product_inline_error.html' %}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr >
+                                            <th colspan="6" class="text-end" >Total amount ($) :</th>
+                                            <td colspan="3" style="margin-right: 10px;">{% render_field form.total_amount|attr:"disabled:disabled" %}</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% comment %} <div class="row">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="col-12 d-flex justify-content-between">
+                        <div class="col-6 ">
+                            <div class="form-group row mt-4">
+                                <label class="col-md-3 label-control" for="{{form.total_amount.auto_id}}">{{form.total_amount.label}}{% if form.total_amount.field.required %}<span class="asteriskField">*</span>{% endif %}</label>
+                                <div class="col-md-9">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row mt-4">
+                                <label class="col-md-3 label-control" for="{{form.grand_total.auto_id}}">{{form.grand_total.label}}{% if form.grand_total.field.required %}<span class="asteriskField">*</span>{% endif %}</label>
+                                <div class="col-md-9">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        {% render_field form.grand_total|attr:"disabled:disabled" %}
+                                    </div>
+                                </div>
+                            </div> 
+                        </div>
+                    </div>
+                   </div>
+                </div>
+            </div> {% endcomment %}
+            <div class="row">
+                <div class="col-lg-12 col-12">
+                    <div class="card">
+                        <div class="card-header">
+                        </div>
+                        <div class="card-content">
+                            <div class="card-body col-12 d-flex">
+                                <div class="form-row col-6">
+                                    <div class="form-row">
+                                        <label class="col-form-label font-weight-bold">Shipping Address Details<span class="asteriskField">*</span></label>
+                                    </div>
+                                    <div class="form-row" id="shipping_address_form">
+                                        <div class="col-md-6 col-12">
+                                        <div class="form-group">
+                                            {{form.shipping_address_suite_apartment}}
+                                            {% if form.shipping_address_suite_apartment.errors %}
+                                                {% for error in form.shipping_address_suite_apartment.errors %}
+                                                    <p class="text-danger">{{error}}</p>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                        </div>
+                                        <div class="col-md-6 col-12">
+                                        <div class="form-group">
+                                            {{form.shipping_address_line_1}}
+                                            {% if form.shipping_address_line_1.errors %}
+                                                {% for error in form.shipping_address_line_1.errors %}
+                                                    <p class="text-danger">{{error}}</p>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                        </div>
+                                        <div class="col-md-6 col-12">
+                                        <div class="form-group">
+                                            {{form.shipping_address_line_2}}
+                                            {% if form.shipping_address_line_2.errors %}
+                                                {% for error in form.shipping_address_line_2.errors %}
+                                                    <p class="text-danger">{{error}}</p>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                        </div>
+                                        <div class="col-md-6 col-12">
+                                        <div class="form-group">
+                                            {{form.shipping_city}}
+                                            {% if form.shipping_city.errors %}
+                                                {% for error in form.shipping_city.errors %}
+                                                    <p class="text-danger">{{error}}</p>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                        </div>
+                                        <div class="col-md-6 col-12">
+                                        <div class="form-group">
+                                            {{form.shipping_state}}
+                                            {% if form.shipping_state.errors %}
+                                                {% for error in form.shipping_state.errors %}
+                                                    <p class="text-danger">{{error}}</p>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group">
+                                                {{form.shipping_country}}
+                                                {% if form.shipping_country.errors %}
+                                                    {% for error in form.shipping_country.errors %}
+                                                    <p class="text-danger">{{error}}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group">
+                                                {{form.shipping_zip_code}}
+                                                {% if form.shipping_zip_code.errors %}
+                                                    {% for error in form.shipping_zip_code.errors %}
+                                                    <p class="text-danger">{{error}}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-row col-6">
+                                    <div class="form-row d-flex">
+                                        <label class="col-form-label font-weight-bold">Billing Address Details<span class="asteriskField">*</span></label>
+                                        <div class="form-group mt-2 justify-content-end text-end" style="margin-left: 20px;">
+                                            <input class="address_checkbox" type="checkbox" id="same_address" name="same_address" />
+                                            <label for="same_address"> Same as Shipping Address </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-row" id="billing_address_form">
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group">
+                                                {{form.billing_address_suite_apartment}}
+                                                {% if form.billing_address_suite_apartment.errors %}
+                                                    {% for error in form.billing_address_suite_apartment.errors %}
+                                                        <p class="text-danger">{{error}}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group">
+                                                {{form.billing_address_line_1}}
+                                                {% if form.billing_address_line_1.errors %}
+                                                    {% for error in form.billing_address_line_1.errors %}
+                                                        <p class="text-danger">{{error}}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group">
+                                                {{form.billing_address_line_2}}
+                                                {% if form.billing_address_line_2.errors %}
+                                                    {% for error in form.billing_address_line_2.errors %}
+                                                        <p class="text-danger">{{error}}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group">
+                                                {{form.billing_city}}
+                                                {% if form.billing_city.errors %}
+                                                    {% for error in form.billing_city.errors %}
+                                                        <p class="text-danger">{{error}}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group">
+                                                {{form.billing_state}}
+                                                {% if form.billing_state.errors %}
+                                                    {% for error in form.billing_state.errors %}
+                                                        <p class="text-danger">{{error}}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group">
+                                                {{form.billing_country}}
+                                                {% if form.billing_country.errors %}
+                                                    {% for error in form.billing_country.errors %}
+                                                    <p class="text-danger">{{error}}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group">
+                                                {{form.billing_zip_code}}
+                                                {% if form.billing_zip_code.errors %}
+                                                    {% for error in form.billing_zip_code.errors %}
+                                                        <p class="text-danger">{{error}}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12 col-12">
+                    <div class="card">
+                       
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="form-bordered">
+                                    
+                                    {% if not form.instance.id %}
+                                    <input type="hidden" name="created_by" id="id_created_by" value ="{{user.id}}">
+                                    {% endif %}
+                                    
+                                </div>
+                            <div class="card-footer">
+                                <div class="d-flex flex-sm-row flex-column justify-content-end">
+                                    {% if form.instance.id %}
+                                        <button type="submit" name="submit" value="new" class="btn btn-primary mr-2">Update</button>
+                                    {% else %}
+                                        <button type="submit" name="submit" value="new" class="btn btn-primary mr-2">Save</button>
+                                    {% endif %}
+                                    <a href="{% url 'order:order_list' %}"><button type="button" class="btn btn-secondary mx-1">Cancel</button></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+{% include 'purchase_order/add_product_case_modal.html' %}
+
+{% endblock %}
+
+{% block script %}
+<script>
+    var row;
+
+    $(document).ready(function() {
+        
+        {% if request.user.is_superuser or requser.user.role == "Super Admin" %}
+        $("#id_company").select2({
+            placeholder: "Select Company",
+            allowClear: true,
+        });
+        {% endif %}
+        
+        $("#id_customer").select2({
+            placeholder: "Select Customer",
+            allowClear: true,
+        });
+    });
+
+</script>
+
+<script>
+    const productDetailUrl = "{% url 'products:product_details' 0 %}";
+</script>
+
+<script src="{% static 'assets/product/product_dropdown.js' %}"></script>
+<script src="{% static 'assets/order/calculate_amount.js' %}"></script>
+<script src="{% static 'assets/order/manage_inline.js' %}"></script>
+<script src="{% static 'assets/order/create_product_case.js' %}"></script>
+
+<script>
+    var product_search_url = "{% url 'products:search_product' %}"
+    var product_detail_url = "{% url 'products:get_product_details_ajax' %}"
+    product_dropdown("#id_item_name", sales_order=true, company="#id_company");
+
+    $("#id_customer").change(function(){
+        var customer_id = $(this).val();
+        
+        $.ajax({
+            type: "GET",
+            url: '{% url "customers:load_customer_products" %}',
+            data: {
+                "customer_id": customer_id,
+            },
+            success: function (data) {
+                $("#id_orders-TOTAL_FORMS").val(0);
+
+                $("#order_table tbody").empty();
+                $("#order_table tbody").append("<tr class='no-product'><td colspan='10'><p>No product found</p></td></tr>");
+
+                if(data.shipping_address){
+                    set_shipping_address(data.shipping_address);
+                }
+                else{
+                    $("#shipping_address_form").find("input").val("");
+                }
+                if(data.billing_address){
+                    set_billing_address(data.billing_address);
+                }
+                else{
+                    $("#billing_address_form").find("input").val("");
+                }
+            }
+        });
+    })
+
+    $(document).ready(function(){
+        
+        {% if form.errors %}
+        $.ajax({
+            type: "GET",
+            url: '{% url "customers:load_customer_products" %}',
+            data: {
+                "customer_id": $("#id_customer").val(),
+            },
+            success: function (data) {
+                $("#id_item_name").empty();
+                data.product_list.forEach((element, key) => {
+                    $("#id_item_name").append(
+                        "<option value='"+element.id+"' data-name='"+element.product_name+"' data-code='"+element.product_code+"' data-image='"+element.image_url+"' data-casepack='"+element.case_packs+"' data-price='"+element.price+"'>"+element.text+"</option>"
+                    );
+                })
+                $("#id_item_name").trigger('change');
+            }
+        });
+        {% endif %}
+    })
+</script>
+
+<script>
+    function manageInlineForm(){
+        let row_list = $(`#${table_id} tbody`).children("tr:last");
+    
+        if (row_list.hasClass("no-product") == true){
+            $.toast({
+                text: 'Add at least one product in order !!!',
+                position: 'bottom-right',
+                stack: false,
+                icon: 'error',
+            });
+            return false;
+        }
+
+        $(".extra-fields-wrap").empty();
+        $('.form-control').prop("disabled", false);
+        return true;
+    }
+
+</script>
+
+<script>
+    $(".address_checkbox").change(function() {
+        if(this.checked) {
+            //get shipping address details
+            suite = $("#id_shipping_address_suite_apartment").val()
+            address_1 = $("#id_shipping_address_line_1").val()
+            address_2 = $("#id_shipping_address_line_2").val()
+            city = $("#id_shipping_city").val()
+            state = $("#id_shipping_state").val()
+            country = $("#id_shipping_country").val()
+            zip_code = $("#id_shipping_zip_code").val()
+            // fill billing address details on checkbox checked
+            $("#id_billing_address_suite_apartment").val(suite)
+            $("#id_billing_address_line_1").val(address_1)
+            $("#id_billing_address_line_2").val(address_2)
+            $("#id_billing_city").val(city)
+            $("#id_billing_state").val(state)
+            $("#id_billing_country").val(country)
+            $("#id_billing_zip_code").val(zip_code)
+        }
+        else{
+            $("#billing_address_form").find("input").val("");
+        }
+    });
+
+    function set_shipping_address(address){
+        $("#id_shipping_address_suite_apartment").val(address["suite_apartment"]);
+        $("#id_shipping_address_line_1").val(address["address_line_1"]);
+        $("#id_shipping_address_line_2").val(address["address_line_2"]);
+        $("#id_shipping_city").val(address["city"]);
+        $("#id_shipping_state").val(address["state"]);
+        $("#id_shipping_country").val(address["country"]);
+        $("#id_shipping_zip_code").val(address["zip_code"]);
+    }
+
+    function set_billing_address(address){
+        $("#id_billing_address_suite_apartment").val(address["suite_apartment"]);
+        $("#id_billing_address_line_1").val(address["address_line_1"]);
+        $("#id_billing_address_line_2").val(address["address_line_2"]);
+        $("#id_billing_city").val(address["city"]);
+        $("#id_billing_state").val(address["state"]);
+        $("#id_billing_country").val(address["country"]);
+        $("#id_billing_zip_code").val(address["zip_code"]);
+    }
+</script>
+
+{% endblock script %}
